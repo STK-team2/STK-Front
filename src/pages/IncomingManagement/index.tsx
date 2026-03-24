@@ -7,7 +7,8 @@ import { ActionMenu } from '../../shared/ui/ActionMenu';
 import { Checkbox } from '../../shared/ui/Checkbox';
 import * as s from './style';
 
-type FilterType = 'date' | 'sort' | 'qty' | null;
+type FilterType = 'date' | 'qty' | 'sort' | null;
+type SortOrder = null | 'asc' | 'desc';
 
 interface Row {
   id: string;
@@ -53,12 +54,17 @@ const IncomingManagementPage = () => {
   const [search, setSearch] = useState('');
   const [qtyMin, setQtyMin] = useState('');
   const [qtyMax, setQtyMax] = useState('');
+  const [sortOrder, setSortOrder] = useState<SortOrder>(null);
   const [rows, setRows] = useState<Row[]>(mockData);
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [newRows, setNewRows] = useState<NewRow[]>([]);
   const [deleteMode, setDeleteMode] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [editValues, setEditValues] = useState<Record<string, Row>>({});
+
+  const sortedRows = sortOrder === null ? rows : [...rows].sort((a, b) =>
+    sortOrder === 'asc' ? a.qty - b.qty : b.qty - a.qty
+  );
 
   const allSelected = rows.length > 0 && selectedRows.size === rows.length;
 
@@ -179,11 +185,6 @@ const IncomingManagementPage = () => {
               onToggle={() => setOpenFilter(openFilter === 'date' ? null : 'date')}
             />
             <FilterButton
-              label="자재명"
-              isOpen={openFilter === 'sort'}
-              onToggle={() => setOpenFilter(openFilter === 'sort' ? null : 'sort')}
-            />
-            <FilterButton
               label="수량"
               isOpen={openFilter === 'qty'}
               onToggle={() => setOpenFilter(openFilter === 'qty' ? null : 'qty')}
@@ -193,6 +194,17 @@ const IncomingManagementPage = () => {
                 <input css={s.qtyInput} type="number" value={qtyMin} onChange={e => setQtyMin(e.target.value)} />
                 <span css={s.qtySep}>~</span>
                 <input css={s.qtyInput} type="number" value={qtyMax} onChange={e => setQtyMax(e.target.value)} />
+              </div>
+            </FilterButton>
+            <FilterButton
+              label="수량 정렬"
+              isOpen={openFilter === 'sort'}
+              onToggle={() => setOpenFilter(openFilter === 'sort' ? null : 'sort')}
+            >
+              <div css={s.sortOptionList}>
+                <button css={[s.sortOption, sortOrder === null && s.sortOptionActive]} type="button" onClick={() => setSortOrder(null)}>정렬 초기화</button>
+                <button css={[s.sortOption, sortOrder === 'asc' && s.sortOptionActive]} type="button" onClick={() => setSortOrder('asc')}>오름차순</button>
+                <button css={[s.sortOption, sortOrder === 'desc' && s.sortOptionActive]} type="button" onClick={() => setSortOrder('desc')}>내림차순</button>
               </div>
             </FilterButton>
           </div>
@@ -245,7 +257,7 @@ const IncomingManagementPage = () => {
               </tr>
             </thead>
             <tbody>
-              {rows.map(row => editMode ? (
+              {sortedRows.map(row => editMode ? (
                 <tr key={row.id} css={s.newRow}>
                   <td css={s.td} />
                   <td css={s.td}>
