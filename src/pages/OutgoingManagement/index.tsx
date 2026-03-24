@@ -178,11 +178,6 @@ const OutgoingManagementPage = () => {
               onToggle={() => setOpenFilter(openFilter === 'date' ? null : 'date')}
             />
             <FilterButton
-              label="정렬"
-              isOpen={openFilter === 'sort'}
-              onToggle={() => setOpenFilter(openFilter === 'sort' ? null : 'sort')}
-            />
-            <FilterButton
               label="수량"
               isOpen={openFilter === 'qty'}
               onToggle={() => setOpenFilter(openFilter === 'qty' ? null : 'qty')}
