@@ -164,6 +164,7 @@ export const td = css`
   font-size: 14px;
   color: #1a1b1e;
   font-feature-settings: 'ss05' 1;
+  max-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

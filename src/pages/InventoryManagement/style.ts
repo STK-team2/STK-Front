@@ -57,6 +57,38 @@ export const qtyLabel = css`
   font-feature-settings: 'ss05' 1;
 `;
 
+export const sortOptionList = css`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 120px;
+`;
+
+export const sortOption = css`
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 8px;
+  border-radius: 4px;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 13px;
+  color: #1a1b1e;
+  cursor: pointer;
+  background: none;
+  border: none;
+  text-align: left;
+  width: 100%;
+  font-feature-settings: 'ss05' 1;
+  &:hover {
+    background: #f5f6f8;
+  }
+`;
+
+export const sortOptionActive = css`
+  color: #0068e0;
+  font-weight: 500;
+`;
+
 export const qtyInputRow = css`
   display: flex;
   align-items: center;
@@ -125,6 +157,7 @@ export const td = css`
   font-size: 14px;
   color: #1a1b1e;
   font-feature-settings: 'ss05' 1;
+  max-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
