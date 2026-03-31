@@ -1,6 +1,5 @@
-/** @jsxImportSource @emotion/react */
 import { CheckIcon } from '../Icons';
-import * as s from './style';
+import { CheckboxBox } from './style';
 
 interface CheckboxProps {
   checked: boolean;
@@ -8,7 +7,7 @@ interface CheckboxProps {
 }
 
 export const Checkbox = ({ checked, onChange }: CheckboxProps) => (
-  <div css={[s.checkbox, checked && s.checkboxChecked]} onClick={onChange}>
+  <CheckboxBox checked={checked} onClick={onChange}>
     {checked && <CheckIcon />}
-  </div>
+  </CheckboxBox>
 );

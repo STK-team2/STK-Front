@@ -1,13 +1,14 @@
+import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 
-export const wrapper = css`
+export const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
   min-height: 100svh;
   background: #ffffff;
 `;
 
-export const sidebar = css`
+export const Sidebar = styled.aside`
   width: 160px;
   flex-shrink: 0;
   display: flex;
@@ -22,28 +23,30 @@ export const sidebar = css`
   }
 `;
 
-export const logoWrap = css`
+export const LogoWrap = styled.div`
   padding: 20px 16px 16px;
 `;
 
-export const logoClip = css`
+export const LogoClip = styled.div`
   width: 88px;
   overflow: hidden;
 `;
 
-export const logo = css`
+export const Logo = styled.img`
   display: block;
   width: 242px;
   height: auto;
 `;
 
-export const nav = css`
+export const Nav = styled.nav`
   display: flex;
   flex-direction: column;
   flex: 1;
 `;
 
-export const navItem = css`
+export const NavItem = styled('button', {
+  shouldForwardProp: prop => prop !== 'active',
+})<{ active?: boolean }>`
   display: flex;
   align-items: center;
   height: 44px;
@@ -68,19 +71,19 @@ export const navItem = css`
     font-size: 13px;
     height: 40px;
   }
+
+  ${({ active }) => active && css`
+    border-left-color: #0068e0;
+    background: linear-gradient(to right, rgba(0, 104, 224, 0.12), rgba(0, 104, 224, 0.01));
+    color: #0068e0;
+    font-weight: 600;
+    &:hover {
+      background: linear-gradient(to right, rgba(0, 104, 224, 0.18), rgba(0, 104, 224, 0.04));
+    }
+  `}
 `;
 
-export const navItemActive = css`
-  border-left-color: #0068e0;
-  background: linear-gradient(to right, rgba(0, 104, 224, 0.12), rgba(0, 104, 224, 0.01));
-  color: #0068e0;
-  font-weight: 600;
-  &:hover {
-    background: linear-gradient(to right, rgba(0, 104, 224, 0.18), rgba(0, 104, 224, 0.04));
-  }
-`;
-
-export const logoutBtn = css`
+export const LogoutBtn = styled.button`
   padding: 20px;
   background: none;
   border: none;
@@ -95,7 +98,7 @@ export const logoutBtn = css`
   }
 `;
 
-export const content = css`
+export const Content = styled.div`
   flex: 1;
   min-width: 0;
   background: #ffffff;

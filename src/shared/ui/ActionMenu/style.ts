@@ -1,10 +1,13 @@
+import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 
-export const actionWrap = css`
+export const ActionWrap = styled.div`
   position: relative;
 `;
 
-export const actionBtn = css`
+export const ActionBtn = styled('button', {
+  shouldForwardProp: prop => prop !== 'active',
+})<{ active?: boolean }>`
   display: flex;
   align-items: center;
   gap: 6px;
@@ -28,13 +31,13 @@ export const actionBtn = css`
     height: 36px;
     font-size: 13px;
   }
+
+  ${({ active }) => active && css`
+    background: #0056b8;
+  `}
 `;
 
-export const actionBtnActive = css`
-  background: #0056b8;
-`;
-
-export const actionDropdown = css`
+export const ActionDropdown = styled.div`
   position: absolute;
   top: calc(100% + 4px);
   right: 0;
@@ -47,7 +50,7 @@ export const actionDropdown = css`
   overflow: hidden;
 `;
 
-export const actionOption = css`
+export const ActionOption = styled.button`
   display: block;
   width: 100%;
   height: 40px;

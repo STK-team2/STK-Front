@@ -1,10 +1,13 @@
+import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 
-export const filterWrap = css`
+export const FilterWrap = styled.div`
   position: relative;
 `;
 
-export const filterBtn = css`
+export const FilterBtn = styled('button', {
+  shouldForwardProp: prop => prop !== 'active',
+})<{ active?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -27,14 +30,14 @@ export const filterBtn = css`
     min-width: 84px;
     font-size: 13px;
   }
+
+  ${({ active }) => active && css`
+    border-color: #0068e0;
+    color: #0068e0;
+  `}
 `;
 
-export const filterBtnActive = css`
-  border-color: #0068e0;
-  color: #0068e0;
-`;
-
-export const filterPopover = css`
+export const FilterPopover = styled.div`
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
@@ -47,14 +50,16 @@ export const filterPopover = css`
   min-width: 180px;
 `;
 
-export const sortOptionList = css`
+export const SortOptionList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2px;
   min-width: 120px;
 `;
 
-export const sortOption = css`
+export const SortOption = styled('button', {
+  shouldForwardProp: prop => prop !== 'active',
+})<{ active?: boolean }>`
   display: flex;
   align-items: center;
   height: 36px;
@@ -72,9 +77,9 @@ export const sortOption = css`
   &:hover {
     background: #f5f6f8;
   }
-`;
 
-export const sortOptionActive = css`
-  color: #0068e0;
-  font-weight: 500;
+  ${({ active }) => active && css`
+    color: #0068e0;
+    font-weight: 500;
+  `}
 `;

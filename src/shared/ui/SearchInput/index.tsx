@@ -1,6 +1,5 @@
-/** @jsxImportSource @emotion/react */
 import { SearchIcon } from '../Icons';
-import * as s from './style';
+import { SearchWrap, Input, IconWrap } from './style';
 
 interface SearchInputProps {
   value: string;
@@ -9,14 +8,13 @@ interface SearchInputProps {
 }
 
 export const SearchInput = ({ value, onChange, placeholder = '검색' }: SearchInputProps) => (
-  <div css={s.searchWrap}>
-    <input
-      css={s.searchInput}
+  <SearchWrap>
+    <Input
       type="text"
       placeholder={placeholder}
       value={value}
       onChange={e => onChange(e.target.value)}
     />
-    <span css={s.searchIcon}><SearchIcon /></span>
-  </div>
+    <IconWrap><SearchIcon /></IconWrap>
+  </SearchWrap>
 );

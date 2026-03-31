@@ -1,12 +1,12 @@
-import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 
-export const searchWrap = css`
+export const SearchWrap = styled.div`
   position: relative;
   display: flex;
   align-items: center;
 `;
 
-export const searchInput = css`
+export const Input = styled.input`
   width: 240px;
   height: 40px;
   padding: 0 40px 0 12px;
@@ -31,7 +31,7 @@ export const searchInput = css`
   }
 `;
 
-export const searchIcon = css`
+export const IconWrap = styled.span`
   position: absolute;
   right: 12px;
   display: flex;

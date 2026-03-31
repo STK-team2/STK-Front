@@ -1,6 +1,5 @@
-/** @jsxImportSource @emotion/react */
 import { ChevronDownIcon, ChevronUpIcon } from '../Icons';
-import * as s from './style';
+import { ActionWrap, ActionBtn, ActionDropdown, ActionOption } from './style';
 
 interface ActionMenuProps {
   label: string;
@@ -11,28 +10,23 @@ interface ActionMenuProps {
 }
 
 export const ActionMenu = ({ label, isOpen, onToggle, items, onItemClick }: ActionMenuProps) => (
-  <div css={s.actionWrap}>
-    <button
-      css={[s.actionBtn, isOpen && s.actionBtnActive]}
-      onClick={onToggle}
-      type="button"
-    >
+  <ActionWrap>
+    <ActionBtn active={isOpen} onClick={onToggle} type="button">
       {label}
       {isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
-    </button>
+    </ActionBtn>
     {isOpen && (
-      <div css={s.actionDropdown}>
+      <ActionDropdown>
         {items.map(item => (
-          <button
+          <ActionOption
             key={item}
-            css={s.actionOption}
             type="button"
             onClick={() => onItemClick?.(item)}
           >
             {item}
-          </button>
+          </ActionOption>
         ))}
-      </div>
+      </ActionDropdown>
     )}
-  </div>
+  </ActionWrap>
 );

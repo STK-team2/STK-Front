@@ -1,12 +1,13 @@
+import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 
-export const backdrop = css`
+export const Backdrop = styled.div`
   position: fixed;
   inset: 0;
   z-index: 10;
 `;
 
-export const pageInner = css`
+export const PageInner = styled.div`
   padding: 32px;
   position: relative;
 
@@ -15,7 +16,7 @@ export const pageInner = css`
   }
 `;
 
-export const pageTitle = css`
+export const PageTitle = styled.h1`
   font-family: 'Pretendard Variable', sans-serif;
   font-size: 24px;
   font-weight: 700;
@@ -29,7 +30,7 @@ export const pageTitle = css`
   }
 `;
 
-export const toolbar = css`
+export const Toolbar = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -37,19 +38,19 @@ export const toolbar = css`
   margin-bottom: 16px;
 `;
 
-export const filters = css`
+export const Filters = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
 `;
 
-export const toolbarRight = css`
+export const ToolbarRight = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
 `;
 
-export const qtyLabel = css`
+export const QtyLabel = styled.p`
   font-family: 'Pretendard Variable', sans-serif;
   font-size: 12px;
   color: #595b66;
@@ -57,14 +58,16 @@ export const qtyLabel = css`
   font-feature-settings: 'ss05' 1;
 `;
 
-export const sortOptionList = css`
+export const SortOptionList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2px;
   min-width: 120px;
 `;
 
-export const sortOption = css`
+export const SortOption = styled('button', {
+  shouldForwardProp: prop => prop !== 'active',
+})<{ active?: boolean }>`
   display: flex;
   align-items: center;
   height: 36px;
@@ -82,20 +85,20 @@ export const sortOption = css`
   &:hover {
     background: #f5f6f8;
   }
+
+  ${({ active }) => active && css`
+    color: #0068e0;
+    font-weight: 500;
+  `}
 `;
 
-export const sortOptionActive = css`
-  color: #0068e0;
-  font-weight: 500;
-`;
-
-export const qtyInputRow = css`
+export const QtyInputRow = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
 `;
 
-export const qtyInput = css`
+export const QtyInput = styled.input`
   width: 72px;
   height: 28px;
   border: none;
@@ -111,28 +114,28 @@ export const qtyInput = css`
   }
 `;
 
-export const qtySep = css`
+export const QtySep = styled.span`
   font-size: 14px;
   color: #595b66;
 `;
 
-export const tableWrap = css`
+export const TableWrap = styled.div`
   width: 100%;
   overflow-x: auto;
 `;
 
-export const table = css`
+export const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
 `;
 
-export const headerRow = css`
+export const HeaderRow = styled.tr`
   background: #f8f9fa;
   border-bottom: 1px solid #bbbcc2;
 `;
 
-export const th = css`
+export const Th = styled.th`
   height: 44px;
   padding: 0 12px;
   font-family: 'Pretendard Variable', sans-serif;
@@ -143,14 +146,14 @@ export const th = css`
   font-feature-settings: 'ss05' 1;
 `;
 
-export const dataRow = css`
+export const DataRow = styled.tr`
   border-bottom: 1px solid #e5e6ea;
   &:hover {
     background: #f8f9fa;
   }
 `;
 
-export const td = css`
+export const Td = styled.td`
   height: 52px;
   padding: 0 12px;
   font-family: 'Pretendard Variable', sans-serif;
@@ -162,4 +165,3 @@ export const td = css`
   text-overflow: ellipsis;
   white-space: nowrap;
 `;
-

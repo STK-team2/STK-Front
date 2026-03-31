@@ -1,7 +1,12 @@
-/** @jsxImportSource @emotion/react */
 import { useState } from 'react';
-import * as s from './style';
 import { EyeIcon } from '@/shared/ui/Icons';
+import {
+  RegisterWrapper, LeftPanel, LeftBgImage, LeftBgOverlay,
+  RightPanel, FormContainer, Heading, Title, Subtitle,
+  FieldsContainer, InputGroup, InputLabel, InputField,
+  VerifyRow, VerifyInput, VerifyBtn,
+  PasswordWrapper, PasswordInput, VisibilityBtn, SubmitBtn,
+} from './style';
 
 const stkBg = '/STK.svg';
 
@@ -22,85 +27,79 @@ const RegisterPage = () => {
   };
 
   return (
-    <div css={s.registerWrapper}>
-      <div css={s.leftPanel}>
-        <img css={s.leftBgImage} src={stkBg} alt="" />
-        <div css={s.leftBgOverlay} />
-      </div>
+    <RegisterWrapper>
+      <LeftPanel>
+        <LeftBgImage src={stkBg} alt="" />
+        <LeftBgOverlay />
+      </LeftPanel>
 
-      <div css={s.rightPanel}>
-        <div css={s.formContainer}>
-          <div css={s.heading}>
-            <p css={s.title}>회원가입</p>
-            <p css={s.subtitle}>정보를 입력해주세요.</p>
-          </div>
+      <RightPanel>
+        <FormContainer>
+          <Heading>
+            <Title>회원가입</Title>
+            <Subtitle>정보를 입력해주세요.</Subtitle>
+          </Heading>
 
-          <div css={s.fieldsContainer}>
-            <div css={s.inputGroup}>
-              <label css={s.inputLabel}>이메일</label>
-              <input
-                css={s.inputField}
+          <FieldsContainer>
+            <InputGroup>
+              <InputLabel>이메일</InputLabel>
+              <InputField
                 type="email"
                 placeholder="예) 홍길동"
                 value={form.email}
                 onChange={handleChange('email')}
               />
-            </div>
+            </InputGroup>
 
-            <div css={s.inputGroup}>
-              <label css={s.inputLabel}>이메일 인증번호 입력</label>
-              <div css={s.verifyRow}>
-                <input
-                  css={s.verifyInput}
+            <InputGroup>
+              <InputLabel>이메일 인증번호 입력</InputLabel>
+              <VerifyRow>
+                <VerifyInput
                   type="text"
                   placeholder="인증번호를 입력해주세요."
                   value={form.verifyCode}
                   onChange={handleChange('verifyCode')}
                 />
-                <button css={s.verifyBtn} type="button">
-                  인증번호 확인
-                </button>
-              </div>
-            </div>
+                <VerifyBtn type="button">인증번호 확인</VerifyBtn>
+              </VerifyRow>
+            </InputGroup>
 
-            <div css={s.inputGroup}>
-              <label css={s.inputLabel}>비밀번호</label>
-              <div css={s.passwordWrapper}>
-                <input
-                  css={s.passwordInput}
+            <InputGroup>
+              <InputLabel>비밀번호</InputLabel>
+              <PasswordWrapper>
+                <PasswordInput
                   type={showPassword ? 'text' : 'password'}
                   placeholder="비밀번호를 입력해주세요."
                   value={form.password}
                   onChange={handleChange('password')}
                 />
-                <button css={s.visibilityBtn} type="button" onClick={() => setShowPassword(v => !v)}>
+                <VisibilityBtn type="button" onClick={() => setShowPassword(v => !v)}>
                   <EyeIcon show={showPassword} />
-                </button>
-              </div>
-            </div>
+                </VisibilityBtn>
+              </PasswordWrapper>
+            </InputGroup>
 
-            <div css={s.inputGroup}>
-              <label css={s.inputLabel}>비밀번호 재입력</label>
-              <input
-                css={s.inputField}
+            <InputGroup>
+              <InputLabel>비밀번호 재입력</InputLabel>
+              <InputField
                 type="password"
                 placeholder="비밀번호를 다시 입력해주세요."
                 value={form.passwordConfirm}
                 onChange={handleChange('passwordConfirm')}
               />
-            </div>
-          </div>
+            </InputGroup>
+          </FieldsContainer>
 
-          <button
-            css={[s.submitBtn, isFormFilled ? s.submitBtnActive : undefined]}
+          <SubmitBtn
+            active={!!isFormFilled}
             type="button"
             disabled={!isFormFilled}
           >
             회원가입
-          </button>
-        </div>
-      </div>
-    </div>
+          </SubmitBtn>
+        </FormContainer>
+      </RightPanel>
+    </RegisterWrapper>
   );
 };
 

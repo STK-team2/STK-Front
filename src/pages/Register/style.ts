@@ -1,6 +1,7 @@
+import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 
-export const registerWrapper = css`
+export const RegisterWrapper = styled.div`
   flex: 1;
   display: flex;
   flex-direction: row;
@@ -12,7 +13,7 @@ export const registerWrapper = css`
   }
 `;
 
-export const leftPanel = css`
+export const LeftPanel = styled.div`
   flex: 1;
   position: relative;
   display: flex;
@@ -25,20 +26,20 @@ export const leftPanel = css`
   }
 `;
 
-export const leftBgImage = css`
+export const LeftBgImage = styled.img`
   width: 72%;
   max-width: 800px;
   height: auto;
   transform: translateY(-40px);
 `;
 
-export const leftBgOverlay = css`
+export const LeftBgOverlay = styled.div`
   position: absolute;
   inset: 0;
   background: rgba(255, 255, 255, 0.7);
 `;
 
-export const rightPanel = css`
+export const RightPanel = styled.div`
   width: 580px;
   flex-shrink: 0;
   background: #ffffff;
@@ -70,7 +71,7 @@ export const rightPanel = css`
   }
 `;
 
-export const formContainer = css`
+export const FormContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -78,13 +79,13 @@ export const formContainer = css`
   max-width: 446px;
 `;
 
-export const heading = css`
+export const Heading = styled.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
 `;
 
-export const title = css`
+export const Title = styled.p`
   font-family: 'Pretendard Variable', sans-serif;
   font-weight: 700;
   font-size: 28px;
@@ -98,7 +99,7 @@ export const title = css`
   }
 `;
 
-export const subtitle = css`
+export const Subtitle = styled.p`
   font-family: 'Pretendard Variable', sans-serif;
   font-weight: 400;
   font-size: 14px;
@@ -109,20 +110,20 @@ export const subtitle = css`
   margin: 0;
 `;
 
-export const fieldsContainer = css`
+export const FieldsContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
 `;
 
-export const inputGroup = css`
+export const InputGroup = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
   width: 100%;
 `;
 
-export const inputLabel = css`
+export const InputLabel = styled.label`
   font-family: 'Pretendard Variable', sans-serif;
   font-weight: 500;
   font-size: 16px;
@@ -136,7 +137,7 @@ export const inputLabel = css`
   }
 `;
 
-export const inputField = css`
+export const InputField = styled.input`
   width: 100%;
   height: 48px;
   padding: 10px 16px;
@@ -159,13 +160,13 @@ export const inputField = css`
   }
 `;
 
-export const verifyRow = css`
+export const VerifyRow = styled.div`
   display: flex;
   gap: 8px;
   align-items: center;
 `;
 
-export const verifyInput = css`
+export const VerifyInput = styled.input`
   flex: 1;
   min-width: 0;
   height: 48px;
@@ -189,7 +190,7 @@ export const verifyInput = css`
   }
 `;
 
-export const verifyBtn = css`
+export const VerifyBtn = styled.button`
   height: 48px;
   padding: 10px 16px;
   background: #0068e0;
@@ -209,13 +210,13 @@ export const verifyBtn = css`
   }
 `;
 
-export const passwordWrapper = css`
+export const PasswordWrapper = styled.div`
   position: relative;
   display: flex;
   align-items: center;
 `;
 
-export const passwordInput = css`
+export const PasswordInput = styled.input`
   width: 100%;
   height: 48px;
   padding: 10px 48px 10px 16px;
@@ -238,7 +239,7 @@ export const passwordInput = css`
   }
 `;
 
-export const visibilityBtn = css`
+export const VisibilityBtn = styled.button`
   position: absolute;
   right: 12px;
   top: 50%;
@@ -252,7 +253,9 @@ export const visibilityBtn = css`
   color: #9497a0;
 `;
 
-export const submitBtn = css`
+export const SubmitBtn = styled('button', {
+  shouldForwardProp: prop => prop !== 'active',
+})<{ active?: boolean }>`
   width: 100%;
   height: 48px;
   background: #dddee3;
@@ -266,12 +269,12 @@ export const submitBtn = css`
   cursor: not-allowed;
   font-feature-settings: 'ss05' 1;
   transition: background 0.2s;
-`;
 
-export const submitBtnActive = css`
-  background: #0068e0;
-  cursor: pointer;
-  &:hover {
-    background: #0056b8;
-  }
+  ${({ active }) => active && css`
+    background: #0068e0;
+    cursor: pointer;
+    &:hover {
+      background: #0056b8;
+    }
+  `}
 `;

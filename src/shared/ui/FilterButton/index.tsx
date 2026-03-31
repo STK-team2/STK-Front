@@ -1,7 +1,6 @@
-/** @jsxImportSource @emotion/react */
 import { type ReactNode } from 'react';
 import { ChevronDownIcon, ChevronUpIcon } from '../Icons';
-import * as s from './style';
+import { FilterWrap, FilterBtn, FilterPopover } from './style';
 
 interface FilterButtonProps {
   label: string;
@@ -11,19 +10,15 @@ interface FilterButtonProps {
 }
 
 export const FilterButton = ({ label, isOpen, onToggle, children }: FilterButtonProps) => (
-  <div css={s.filterWrap}>
-    <button
-      css={[s.filterBtn, isOpen && s.filterBtnActive]}
-      onClick={onToggle}
-      type="button"
-    >
+  <FilterWrap>
+    <FilterBtn active={isOpen} onClick={onToggle} type="button">
       {label}
       {isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
-    </button>
+    </FilterBtn>
     {isOpen && children && (
-      <div css={s.filterPopover}>
+      <FilterPopover>
         {children}
-      </div>
+      </FilterPopover>
     )}
-  </div>
+  </FilterWrap>
 );

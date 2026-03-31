@@ -1,6 +1,9 @@
+import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 
-export const checkbox = css`
+export const CheckboxBox = styled('div', {
+  shouldForwardProp: prop => prop !== 'checked',
+})<{ checked?: boolean }>`
   width: 18px;
   height: 18px;
   border-radius: 4px;
@@ -11,9 +14,9 @@ export const checkbox = css`
   cursor: pointer;
   background: #ffffff;
   flex-shrink: 0;
-`;
 
-export const checkboxChecked = css`
-  background: #0068e0;
-  border-color: #0068e0;
+  ${({ checked }) => checked && css`
+    background: #0068e0;
+    border-color: #0068e0;
+  `}
 `;

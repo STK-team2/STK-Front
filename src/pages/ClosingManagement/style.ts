@@ -1,12 +1,13 @@
+import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 
-export const backdrop = css`
+export const Backdrop = styled.div`
   position: fixed;
   inset: 0;
   z-index: 10;
 `;
 
-export const pageInner = css`
+export const PageInner = styled.div`
   padding: 32px;
   position: relative;
 
@@ -15,7 +16,7 @@ export const pageInner = css`
   }
 `;
 
-export const pageTitle = css`
+export const PageTitle = styled.h1`
   font-family: 'Pretendard Variable', sans-serif;
   font-size: 24px;
   font-weight: 700;
@@ -29,7 +30,7 @@ export const pageTitle = css`
   }
 `;
 
-export const toolbar = css`
+export const Toolbar = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -37,29 +38,29 @@ export const toolbar = css`
   margin-bottom: 16px;
 `;
 
-export const filters = css`
+export const Filters = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
 `;
 
-export const tableWrap = css`
+export const TableWrap = styled.div`
   width: 100%;
   overflow-x: auto;
 `;
 
-export const table = css`
+export const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
 `;
 
-export const headerRow = css`
+export const HeaderRow = styled.tr`
   background: #f8f9fa;
   border-bottom: 1px solid #bbbcc2;
 `;
 
-export const th = css`
+export const Th = styled.th`
   height: 44px;
   padding: 0 12px;
   font-family: 'Pretendard Variable', sans-serif;
@@ -70,14 +71,14 @@ export const th = css`
   font-feature-settings: 'ss05' 1;
 `;
 
-export const dataRow = css`
+export const DataRow = styled.tr`
   border-bottom: 1px solid #e5e6ea;
   &:hover {
     background: #f8f9fa;
   }
 `;
 
-export const td = css`
+export const Td = styled.td`
   height: 52px;
   padding: 0 12px;
   font-family: 'Pretendard Variable', sans-serif;
@@ -90,23 +91,22 @@ export const td = css`
   white-space: nowrap;
 `;
 
-export const statusClosed = css`
+export const StatusText = styled('span', {
+  shouldForwardProp: prop => prop !== 'closed',
+})<{ closed?: boolean }>`
   font-family: 'Pretendard Variable', sans-serif;
   font-size: 14px;
   font-weight: 500;
-  color: #0068e0;
   font-feature-settings: 'ss05' 1;
+
+  ${({ closed }) => closed ? css`
+    color: #0068e0;
+  ` : css`
+    color: #1a1b1e;
+  `}
 `;
 
-export const statusOpen = css`
-  font-family: 'Pretendard Variable', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  color: #1a1b1e;
-  font-feature-settings: 'ss05' 1;
-`;
-
-export const closeBtn = css`
+export const CloseBtn = styled.button`
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -125,7 +125,7 @@ export const closeBtn = css`
   }
 `;
 
-export const cancelBtn = css`
+export const CancelBtn = styled.button`
   display: inline-flex;
   align-items: center;
   justify-content: center;
