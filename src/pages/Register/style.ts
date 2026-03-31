@@ -49,7 +49,7 @@ export const rightPanel = css`
   box-sizing: border-box;
   overflow-y: auto;
 
-  @media (max-width: 1440px) {
+  @media (max-width: 1280px) {
     width: 560px;
     padding: 60px 52px;
   }

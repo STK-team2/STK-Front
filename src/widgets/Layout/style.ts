@@ -17,7 +17,7 @@ export const sidebar = css`
   top: 0;
   height: 100svh;
 
-  @media (max-width: 1440px) {
+  @media (max-width: 1280px) {
     width: 190px;
   }
 `;
@@ -64,7 +64,7 @@ export const navItem = css`
     background: #f5f6f8;
   }
 
-  @media (max-width: 1440px) {
+  @media (max-width: 1280px) {
     font-size: 15px;
     height: 44px;
   }

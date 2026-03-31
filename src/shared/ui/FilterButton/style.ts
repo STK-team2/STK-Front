@@ -22,7 +22,7 @@ export const filterBtn = css`
   font-feature-settings: 'ss05' 1;
   white-space: nowrap;
 
-  @media (max-width: 1440px) {
+  @media (max-width: 1280px) {
     height: 36px;
     min-width: 84px;
     font-size: 15px;

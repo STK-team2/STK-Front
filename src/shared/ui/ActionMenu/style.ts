@@ -24,7 +24,7 @@ export const actionBtn = css`
     background: #0056b8;
   }
 
-  @media (max-width: 1440px) {
+  @media (max-width: 1280px) {
     height: 36px;
     font-size: 15px;
   }

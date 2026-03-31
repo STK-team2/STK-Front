@@ -10,7 +10,7 @@ export const pageInner = css`
   padding: 32px;
   position: relative;
 
-  @media (max-width: 1440px) {
+  @media (max-width: 1280px) {
     padding: 24px;
   }
 `;
@@ -23,7 +23,7 @@ export const pageTitle = css`
   margin: 0 0 20px 0;
   font-feature-settings: 'ss05' 1;
 
-  @media (max-width: 1440px) {
+  @media (max-width: 1280px) {
     font-size: 22px;
     margin-bottom: 16px;
   }

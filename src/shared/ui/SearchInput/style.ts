@@ -24,7 +24,7 @@ export const searchInput = css`
     border-color: #0068e0;
   }
 
-  @media (max-width: 1440px) {
+  @media (max-width: 1280px) {
     width: 200px;
     height: 36px;
     font-size: 15px;

@@ -20,7 +20,7 @@ export const formContainer = css`
   width: 100%;
   max-width: 584px;
 
-  @media (max-width: 1440px) {
+  @media (max-width: 1280px) {
     max-width: 440px;
     gap: 36px;
   }
@@ -46,7 +46,7 @@ export const logoImage = css`
   height: auto;
   max-width: 100%;
 
-  @media (max-width: 1440px) {
+  @media (max-width: 1280px) {
     width: 324px;
   }
 
@@ -183,7 +183,7 @@ export const loginBtn = css`
     background: #0056b8;
   }
 
-  @media (max-width: 1440px) {
+  @media (max-width: 1280px) {
     height: 48px;
     font-size: 19px;
   }
@@ -216,7 +216,7 @@ export const registerBtn = css`
   font-feature-settings: 'ss05' 1;
   padding: 0;
 
-  @media (max-width: 1440px) {
+  @media (max-width: 1280px) {
     font-size: 19px;
   }
 

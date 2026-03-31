@@ -9,6 +9,7 @@ export const globalStyles = css`
 
   body {
     margin: 0;
+    min-width: 1280px;
     font-family: 'Pretendard Variable', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
