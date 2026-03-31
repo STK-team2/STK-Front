@@ -13,7 +13,7 @@ export const searchInput = css`
   border: 1px solid #bbbcc2;
   border-radius: 6px;
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   color: #1a1b1e;
   outline: none;
   box-sizing: border-box;
@@ -27,7 +27,7 @@ export const searchInput = css`
   @media (max-width: 1440px) {
     width: 200px;
     height: 36px;
-    font-size: 13px;
+    font-size: 15px;
   }
 `;
 

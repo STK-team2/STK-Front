@@ -17,14 +17,14 @@ export const pageInner = css`
 
 export const pageTitle = css`
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 700;
   color: #1a1b1e;
   margin: 0 0 20px 0;
   font-feature-settings: 'ss05' 1;
 
   @media (max-width: 1440px) {
-    font-size: 20px;
+    font-size: 22px;
     margin-bottom: 16px;
   }
 `;
@@ -50,7 +50,7 @@ export const toolbarRight = css`
 
 export const qtyLabel = css`
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   color: #595b66;
   margin: 0 0 8px 0;
   font-feature-settings: 'ss05' 1;
@@ -69,7 +69,7 @@ export const qtyInput = css`
   border-bottom: 1.5px solid #0068e0;
   outline: none;
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 13px;
+  font-size: 15px;
   text-align: center;
   color: #1a1b1e;
   background: transparent;
@@ -79,7 +79,7 @@ export const qtyInput = css`
 `;
 
 export const qtySep = css`
-  font-size: 14px;
+  font-size: 16px;
   color: #595b66;
 `;
 
@@ -97,7 +97,7 @@ export const sortOption = css`
   padding: 0 8px;
   border-radius: 4px;
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 13px;
+  font-size: 15px;
   color: #1a1b1e;
   cursor: pointer;
   background: none;
@@ -117,7 +117,7 @@ export const sortOptionActive = css`
 
 export const totalLabel = css`
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 13px;
+  font-size: 15px;
   color: #595b66;
   margin: 16px 0 8px;
   font-feature-settings: 'ss05' 1;
@@ -143,7 +143,7 @@ export const th = css`
   height: 44px;
   padding: 0 12px;
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
   color: #595b66;
   text-align: left;
@@ -161,7 +161,7 @@ export const td = css`
   height: 52px;
   padding: 0 12px;
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   color: #1a1b1e;
   font-feature-settings: 'ss05' 1;
   max-width: 0;
@@ -182,7 +182,7 @@ export const newRowInput = css`
   border: 1px solid #bbbcc2;
   border-radius: 4px;
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 13px;
+  font-size: 15px;
   color: #1a1b1e;
   outline: none;
   box-sizing: border-box;
@@ -205,7 +205,7 @@ export const newRowDateInput = css`
   border: 1px solid #bbbcc2;
   border-radius: 4px;
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 13px;
+  font-size: 15px;
   color: #1a1b1e;
   outline: none;
   box-sizing: border-box;
@@ -230,7 +230,7 @@ export const cancelBtn = css`
   border: 1px solid #bbbcc2;
   border-radius: 6px;
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
   color: #595b66;
   cursor: pointer;
@@ -248,7 +248,7 @@ export const deleteBtn = css`
   border: none;
   border-radius: 6px;
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
   color: #ffffff;
   cursor: pointer;

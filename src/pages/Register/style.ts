@@ -39,34 +39,34 @@ export const leftBgOverlay = css`
 `;
 
 export const rightPanel = css`
-  width: 580px;
+  width: 700px;
   flex-shrink: 0;
   background: #ffffff;
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 80px 48px;
+  justify-content: flex-start;
+  padding: 80px 64px;
   box-sizing: border-box;
   overflow-y: auto;
 
   @media (max-width: 1440px) {
-    width: 460px;
-    padding: 60px 36px;
+    width: 560px;
+    padding: 60px 52px;
   }
 
   @media (max-width: 1280px) {
-    width: 420px;
-    padding: 60px 32px;
+    width: 500px;
+    padding: 60px 44px;
   }
 
   @media (max-width: 768px) {
     width: 100%;
-    padding: 48px 24px;
+    padding: 48px 32px;
     min-height: 100svh;
   }
 
   @media (max-width: 480px) {
-    padding: 36px 20px;
+    padding: 36px 24px;
   }
 `;
 
@@ -75,7 +75,7 @@ export const formContainer = css`
   flex-direction: column;
   gap: 24px;
   width: 100%;
-  max-width: 446px;
+  max-width: 520px;
 `;
 
 export const heading = css`
@@ -87,21 +87,21 @@ export const heading = css`
 export const title = css`
   font-family: 'Pretendard Variable', sans-serif;
   font-weight: 700;
-  font-size: 28px;
+  font-size: 30px;
   line-height: 1.4;
   color: #000000;
   font-feature-settings: 'ss05' 1;
   margin: 0;
 
   @media (max-width: 480px) {
-    font-size: 24px;
+    font-size: 26px;
   }
 `;
 
 export const subtitle = css`
   font-family: 'Pretendard Variable', sans-serif;
   font-weight: 400;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.6;
   color: #595b66;
   letter-spacing: -0.014px;
@@ -125,26 +125,26 @@ export const inputGroup = css`
 export const inputLabel = css`
   font-family: 'Pretendard Variable', sans-serif;
   font-weight: 500;
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1.3;
   color: #595b66;
   font-feature-settings: 'ss05' 1;
   white-space: nowrap;
 
   @media (max-width: 480px) {
-    font-size: 14px;
+    font-size: 16px;
   }
 `;
 
 export const inputField = css`
   width: 100%;
-  height: 48px;
-  padding: 10px 16px;
+  height: 52px;
+  padding: 12px 20px;
   border: 1px solid #bbbcc2;
   border-radius: 6px;
   font-family: 'Pretendard Variable', sans-serif;
   font-weight: 400;
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1.6;
   color: #1a1b1e;
   font-feature-settings: 'ss05' 1;
@@ -168,13 +168,13 @@ export const verifyRow = css`
 export const verifyInput = css`
   flex: 1;
   min-width: 0;
-  height: 48px;
-  padding: 10px 16px;
+  height: 52px;
+  padding: 12px 20px;
   border: 1px solid #bbbcc2;
   border-radius: 6px;
   font-family: 'Pretendard Variable', sans-serif;
   font-weight: 400;
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1.6;
   color: #1a1b1e;
   font-feature-settings: 'ss05' 1;
@@ -190,14 +190,14 @@ export const verifyInput = css`
 `;
 
 export const verifyBtn = css`
-  height: 48px;
-  padding: 10px 16px;
+  height: 52px;
+  padding: 12px 20px;
   background: #0068e0;
   border: none;
   border-radius: 6px;
   font-family: 'Pretendard Variable', sans-serif;
   font-weight: 500;
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1.3;
   color: #ffffff;
   white-space: nowrap;
@@ -217,13 +217,13 @@ export const passwordWrapper = css`
 
 export const passwordInput = css`
   width: 100%;
-  height: 48px;
-  padding: 10px 48px 10px 16px;
+  height: 52px;
+  padding: 12px 52px 12px 20px;
   border: 1px solid #bbbcc2;
   border-radius: 6px;
   font-family: 'Pretendard Variable', sans-serif;
   font-weight: 400;
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1.6;
   color: #1a1b1e;
   font-feature-settings: 'ss05' 1;
@@ -254,13 +254,13 @@ export const visibilityBtn = css`
 
 export const submitBtn = css`
   width: 100%;
-  height: 48px;
+  height: 52px;
   background: #dddee3;
   border: none;
   border-radius: 6px;
   font-family: 'Pretendard Variable', sans-serif;
   font-weight: 500;
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1.3;
   color: #ffffff;
   cursor: not-allowed;

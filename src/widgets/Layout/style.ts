@@ -8,7 +8,7 @@ export const wrapper = css`
 `;
 
 export const sidebar = css`
-  width: 160px;
+  width: 220px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -18,7 +18,7 @@ export const sidebar = css`
   height: 100svh;
 
   @media (max-width: 1440px) {
-    width: 140px;
+    width: 190px;
   }
 `;
 
@@ -46,13 +46,13 @@ export const nav = css`
 export const navItem = css`
   display: flex;
   align-items: center;
-  height: 44px;
-  padding: 0 16px;
+  height: 48px;
+  padding: 0 20px;
   background: none;
   border: none;
   border-left: 3px solid transparent;
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
   color: #595b66;
   cursor: pointer;
@@ -65,8 +65,8 @@ export const navItem = css`
   }
 
   @media (max-width: 1440px) {
-    font-size: 13px;
-    height: 40px;
+    font-size: 15px;
+    height: 44px;
   }
 `;
 
@@ -85,7 +85,7 @@ export const logoutBtn = css`
   background: none;
   border: none;
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   color: #9497a0;
   cursor: pointer;
   text-align: left;
