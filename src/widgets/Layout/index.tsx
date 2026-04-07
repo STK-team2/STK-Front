@@ -1,8 +1,10 @@
+/** @jsxImportSource @emotion/react */
 import type { ReactNode } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Wrapper, Sidebar, LogoWrap, LogoClip, Logo, Nav, NavItem, LogoutBtn, Content } from './style';
 
 const navItems = [
+  { label: '홈', path: '/dashboard' },
   { label: '입고 관리', path: '/incoming' },
   { label: '출고 관리', path: '/outgoing' },
   { label: '재고 조회', path: '/inventory' },

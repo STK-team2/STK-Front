@@ -14,7 +14,7 @@ export const actionBtn = css`
   border: none;
   border-radius: 6px;
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   color: #ffffff;
   cursor: pointer;
@@ -24,9 +24,9 @@ export const actionBtn = css`
     background: #0056b8;
   }
 
-  @media (max-width: 1440px) {
+  @media (max-width: 1280px) {
     height: 36px;
-    font-size: 13px;
+    font-size: 15px;
   }
 `;
 
@@ -55,7 +55,7 @@ export const actionOption = css`
   background: none;
   border: none;
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   color: #1a1b1e;
   text-align: left;
   cursor: pointer;

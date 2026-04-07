@@ -20,7 +20,7 @@ export const FormContainer = styled.div`
   width: 100%;
   max-width: 584px;
 
-  @media (max-width: 1440px) {
+  @media (max-width: 1280px) {
     max-width: 440px;
     gap: 36px;
   }
@@ -46,7 +46,7 @@ export const LogoImage = styled.img`
   height: auto;
   max-width: 100%;
 
-  @media (max-width: 1440px) {
+  @media (max-width: 1280px) {
     width: 324px;
   }
 
@@ -72,14 +72,14 @@ export const InputGroup = styled.div`
 export const InputLabel = styled.label`
   font-family: 'Pretendard Variable', sans-serif;
   font-weight: 500;
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1.3;
   color: #595b66;
   font-feature-settings: 'ss05' 1;
   margin: 0;
 
   @media (max-width: 480px) {
-    font-size: 14px;
+    font-size: 16px;
   }
 `;
 
@@ -91,7 +91,7 @@ export const InputField = styled.input`
   border-radius: 6px;
   font-family: 'Pretendard Variable', sans-serif;
   font-weight: 400;
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1.6;
   color: #1a1b1e;
   font-feature-settings: 'ss05' 1;
@@ -107,7 +107,7 @@ export const InputField = styled.input`
 
   @media (max-width: 480px) {
     height: 44px;
-    font-size: 15px;
+    font-size: 17px;
   }
 `;
 
@@ -125,7 +125,7 @@ export const PasswordInput = styled.input`
   border-radius: 6px;
   font-family: 'Pretendard Variable', sans-serif;
   font-weight: 400;
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1.6;
   color: #1a1b1e;
   font-feature-settings: 'ss05' 1;
@@ -141,7 +141,7 @@ export const PasswordInput = styled.input`
 
   @media (max-width: 480px) {
     height: 44px;
-    font-size: 15px;
+    font-size: 17px;
   }
 `;
 
@@ -174,7 +174,7 @@ export const LoginBtn = styled.button`
   border-radius: 5px;
   font-family: 'Pretendard Variable', sans-serif;
   font-weight: 500;
-  font-size: 21px;
+  font-size: 23px;
   line-height: 1.3;
   color: #ffffff;
   cursor: pointer;
@@ -183,14 +183,14 @@ export const LoginBtn = styled.button`
     background: #0056b8;
   }
 
-  @media (max-width: 1440px) {
+  @media (max-width: 1280px) {
     height: 48px;
-    font-size: 17px;
+    font-size: 19px;
   }
 
   @media (max-width: 480px) {
     height: 44px;
-    font-size: 16px;
+    font-size: 18px;
   }
 `;
 
@@ -210,17 +210,17 @@ export const RegisterBtn = styled.button`
   cursor: pointer;
   font-family: 'Pretendard Variable', sans-serif;
   font-weight: 400;
-  font-size: 21px;
+  font-size: 23px;
   line-height: 1.6;
   color: #9497a0;
   font-feature-settings: 'ss05' 1;
   padding: 0;
 
-  @media (max-width: 1440px) {
-    font-size: 17px;
+  @media (max-width: 1280px) {
+    font-size: 19px;
   }
 
   @media (max-width: 480px) {
-    font-size: 15px;
+    font-size: 17px;
   }
 `;

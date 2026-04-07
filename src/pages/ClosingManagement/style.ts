@@ -11,21 +11,21 @@ export const pageInner = css`
   padding: 32px;
   position: relative;
 
-  @media (max-width: 1440px) {
+  @media (max-width: 1280px) {
     padding: 24px;
   }
 `;
 
 export const pageTitle = css`
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 700;
   color: #1a1b1e;
   margin: 0 0 20px 0;
   font-feature-settings: 'ss05' 1;
 
-  @media (max-width: 1440px) {
-    font-size: 20px;
+  @media (max-width: 1280px) {
+    font-size: 22px;
     margin-bottom: 16px;
   }
 `;
@@ -64,7 +64,7 @@ export const th = css`
   height: 44px;
   padding: 0 12px;
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
   color: #595b66;
   text-align: left;
@@ -82,7 +82,7 @@ export const td = css`
   height: 52px;
   padding: 0 12px;
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   color: #1a1b1e;
   font-feature-settings: 'ss05' 1;
   max-width: 0;
@@ -93,7 +93,7 @@ export const td = css`
 
 export const statusClosed = css`
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   color: #0068e0;
   font-feature-settings: 'ss05' 1;
@@ -101,7 +101,7 @@ export const statusClosed = css`
 
 export const statusOpen = css`
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   color: #1a1b1e;
   font-feature-settings: 'ss05' 1;
@@ -117,7 +117,7 @@ export const closeBtn = css`
   border: none;
   border-radius: 6px;
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
   color: #ffffff;
   cursor: pointer;
@@ -136,7 +136,7 @@ export const cancelBtn = css`
   border: none;
   border-radius: 6px;
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
   color: #ffffff;
   cursor: pointer;

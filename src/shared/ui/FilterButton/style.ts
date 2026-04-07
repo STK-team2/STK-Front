@@ -16,16 +16,16 @@ export const filterBtn = css`
   border-radius: 6px;
   background: #ffffff;
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   color: #1a1b1e;
   cursor: pointer;
   font-feature-settings: 'ss05' 1;
   white-space: nowrap;
 
-  @media (max-width: 1440px) {
+  @media (max-width: 1280px) {
     height: 36px;
     min-width: 84px;
-    font-size: 13px;
+    font-size: 15px;
   }
 `;
 
@@ -61,7 +61,7 @@ export const sortOption = css`
   padding: 0 8px;
   border-radius: 4px;
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 13px;
+  font-size: 15px;
   color: #1a1b1e;
   cursor: pointer;
   background: none;

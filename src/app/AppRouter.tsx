@@ -5,6 +5,7 @@ import { authApi } from '../entities/auth/api/authApi';
 import { useAuthStore } from '../entities/auth/model/authStore';
 import LoginPage from '../pages/Login';
 import RegisterPage from '../pages/Register';
+import DashboardPage from '../pages/Dashboard';
 import IncomingManagementPage from '../pages/IncomingManagement';
 import OutgoingManagementPage from '../pages/OutgoingManagement';
 import ClosingManagementPage from '../pages/ClosingManagement';
@@ -80,12 +81,13 @@ const RouterContent = () => {
 
   return (
     <Routes>
-      <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-      <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
-      <Route path="/incoming" element={<ProtectedRoute><IncomingManagementPage /></ProtectedRoute>} />
-      <Route path="/outgoing" element={<ProtectedRoute><OutgoingManagementPage /></ProtectedRoute>} />
-      <Route path="/closing" element={<ProtectedRoute><ClosingManagementPage /></ProtectedRoute>} />
-      <Route path="/inventory" element={<ProtectedRoute><InventoryManagementPage /></ProtectedRoute>} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/incoming" element={<IncomingManagementPage />} />
+      <Route path="/outgoing" element={<OutgoingManagementPage />} />
+      <Route path="/closing" element={<ClosingManagementPage />} />
+      <Route path="/inventory" element={<InventoryManagementPage />} />
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );

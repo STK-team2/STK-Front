@@ -4,22 +4,22 @@ import styled from '@emotion/styled';
 export const wrapper = css`
   display: flex;
   flex-direction: row;
-  min-height: 100svh;
+  height: 100vh;
+  overflow: hidden;
   background: #ffffff;
 `;
 
 export const sidebar = css`
-  width: 160px;
+  width: 220px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   background: #ffffff;
-  position: sticky;
-  top: 0;
-  height: 100svh;
+  height: 100vh;
+  border-right: 1px solid #f0f1f4;
 
-  @media (max-width: 1440px) {
-    width: 140px;
+  @media (max-width: 1280px) {
+    width: 190px;
   }
 `;
 
@@ -47,13 +47,13 @@ export const nav = css`
 export const navItem = css`
   display: flex;
   align-items: center;
-  height: 44px;
-  padding: 0 16px;
+  height: 48px;
+  padding: 0 20px;
   background: none;
   border: none;
   border-left: 3px solid transparent;
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
   color: #595b66;
   cursor: pointer;
@@ -65,9 +65,9 @@ export const navItem = css`
     background: #f5f6f8;
   }
 
-  @media (max-width: 1440px) {
-    font-size: 13px;
-    height: 40px;
+  @media (max-width: 1280px) {
+    font-size: 15px;
+    height: 44px;
   }
 `;
 
@@ -86,7 +86,7 @@ export const logoutBtn = css`
   background: none;
   border: none;
   font-family: 'Pretendard Variable', sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   color: #9497a0;
   cursor: pointer;
   text-align: left;
@@ -99,8 +99,9 @@ export const logoutBtn = css`
 export const content = css`
   flex: 1;
   min-width: 0;
-  background: #ffffff;
+  height: 100vh;
   overflow-y: auto;
+  background: #ffffff;
 `;
 
 export const Wrapper = styled.div`${wrapper}`;
