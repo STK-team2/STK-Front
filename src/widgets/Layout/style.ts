@@ -1,4 +1,5 @@
 import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 
 export const wrapper = css`
   display: flex;
@@ -102,3 +103,18 @@ export const content = css`
   overflow-y: auto;
   background: #ffffff;
 `;
+
+export const Wrapper = styled.div`${wrapper}`;
+export const Sidebar = styled.aside`${sidebar}`;
+export const LogoWrap = styled.div`${logoWrap}`;
+export const LogoClip = styled.div`${logoClip}`;
+export const Logo = styled.img`${logo}`;
+export const Nav = styled.nav`${nav}`;
+export const NavItem = styled('button', {
+  shouldForwardProp: (prop) => prop !== 'active',
+})<{ active?: boolean }>`
+  ${navItem}
+  ${({ active }) => active && navItemActive}
+`;
+export const LogoutBtn = styled.button`${logoutBtn}`;
+export const Content = styled.main`${content}`;

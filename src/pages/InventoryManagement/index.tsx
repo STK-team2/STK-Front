@@ -1,11 +1,14 @@
-/** @jsxImportSource @emotion/react */
 import { useState } from 'react';
 import Layout from '../../widgets/Layout';
 import { FilterButton } from '../../shared/ui/FilterButton';
 import { SearchInput } from '../../shared/ui/SearchInput';
 import { ActionMenu } from '../../shared/ui/ActionMenu';
 import { Checkbox } from '../../shared/ui/Checkbox';
-import * as s from './style';
+import {
+  Backdrop, PageInner, PageTitle, Toolbar, Filters, ToolbarRight,
+  QtyLabel, QtyInputRow, QtyInput, QtySep, SortOptionList, SortOption,
+  TableWrap, Table, HeaderRow, Th, DataRow, Td,
+} from './style';
 
 type FilterType = 'date' | 'sort' | 'qty' | 'status' | null;
 type StockStatus = null | 'current' | 'inout' | 'changed';
@@ -54,22 +57,17 @@ const InventoryManagementPage = () => {
     });
   };
 
-  const closeAll = () => {
-    setOpenFilter(null);
-    setActionOpen(false);
-  };
+  const closeAll = () => { setOpenFilter(null); setActionOpen(false); };
 
   return (
     <Layout>
-      {(openFilter || actionOpen) && (
-        <div css={s.backdrop} onClick={closeAll} />
-      )}
+      {(openFilter || actionOpen) && <Backdrop onClick={closeAll} />}
 
-      <div css={s.pageInner}>
-        <h1 css={s.pageTitle}>재고 조회</h1>
+      <PageInner>
+        <PageTitle>재고 조회</PageTitle>
 
-        <div css={s.toolbar}>
-          <div css={s.filters}>
+        <Toolbar>
+          <Filters>
             <FilterButton
               label="날짜"
               isOpen={openFilter === 'date'}
@@ -85,27 +83,27 @@ const InventoryManagementPage = () => {
               isOpen={openFilter === 'qty'}
               onToggle={() => setOpenFilter(openFilter === 'qty' ? null : 'qty')}
             >
-              <p css={s.qtyLabel}>수량</p>
-              <div css={s.qtyInputRow}>
-                <input css={s.qtyInput} type="number" value={qtyMin} onChange={e => setQtyMin(e.target.value)} />
-                <span css={s.qtySep}>~</span>
-                <input css={s.qtyInput} type="number" value={qtyMax} onChange={e => setQtyMax(e.target.value)} />
-              </div>
+              <QtyLabel>수량</QtyLabel>
+              <QtyInputRow>
+                <QtyInput type="number" value={qtyMin} onChange={e => setQtyMin(e.target.value)} />
+                <QtySep>~</QtySep>
+                <QtyInput type="number" value={qtyMax} onChange={e => setQtyMax(e.target.value)} />
+              </QtyInputRow>
             </FilterButton>
             <FilterButton
               label="재고 상태"
               isOpen={openFilter === 'status'}
               onToggle={() => setOpenFilter(openFilter === 'status' ? null : 'status')}
             >
-              <div css={s.sortOptionList}>
-                <button css={[s.sortOption, stockStatus === 'current' && s.sortOptionActive]} type="button" onClick={() => setStockStatus('current')}>현재 재고</button>
-                <button css={[s.sortOption, stockStatus === 'inout' && s.sortOptionActive]} type="button" onClick={() => setStockStatus('inout')}>재고 수불</button>
-                <button css={[s.sortOption, stockStatus === 'changed' && s.sortOptionActive]} type="button" onClick={() => setStockStatus('changed')}>변경 재고</button>
-              </div>
+              <SortOptionList>
+                <SortOption active={stockStatus === 'current'} type="button" onClick={() => setStockStatus('current')}>현재 재고</SortOption>
+                <SortOption active={stockStatus === 'inout'} type="button" onClick={() => setStockStatus('inout')}>재고 수불</SortOption>
+                <SortOption active={stockStatus === 'changed'} type="button" onClick={() => setStockStatus('changed')}>변경 재고</SortOption>
+              </SortOptionList>
             </FilterButton>
-          </div>
+          </Filters>
 
-          <div css={s.toolbarRight}>
+          <ToolbarRight>
             <SearchInput value={search} onChange={setSearch} />
             <ActionMenu
               label="재고 관리"
@@ -113,11 +111,11 @@ const InventoryManagementPage = () => {
               onToggle={() => setActionOpen(v => !v)}
               items={INVENTORY_ACTIONS}
             />
-          </div>
-        </div>
+          </ToolbarRight>
+        </Toolbar>
 
-        <div css={s.tableWrap}>
-          <table css={s.table}>
+        <TableWrap>
+          <Table>
             <colgroup>
               <col style={{ width: '48px' }} />
               <col style={{ width: '130px' }} />
@@ -130,40 +128,36 @@ const InventoryManagementPage = () => {
               <col style={{ width: '100px' }} />
             </colgroup>
             <thead>
-              <tr css={s.headerRow}>
-                <th css={s.th}>
-                  <Checkbox checked={allSelected} onChange={toggleSelectAll} />
-                </th>
-                <th css={s.th}>변경일시</th>
-                <th css={s.th}>입/출고번호</th>
-                <th css={s.th}>작업화면</th>
-                <th css={s.th}>자재위치</th>
-                <th css={s.th}>자재코드</th>
-                <th css={s.th}>자재명</th>
-                <th css={s.th}>변경수량</th>
-                <th css={s.th}>변경자</th>
-              </tr>
+              <HeaderRow>
+                <Th><Checkbox checked={allSelected} onChange={toggleSelectAll} /></Th>
+                <Th>변경일시</Th>
+                <Th>입/출고번호</Th>
+                <Th>작업화면</Th>
+                <Th>자재위치</Th>
+                <Th>자재코드</Th>
+                <Th>자재명</Th>
+                <Th>변경수량</Th>
+                <Th>변경자</Th>
+              </HeaderRow>
             </thead>
             <tbody>
               {rows.map(row => (
-                <tr key={row.id} css={s.dataRow}>
-                  <td css={s.td}>
-                    <Checkbox checked={selectedRows.has(row.id)} onChange={() => toggleRow(row.id)} />
-                  </td>
-                  <td css={s.td}>{row.changedAt}</td>
-                  <td css={s.td}>{row.ioNumber}</td>
-                  <td css={s.td}>{row.workScreen}</td>
-                  <td css={s.td}>{row.location}</td>
-                  <td css={s.td}>{row.code}</td>
-                  <td css={s.td}>{row.name}</td>
-                  <td css={s.td}>{row.changedQty}</td>
-                  <td css={s.td}>{row.manager}</td>
-                </tr>
+                <DataRow key={row.id}>
+                  <Td><Checkbox checked={selectedRows.has(row.id)} onChange={() => toggleRow(row.id)} /></Td>
+                  <Td>{row.changedAt}</Td>
+                  <Td>{row.ioNumber}</Td>
+                  <Td>{row.workScreen}</Td>
+                  <Td>{row.location}</Td>
+                  <Td>{row.code}</Td>
+                  <Td>{row.name}</Td>
+                  <Td>{row.changedQty}</Td>
+                  <Td>{row.manager}</Td>
+                </DataRow>
               ))}
             </tbody>
-          </table>
-        </div>
-      </div>
+          </Table>
+        </TableWrap>
+      </PageInner>
     </Layout>
   );
 };

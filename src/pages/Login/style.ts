@@ -1,6 +1,6 @@
-import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 
-export const loginWrapper = css`
+export const LoginWrapper = styled.div`
   flex: 1;
   display: flex;
   align-items: center;
@@ -12,7 +12,7 @@ export const loginWrapper = css`
   box-sizing: border-box;
 `;
 
-export const formContainer = css`
+export const FormContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -34,14 +34,14 @@ export const formContainer = css`
   }
 `;
 
-export const logoContainer = css`
+export const LogoContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
 `;
 
-export const logoImage = css`
+export const LogoImage = styled.img`
   width: 432px;
   height: auto;
   max-width: 100%;
@@ -55,21 +55,21 @@ export const logoImage = css`
   }
 `;
 
-export const fieldsContainer = css`
+export const FieldsContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 24px;
   width: 100%;
 `;
 
-export const inputGroup = css`
+export const InputGroup = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
   width: 100%;
 `;
 
-export const inputLabel = css`
+export const InputLabel = styled.label`
   font-family: 'Pretendard Variable', sans-serif;
   font-weight: 500;
   font-size: 18px;
@@ -83,7 +83,7 @@ export const inputLabel = css`
   }
 `;
 
-export const inputField = css`
+export const InputField = styled.input`
   width: 100%;
   height: 48px;
   padding: 10px 16px;
@@ -111,13 +111,13 @@ export const inputField = css`
   }
 `;
 
-export const passwordWrapper = css`
+export const PasswordWrapper = styled.div`
   position: relative;
   display: flex;
   align-items: center;
 `;
 
-export const passwordInput = css`
+export const PasswordInput = styled.input`
   width: 100%;
   height: 48px;
   padding: 10px 48px 10px 16px;
@@ -145,7 +145,7 @@ export const passwordInput = css`
   }
 `;
 
-export const visibilityBtn = css`
+export const VisibilityBtn = styled.button`
   position: absolute;
   right: 12px;
   top: 50%;
@@ -159,14 +159,14 @@ export const visibilityBtn = css`
   color: #9497a0;
 `;
 
-export const actionsContainer = css`
+export const ActionsContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 31px;
   width: 100%;
 `;
 
-export const loginBtn = css`
+export const LoginBtn = styled.button`
   width: 100%;
   height: 57px;
   background: #0068e0;
@@ -194,14 +194,14 @@ export const loginBtn = css`
   }
 `;
 
-export const registerLinkRow = css`
+export const RegisterLinkRow = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
   height: 38px;
 `;
 
-export const registerBtn = css`
+export const RegisterBtn = styled.button`
   display: flex;
   align-items: center;
   gap: 2px;

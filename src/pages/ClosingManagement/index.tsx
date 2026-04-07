@@ -1,10 +1,13 @@
-/** @jsxImportSource @emotion/react */
 import { useState } from 'react';
 import Layout from '../../widgets/Layout';
 import { FilterButton } from '../../shared/ui/FilterButton';
 import { SearchInput } from '../../shared/ui/SearchInput';
 import { Checkbox } from '../../shared/ui/Checkbox';
-import * as s from './style';
+import {
+  Backdrop, PageInner, PageTitle, Toolbar, Filters,
+  TableWrap, Table, HeaderRow, Th, DataRow, Td,
+  StatusText, CloseBtn, CancelBtn,
+} from './style';
 
 type FilterType = 'period' | 'status' | null;
 type ClosingStatus = '마감' | '미마감';
@@ -54,13 +57,13 @@ const ClosingManagementPage = () => {
 
   return (
     <Layout>
-      {openFilter && <div css={s.backdrop} onClick={closeFilter} />}
+      {openFilter && <Backdrop onClick={closeFilter} />}
 
-      <div css={s.pageInner}>
-        <h1 css={s.pageTitle}>마감 관리</h1>
+      <PageInner>
+        <PageTitle>마감 관리</PageTitle>
 
-        <div css={s.toolbar}>
-          <div css={s.filters}>
+        <Toolbar>
+          <Filters>
             <FilterButton
               label="기간"
               isOpen={openFilter === 'period'}
@@ -71,13 +74,13 @@ const ClosingManagementPage = () => {
               isOpen={openFilter === 'status'}
               onToggle={() => setOpenFilter(openFilter === 'status' ? null : 'status')}
             />
-          </div>
+          </Filters>
 
           <SearchInput value={search} onChange={setSearch} />
-        </div>
+        </Toolbar>
 
-        <div css={s.tableWrap}>
-          <table css={s.table}>
+        <TableWrap>
+          <Table>
             <colgroup>
               <col style={{ width: '48px' }} />
               <col style={{ width: '200px' }} />
@@ -86,46 +89,36 @@ const ClosingManagementPage = () => {
               <col style={{ width: '120px' }} />
             </colgroup>
             <thead>
-              <tr css={s.headerRow}>
-                <th css={s.th}>
-                  <Checkbox checked={allSelected} onChange={toggleSelectAll} />
-                </th>
-                <th css={s.th}>사업장</th>
-                <th css={s.th}>기간</th>
-                <th css={s.th}>상태</th>
-                <th css={s.th}>마감</th>
-              </tr>
+              <HeaderRow>
+                <Th><Checkbox checked={allSelected} onChange={toggleSelectAll} /></Th>
+                <Th>사업장</Th>
+                <Th>기간</Th>
+                <Th>상태</Th>
+                <Th>마감</Th>
+              </HeaderRow>
             </thead>
             <tbody>
               {rows.map(row => (
-                <tr key={row.id} css={s.dataRow}>
-                  <td css={s.td}>
-                    <Checkbox checked={selectedRows.has(row.id)} onChange={() => toggleRow(row.id)} />
-                  </td>
-                  <td css={s.td}>{row.site}</td>
-                  <td css={s.td}>{row.period}</td>
-                  <td css={s.td}>
-                    <span css={row.status === '마감' ? s.statusClosed : s.statusOpen}>
-                      {row.status}
-                    </span>
-                  </td>
-                  <td css={s.td}>
+                <DataRow key={row.id}>
+                  <Td><Checkbox checked={selectedRows.has(row.id)} onChange={() => toggleRow(row.id)} /></Td>
+                  <Td>{row.site}</Td>
+                  <Td>{row.period}</Td>
+                  <Td>
+                    <StatusText closed={row.status === '마감'}>{row.status}</StatusText>
+                  </Td>
+                  <Td>
                     {row.status === '마감' ? (
-                      <button css={s.cancelBtn} type="button" onClick={() => toggleStatus(row.id)}>
-                        취소
-                      </button>
+                      <CancelBtn type="button" onClick={() => toggleStatus(row.id)}>취소</CancelBtn>
                     ) : (
-                      <button css={s.closeBtn} type="button" onClick={() => toggleStatus(row.id)}>
-                        마감
-                      </button>
+                      <CloseBtn type="button" onClick={() => toggleStatus(row.id)}>마감</CloseBtn>
                     )}
-                  </td>
-                </tr>
+                  </Td>
+                </DataRow>
               ))}
             </tbody>
-          </table>
-        </div>
-      </div>
+          </Table>
+        </TableWrap>
+      </PageInner>
     </Layout>
   );
 };

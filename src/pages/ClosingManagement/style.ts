@@ -1,4 +1,5 @@
 import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 
 export const backdrop = css`
   position: fixed;
@@ -143,3 +144,22 @@ export const cancelBtn = css`
     background: #7c7f8a;
   }
 `;
+
+export const Backdrop = styled.div`${backdrop}`;
+export const PageInner = styled.div`${pageInner}`;
+export const PageTitle = styled.h1`${pageTitle}`;
+export const Toolbar = styled.div`${toolbar}`;
+export const Filters = styled.div`${filters}`;
+export const TableWrap = styled.div`${tableWrap}`;
+export const Table = styled.table`${table}`;
+export const HeaderRow = styled.tr`${headerRow}`;
+export const Th = styled.th`${th}`;
+export const DataRow = styled.tr`${dataRow}`;
+export const Td = styled.td`${td}`;
+export const StatusText = styled('span', {
+  shouldForwardProp: (prop) => prop !== 'closed',
+})<{ closed?: boolean }>`
+  ${({ closed }) => (closed ? statusClosed : statusOpen)}
+`;
+export const CloseBtn = styled.button`${closeBtn}`;
+export const CancelBtn = styled.button`${cancelBtn}`;
