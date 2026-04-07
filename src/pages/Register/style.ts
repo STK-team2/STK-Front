@@ -1,4 +1,5 @@
 import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 
 export const registerWrapper = css`
   flex: 1;
@@ -204,8 +205,13 @@ export const verifyBtn = css`
   cursor: pointer;
   font-feature-settings: 'ss05' 1;
   flex-shrink: 0;
-  &:hover {
+  transition: background 0.2s;
+  &:hover:not(:disabled) {
     background: #0056b8;
+  }
+  &:disabled {
+    background: #dddee3;
+    cursor: not-allowed;
   }
 `;
 
@@ -274,4 +280,30 @@ export const submitBtnActive = css`
   &:hover {
     background: #0056b8;
   }
+`;
+
+export const RegisterWrapper = styled.div`${registerWrapper}`;
+export const LeftPanel = styled.div`${leftPanel}`;
+export const LeftBgImage = styled.img`${leftBgImage}`;
+export const LeftBgOverlay = styled.div`${leftBgOverlay}`;
+export const RightPanel = styled.div`${rightPanel}`;
+export const FormContainer = styled.div`${formContainer}`;
+export const Heading = styled.div`${heading}`;
+export const Title = styled.p`${title}`;
+export const Subtitle = styled.p`${subtitle}`;
+export const FieldsContainer = styled.div`${fieldsContainer}`;
+export const InputGroup = styled.div`${inputGroup}`;
+export const InputLabel = styled.label`${inputLabel}`;
+export const InputField = styled.input`${inputField}`;
+export const VerifyRow = styled.div`${verifyRow}`;
+export const VerifyInput = styled.input`${verifyInput}`;
+export const VerifyBtn = styled.button`${verifyBtn}`;
+export const PasswordWrapper = styled.div`${passwordWrapper}`;
+export const PasswordInput = styled.input`${passwordInput}`;
+export const VisibilityBtn = styled.button`${visibilityBtn}`;
+export const SubmitBtn = styled('button', {
+  shouldForwardProp: (prop) => prop !== 'active',
+})<{ active?: boolean }>`
+  ${submitBtn}
+  ${({ active }) => active && submitBtnActive}
 `;

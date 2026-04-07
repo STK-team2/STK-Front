@@ -1,4 +1,5 @@
 import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 
 export const backdrop = css`
   position: fixed;
@@ -163,3 +164,26 @@ export const td = css`
   white-space: nowrap;
 `;
 
+export const Backdrop = styled.div`${backdrop}`;
+export const PageInner = styled.div`${pageInner}`;
+export const PageTitle = styled.h1`${pageTitle}`;
+export const Toolbar = styled.div`${toolbar}`;
+export const Filters = styled.div`${filters}`;
+export const ToolbarRight = styled.div`${toolbarRight}`;
+export const QtyLabel = styled.p`${qtyLabel}`;
+export const SortOptionList = styled.div`${sortOptionList}`;
+export const SortOption = styled('button', {
+  shouldForwardProp: (prop) => prop !== 'active',
+})<{ active?: boolean }>`
+  ${sortOption}
+  ${({ active }) => active && sortOptionActive}
+`;
+export const QtyInputRow = styled.div`${qtyInputRow}`;
+export const QtyInput = styled.input`${qtyInput}`;
+export const QtySep = styled.span`${qtySep}`;
+export const TableWrap = styled.div`${tableWrap}`;
+export const Table = styled.table`${table}`;
+export const HeaderRow = styled.tr`${headerRow}`;
+export const Th = styled.th`${th}`;
+export const DataRow = styled.tr`${dataRow}`;
+export const Td = styled.td`${td}`;

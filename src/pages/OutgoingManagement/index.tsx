@@ -1,11 +1,16 @@
-/** @jsxImportSource @emotion/react */
 import { useState } from 'react';
 import Layout from '../../widgets/Layout';
 import { FilterButton } from '../../shared/ui/FilterButton';
 import { SearchInput } from '../../shared/ui/SearchInput';
 import { ActionMenu } from '../../shared/ui/ActionMenu';
 import { Checkbox } from '../../shared/ui/Checkbox';
-import * as s from './style';
+import {
+  Backdrop, PageInner, PageTitle, Toolbar, Filters, ToolbarRight,
+  QtyLabel, QtyInputRow, QtyInput, QtySep, TotalLabel,
+  TableWrap, Table, HeaderRow, Th, DataRow, Td,
+  NewRow, NewRowInput, NewRowDateWrap, NewRowDateInput,
+  CancelBtn, DeleteBtn,
+} from './style';
 
 type FilterType = 'date' | 'qty' | null;
 
@@ -22,7 +27,7 @@ interface Row {
   reference: string;
 }
 
-interface NewRow {
+interface NewRowData {
   id: string;
   site: string;
   date: string;
@@ -42,17 +47,9 @@ const mockData: Row[] = [
 const OUTGOING_ACTIONS = ['출고 등록', '출고 수정', '출고 삭제', '다운로드'];
 
 let rowIdCounter = 0;
-const createEmptyRow = (): NewRow => ({
+const createEmptyRow = (): NewRowData => ({
   id: `new-${++rowIdCounter}`,
-  site: '',
-  date: '',
-  code: '',
-  name: '',
-  qty: '',
-  location: '',
-  manager: '',
-  note: '',
-  reference: '',
+  site: '', date: '', code: '', name: '', qty: '', location: '', manager: '', note: '', reference: '',
 });
 
 const OutgoingManagementPage = () => {
@@ -63,7 +60,7 @@ const OutgoingManagementPage = () => {
   const [qtyMax, setQtyMax] = useState('');
   const [rows, setRows] = useState<Row[]>(mockData);
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
-  const [newRows, setNewRows] = useState<NewRow[]>([]);
+  const [newRows, setNewRows] = useState<NewRowData[]>([]);
   const [deleteMode, setDeleteMode] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [editValues, setEditValues] = useState<Record<string, Row>>({});
@@ -100,21 +97,9 @@ const OutgoingManagementPage = () => {
     }
   };
 
-  const cancelDeleteMode = () => {
-    setDeleteMode(false);
-    setSelectedRows(new Set());
-  };
-
-  const confirmDelete = () => {
-    setRows(prev => prev.filter(r => !selectedRows.has(r.id)));
-    setSelectedRows(new Set());
-  };
-
-  const cancelEditMode = () => {
-    setEditMode(false);
-    setEditValues({});
-    setNewRows([]);
-  };
+  const cancelDeleteMode = () => { setDeleteMode(false); setSelectedRows(new Set()); };
+  const confirmDelete = () => { setRows(prev => prev.filter(r => !selectedRows.has(r.id))); setSelectedRows(new Set()); };
+  const cancelEditMode = () => { setEditMode(false); setEditValues({}); setNewRows([]); };
 
   const updateEditValue = (id: string, field: keyof Omit<Row, 'id'>, value: string) => {
     setEditValues(prev => ({
@@ -123,64 +108,46 @@ const OutgoingManagementPage = () => {
     }));
   };
 
-  const saveEditRow = (id: string) => {
-    setRows(prev => prev.map(r => r.id === id ? editValues[id] : r));
-  };
-
+  const saveEditRow = (id: string) => { setRows(prev => prev.map(r => r.id === id ? editValues[id] : r)); };
   const revertEditRow = (id: string) => {
     const original = rows.find(r => r.id === id);
     if (original) setEditValues(prev => ({ ...prev, [id]: { ...original } }));
   };
 
   const handleEditRowKeyDown = (id: string, e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      saveEditRow(id);
-    } else if (e.key === 'Escape') {
-      revertEditRow(id);
-    }
+    if (e.key === 'Enter') { e.preventDefault(); saveEditRow(id); }
+    else if (e.key === 'Escape') { revertEditRow(id); }
   };
 
-  const updateNewRow = (id: string, field: keyof Omit<NewRow, 'id'>, value: string) => {
+  const updateNewRow = (id: string, field: keyof Omit<NewRowData, 'id'>, value: string) => {
     setNewRows(prev => prev.map(r => r.id === id ? { ...r, [field]: value } : r));
   };
 
   const submitRow = (id: string) => {
     setNewRows(prev => {
       const row = prev.find(r => r.id === id);
-      if (row) {
-        setRows(r => [...r, { ...row, qty: Number(row.qty) }]);
-      }
+      if (row) setRows(r => [...r, { ...row, qty: Number(row.qty) }]);
       const remaining = prev.filter(r => r.id !== id);
       return remaining.length === 0 ? [createEmptyRow()] : remaining;
     });
   };
 
   const handleNewRowKeyDown = (id: string, e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      submitRow(id);
-    } else if (e.key === 'Escape') {
-      setNewRows(prev => prev.filter(r => r.id !== id));
-    }
+    if (e.key === 'Enter') { e.preventDefault(); submitRow(id); }
+    else if (e.key === 'Escape') { setNewRows(prev => prev.filter(r => r.id !== id)); }
   };
 
-  const closeAll = () => {
-    setOpenFilter(null);
-    setActionOpen(false);
-  };
+  const closeAll = () => { setOpenFilter(null); setActionOpen(false); };
 
   return (
     <Layout>
-      {(openFilter || actionOpen) && (
-        <div css={s.backdrop} onClick={closeAll} />
-      )}
+      {(openFilter || actionOpen) && <Backdrop onClick={closeAll} />}
 
-      <div css={s.pageInner}>
-        <h1 css={s.pageTitle}>출고 관리</h1>
+      <PageInner>
+        <PageTitle>출고 관리</PageTitle>
 
-        <div css={s.toolbar}>
-          <div css={s.filters}>
+        <Toolbar>
+          <Filters>
             <FilterButton
               label="날짜"
               isOpen={openFilter === 'date'}
@@ -191,24 +158,24 @@ const OutgoingManagementPage = () => {
               isOpen={openFilter === 'qty'}
               onToggle={() => setOpenFilter(openFilter === 'qty' ? null : 'qty')}
             >
-              <p css={s.qtyLabel}>수량</p>
-              <div css={s.qtyInputRow}>
-                <input css={s.qtyInput} type="number" value={qtyMin} onChange={e => setQtyMin(e.target.value)} />
-                <span css={s.qtySep}>~</span>
-                <input css={s.qtyInput} type="number" value={qtyMax} onChange={e => setQtyMax(e.target.value)} />
-              </div>
+              <QtyLabel>수량</QtyLabel>
+              <QtyInputRow>
+                <QtyInput type="number" value={qtyMin} onChange={e => setQtyMin(e.target.value)} />
+                <QtySep>~</QtySep>
+                <QtyInput type="number" value={qtyMax} onChange={e => setQtyMax(e.target.value)} />
+              </QtyInputRow>
             </FilterButton>
-          </div>
+          </Filters>
 
-          <div css={s.toolbarRight}>
+          <ToolbarRight>
             <SearchInput value={search} onChange={setSearch} />
             {deleteMode ? (
               <>
-                <button css={s.cancelBtn} type="button" onClick={cancelDeleteMode}>취소</button>
-                <button css={s.deleteBtn} type="button" onClick={confirmDelete}>삭제</button>
+                <CancelBtn type="button" onClick={cancelDeleteMode}>취소</CancelBtn>
+                <DeleteBtn type="button" onClick={confirmDelete}>삭제</DeleteBtn>
               </>
             ) : editMode ? (
-              <button css={s.cancelBtn} type="button" onClick={cancelEditMode}>취소</button>
+              <CancelBtn type="button" onClick={cancelEditMode}>취소</CancelBtn>
             ) : (
               <ActionMenu
                 label="출고 관리"
@@ -218,13 +185,13 @@ const OutgoingManagementPage = () => {
                 onItemClick={handleActionItem}
               />
             )}
-          </div>
-        </div>
+          </ToolbarRight>
+        </Toolbar>
 
-        <p css={s.totalLabel}>합계 (1,001)</p>
+        <TotalLabel>합계 (1,001)</TotalLabel>
 
-        <div css={s.tableWrap}>
-          <table css={s.table}>
+        <TableWrap>
+          <Table>
             <colgroup>
               <col style={{ width: '48px' }} />
               <col style={{ width: '110px' }} />
@@ -238,75 +205,65 @@ const OutgoingManagementPage = () => {
               <col style={{ width: '90px' }} />
             </colgroup>
             <thead>
-              <tr css={s.headerRow}>
-                <th css={s.th}>
-                  <Checkbox checked={allSelected} onChange={toggleSelectAll} />
-                </th>
-                <th css={s.th}>사업장</th>
-                <th css={s.th}>출고 날짜</th>
-                <th css={s.th}>자재 코드</th>
-                <th css={s.th}>자재명</th>
-                <th css={s.th}>수량</th>
-                <th css={s.th}>자재 위치</th>
-                <th css={s.th}>출고 담당자</th>
-                <th css={s.th}>비고</th>
-                <th css={s.th}>참고</th>
-              </tr>
+              <HeaderRow>
+                <Th><Checkbox checked={allSelected} onChange={toggleSelectAll} /></Th>
+                <Th>사업장</Th>
+                <Th>출고 날짜</Th>
+                <Th>자재 코드</Th>
+                <Th>자재명</Th>
+                <Th>수량</Th>
+                <Th>자재 위치</Th>
+                <Th>출고 담당자</Th>
+                <Th>비고</Th>
+                <Th>참고</Th>
+              </HeaderRow>
             </thead>
             <tbody>
               {rows.map(row => editMode ? (
-                <tr key={row.id} css={s.newRow}>
-                  <td css={s.td} />
-                  <td css={s.td}><input css={s.newRowInput} type="text" value={editValues[row.id]?.site ?? row.site} onChange={e => updateEditValue(row.id, 'site', e.target.value)} onKeyDown={e => handleEditRowKeyDown(row.id, e)} /></td>
-                  <td css={s.td}>
-                    <div css={s.newRowDateWrap}>
-                      <input css={s.newRowDateInput} type="date" value={editValues[row.id]?.date ?? row.date} onChange={e => updateEditValue(row.id, 'date', e.target.value)} onKeyDown={e => handleEditRowKeyDown(row.id, e)} />
-                    </div>
-                  </td>
-                  <td css={s.td}><input css={s.newRowInput} type="text" value={editValues[row.id]?.code ?? row.code} onChange={e => updateEditValue(row.id, 'code', e.target.value)} onKeyDown={e => handleEditRowKeyDown(row.id, e)} /></td>
-                  <td css={s.td}><input css={s.newRowInput} type="text" value={editValues[row.id]?.name ?? row.name} onChange={e => updateEditValue(row.id, 'name', e.target.value)} onKeyDown={e => handleEditRowKeyDown(row.id, e)} /></td>
-                  <td css={s.td}><input css={s.newRowInput} type="number" value={editValues[row.id]?.qty ?? row.qty} onChange={e => updateEditValue(row.id, 'qty', e.target.value)} onKeyDown={e => handleEditRowKeyDown(row.id, e)} /></td>
-                  <td css={s.td}><input css={s.newRowInput} type="text" value={editValues[row.id]?.location ?? row.location} onChange={e => updateEditValue(row.id, 'location', e.target.value)} onKeyDown={e => handleEditRowKeyDown(row.id, e)} /></td>
-                  <td css={s.td}><input css={s.newRowInput} type="text" value={editValues[row.id]?.manager ?? row.manager} onChange={e => updateEditValue(row.id, 'manager', e.target.value)} onKeyDown={e => handleEditRowKeyDown(row.id, e)} /></td>
-                  <td css={s.td}><input css={s.newRowInput} type="text" value={editValues[row.id]?.note ?? row.note} onChange={e => updateEditValue(row.id, 'note', e.target.value)} onKeyDown={e => handleEditRowKeyDown(row.id, e)} /></td>
-                  <td css={s.td}><input css={s.newRowInput} type="text" value={editValues[row.id]?.reference ?? row.reference} onChange={e => updateEditValue(row.id, 'reference', e.target.value)} onKeyDown={e => handleEditRowKeyDown(row.id, e)} /></td>
-                </tr>
+                <NewRow key={row.id}>
+                  <Td />
+                  <Td><NewRowInput type="text" value={editValues[row.id]?.site ?? row.site} onChange={e => updateEditValue(row.id, 'site', e.target.value)} onKeyDown={e => handleEditRowKeyDown(row.id, e)} /></Td>
+                  <Td><NewRowDateWrap><NewRowDateInput type="date" value={editValues[row.id]?.date ?? row.date} onChange={e => updateEditValue(row.id, 'date', e.target.value)} onKeyDown={e => handleEditRowKeyDown(row.id, e)} /></NewRowDateWrap></Td>
+                  <Td><NewRowInput type="text" value={editValues[row.id]?.code ?? row.code} onChange={e => updateEditValue(row.id, 'code', e.target.value)} onKeyDown={e => handleEditRowKeyDown(row.id, e)} /></Td>
+                  <Td><NewRowInput type="text" value={editValues[row.id]?.name ?? row.name} onChange={e => updateEditValue(row.id, 'name', e.target.value)} onKeyDown={e => handleEditRowKeyDown(row.id, e)} /></Td>
+                  <Td><NewRowInput type="number" value={editValues[row.id]?.qty ?? row.qty} onChange={e => updateEditValue(row.id, 'qty', e.target.value)} onKeyDown={e => handleEditRowKeyDown(row.id, e)} /></Td>
+                  <Td><NewRowInput type="text" value={editValues[row.id]?.location ?? row.location} onChange={e => updateEditValue(row.id, 'location', e.target.value)} onKeyDown={e => handleEditRowKeyDown(row.id, e)} /></Td>
+                  <Td><NewRowInput type="text" value={editValues[row.id]?.manager ?? row.manager} onChange={e => updateEditValue(row.id, 'manager', e.target.value)} onKeyDown={e => handleEditRowKeyDown(row.id, e)} /></Td>
+                  <Td><NewRowInput type="text" value={editValues[row.id]?.note ?? row.note} onChange={e => updateEditValue(row.id, 'note', e.target.value)} onKeyDown={e => handleEditRowKeyDown(row.id, e)} /></Td>
+                  <Td><NewRowInput type="text" value={editValues[row.id]?.reference ?? row.reference} onChange={e => updateEditValue(row.id, 'reference', e.target.value)} onKeyDown={e => handleEditRowKeyDown(row.id, e)} /></Td>
+                </NewRow>
               ) : (
-                <tr key={row.id} css={s.dataRow}>
-                  <td css={s.td}><Checkbox checked={selectedRows.has(row.id)} onChange={() => toggleRow(row.id)} /></td>
-                  <td css={s.td}>{row.site}</td>
-                  <td css={s.td}>{row.date}</td>
-                  <td css={s.td}>{row.code}</td>
-                  <td css={s.td}>{row.name}</td>
-                  <td css={s.td}>{row.qty}</td>
-                  <td css={s.td}>{row.location}</td>
-                  <td css={s.td}>{row.manager}</td>
-                  <td css={s.td}>{row.note}</td>
-                  <td css={s.td}>{row.reference}</td>
-                </tr>
+                <DataRow key={row.id}>
+                  <Td><Checkbox checked={selectedRows.has(row.id)} onChange={() => toggleRow(row.id)} /></Td>
+                  <Td>{row.site}</Td>
+                  <Td>{row.date}</Td>
+                  <Td>{row.code}</Td>
+                  <Td>{row.name}</Td>
+                  <Td>{row.qty}</Td>
+                  <Td>{row.location}</Td>
+                  <Td>{row.manager}</Td>
+                  <Td>{row.note}</Td>
+                  <Td>{row.reference}</Td>
+                </DataRow>
               ))}
               {newRows.map(row => (
-                <tr key={row.id} css={s.newRow}>
-                  <td css={s.td} />
-                  <td css={s.td}><input css={s.newRowInput} type="text" value={row.site} onChange={e => updateNewRow(row.id, 'site', e.target.value)} onKeyDown={e => handleNewRowKeyDown(row.id, e)} /></td>
-                  <td css={s.td}>
-                    <div css={s.newRowDateWrap}>
-                      <input css={s.newRowDateInput} type="date" value={row.date} onChange={e => updateNewRow(row.id, 'date', e.target.value)} onKeyDown={e => handleNewRowKeyDown(row.id, e)} />
-                    </div>
-                  </td>
-                  <td css={s.td}><input css={s.newRowInput} type="text" value={row.code} onChange={e => updateNewRow(row.id, 'code', e.target.value)} onKeyDown={e => handleNewRowKeyDown(row.id, e)} /></td>
-                  <td css={s.td}><input css={s.newRowInput} type="text" value={row.name} onChange={e => updateNewRow(row.id, 'name', e.target.value)} onKeyDown={e => handleNewRowKeyDown(row.id, e)} /></td>
-                  <td css={s.td}><input css={s.newRowInput} type="number" value={row.qty} onChange={e => updateNewRow(row.id, 'qty', e.target.value)} onKeyDown={e => handleNewRowKeyDown(row.id, e)} /></td>
-                  <td css={s.td}><input css={s.newRowInput} type="text" value={row.location} onChange={e => updateNewRow(row.id, 'location', e.target.value)} onKeyDown={e => handleNewRowKeyDown(row.id, e)} /></td>
-                  <td css={s.td}><input css={s.newRowInput} type="text" value={row.manager} onChange={e => updateNewRow(row.id, 'manager', e.target.value)} onKeyDown={e => handleNewRowKeyDown(row.id, e)} /></td>
-                  <td css={s.td}><input css={s.newRowInput} type="text" value={row.note} onChange={e => updateNewRow(row.id, 'note', e.target.value)} onKeyDown={e => handleNewRowKeyDown(row.id, e)} /></td>
-                  <td css={s.td}><input css={s.newRowInput} type="text" value={row.reference} onChange={e => updateNewRow(row.id, 'reference', e.target.value)} onKeyDown={e => handleNewRowKeyDown(row.id, e)} /></td>
-                </tr>
+                <NewRow key={row.id}>
+                  <Td />
+                  <Td><NewRowInput type="text" value={row.site} onChange={e => updateNewRow(row.id, 'site', e.target.value)} onKeyDown={e => handleNewRowKeyDown(row.id, e)} /></Td>
+                  <Td><NewRowDateWrap><NewRowDateInput type="date" value={row.date} onChange={e => updateNewRow(row.id, 'date', e.target.value)} onKeyDown={e => handleNewRowKeyDown(row.id, e)} /></NewRowDateWrap></Td>
+                  <Td><NewRowInput type="text" value={row.code} onChange={e => updateNewRow(row.id, 'code', e.target.value)} onKeyDown={e => handleNewRowKeyDown(row.id, e)} /></Td>
+                  <Td><NewRowInput type="text" value={row.name} onChange={e => updateNewRow(row.id, 'name', e.target.value)} onKeyDown={e => handleNewRowKeyDown(row.id, e)} /></Td>
+                  <Td><NewRowInput type="number" value={row.qty} onChange={e => updateNewRow(row.id, 'qty', e.target.value)} onKeyDown={e => handleNewRowKeyDown(row.id, e)} /></Td>
+                  <Td><NewRowInput type="text" value={row.location} onChange={e => updateNewRow(row.id, 'location', e.target.value)} onKeyDown={e => handleNewRowKeyDown(row.id, e)} /></Td>
+                  <Td><NewRowInput type="text" value={row.manager} onChange={e => updateNewRow(row.id, 'manager', e.target.value)} onKeyDown={e => handleNewRowKeyDown(row.id, e)} /></Td>
+                  <Td><NewRowInput type="text" value={row.note} onChange={e => updateNewRow(row.id, 'note', e.target.value)} onKeyDown={e => handleNewRowKeyDown(row.id, e)} /></Td>
+                  <Td><NewRowInput type="text" value={row.reference} onChange={e => updateNewRow(row.id, 'reference', e.target.value)} onKeyDown={e => handleNewRowKeyDown(row.id, e)} /></Td>
+                </NewRow>
               ))}
             </tbody>
-          </table>
-        </div>
-      </div>
+          </Table>
+        </TableWrap>
+      </PageInner>
     </Layout>
   );
 };

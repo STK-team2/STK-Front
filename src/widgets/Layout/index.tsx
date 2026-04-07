@@ -1,7 +1,6 @@
-/** @jsxImportSource @emotion/react */
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import * as s from './style';
+import { Wrapper, Sidebar, LogoWrap, LogoClip, Logo, Nav, NavItem, LogoutBtn, Content } from './style';
 
 const navItems = [
   { label: '입고 관리', path: '/incoming' },
@@ -15,31 +14,31 @@ const Layout = ({ children }: { children: ReactNode }) => {
   const location = useLocation();
 
   return (
-    <div css={s.wrapper}>
-      <aside css={s.sidebar}>
-        <div css={s.logoWrap}>
-          <div css={s.logoClip}>
-            <img src="/STKFullName.svg" alt="STK" css={s.logo} />
-          </div>
-        </div>
-        <nav css={s.nav}>
+    <Wrapper>
+      <Sidebar>
+        <LogoWrap>
+          <LogoClip>
+            <Logo src="/STKFullName.svg" alt="STK" />
+          </LogoClip>
+        </LogoWrap>
+        <Nav>
           {navItems.map(item => (
-            <button
+            <NavItem
               key={item.path}
-              css={[s.navItem, location.pathname === item.path && s.navItemActive]}
+              active={location.pathname === item.path}
               onClick={() => navigate(item.path)}
               type="button"
             >
               {item.label}
-            </button>
+            </NavItem>
           ))}
-        </nav>
-        <button css={s.logoutBtn} type="button">로그아웃</button>
-      </aside>
-      <div css={s.content}>
+        </Nav>
+        <LogoutBtn type="button">로그아웃</LogoutBtn>
+      </Sidebar>
+      <Content>
         {children}
-      </div>
-    </div>
+      </Content>
+    </Wrapper>
   );
 };
 
