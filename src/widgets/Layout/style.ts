@@ -3,7 +3,8 @@ import { css } from '@emotion/react';
 export const wrapper = css`
   display: flex;
   flex-direction: row;
-  min-height: 100svh;
+  height: 100vh;
+  overflow: hidden;
   background: #ffffff;
 `;
 
@@ -13,9 +14,8 @@ export const sidebar = css`
   display: flex;
   flex-direction: column;
   background: #ffffff;
-  position: sticky;
-  top: 0;
-  height: 100svh;
+  height: 100vh;
+  border-right: 1px solid #f0f1f4;
 
   @media (max-width: 1280px) {
     width: 190px;
@@ -98,6 +98,7 @@ export const logoutBtn = css`
 export const content = css`
   flex: 1;
   min-width: 0;
-  background: #ffffff;
+  height: 100vh;
   overflow-y: auto;
+  background: #ffffff;
 `;
