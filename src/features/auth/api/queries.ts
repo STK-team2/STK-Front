@@ -10,7 +10,7 @@ import type {
 } from '../../../entities/auth/types';
 
 export const useSignIn = () => {
-  const { setTokens } = useAuthStore();
+  const setTokens = useAuthStore((state) => state.setTokens);
   const navigate = useNavigate();
 
   return useMutation({
@@ -40,7 +40,8 @@ export const useSignUp = () =>
   });
 
 export const useSignOut = () => {
-  const { refreshToken, clearTokens } = useAuthStore();
+  const refreshToken = useAuthStore((state) => state.refreshToken);
+  const clearTokens = useAuthStore((state) => state.clearTokens);
   const navigate = useNavigate();
 
   return useMutation({

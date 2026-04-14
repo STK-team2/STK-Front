@@ -166,6 +166,15 @@ export const ActionsContainer = styled.div`
   width: 100%;
 `;
 
+export const StatusMessage = styled.p<{ error?: boolean }>`
+  min-height: 24px;
+  margin: 0;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: ${({ error }) => (error ? '#d92d20' : '#0068e0')};
+`;
+
 export const LoginBtn = styled.button`
   width: 100%;
   height: 57px;
@@ -179,8 +188,12 @@ export const LoginBtn = styled.button`
   color: #ffffff;
   cursor: pointer;
   font-feature-settings: 'ss05' 1;
-  &:hover {
+  &:hover:not(:disabled) {
     background: #0056b8;
+  }
+  &:disabled {
+    background: #dddee3;
+    cursor: not-allowed;
   }
 
   @media (max-width: 1280px) {

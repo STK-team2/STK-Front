@@ -12,10 +12,8 @@ import ClosingManagementPage from '../pages/ClosingManagement';
 import InventoryManagementPage from '../pages/InventoryManagement';
 
 const ProtectedRoute = ({ children }: { children: ReactElement }) => {
-  const { isAuthenticated, isAuthReady } = useAuthStore((state) => ({
-    isAuthenticated: state.isAuthenticated,
-    isAuthReady: state.isAuthReady,
-  }));
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isAuthReady = useAuthStore((state) => state.isAuthReady);
 
   if (!isAuthReady) {
     return null;
@@ -25,10 +23,8 @@ const ProtectedRoute = ({ children }: { children: ReactElement }) => {
 };
 
 const PublicRoute = ({ children }: { children: ReactElement }) => {
-  const { isAuthenticated, isAuthReady } = useAuthStore((state) => ({
-    isAuthenticated: state.isAuthenticated,
-    isAuthReady: state.isAuthReady,
-  }));
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isAuthReady = useAuthStore((state) => state.isAuthReady);
 
   if (!isAuthReady) {
     return null;
@@ -38,17 +34,10 @@ const PublicRoute = ({ children }: { children: ReactElement }) => {
 };
 
 const RouterContent = () => {
-  const {
-    refreshToken,
-    setAccessToken,
-    setAuthReady,
-    clearTokens,
-  } = useAuthStore((state) => ({
-    refreshToken: state.refreshToken,
-    setAccessToken: state.setAccessToken,
-    setAuthReady: state.setAuthReady,
-    clearTokens: state.clearTokens,
-  }));
+  const refreshToken = useAuthStore((state) => state.refreshToken);
+  const setAccessToken = useAuthStore((state) => state.setAccessToken);
+  const setAuthReady = useAuthStore((state) => state.setAuthReady);
+  const clearTokens = useAuthStore((state) => state.clearTokens);
 
   useEffect(() => {
     let cancelled = false;
@@ -81,13 +70,13 @@ const RouterContent = () => {
 
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/dashboard" element={<DashboardPage />} />
-      <Route path="/incoming" element={<IncomingManagementPage />} />
-      <Route path="/outgoing" element={<OutgoingManagementPage />} />
-      <Route path="/closing" element={<ClosingManagementPage />} />
-      <Route path="/inventory" element={<InventoryManagementPage />} />
+      <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+      <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+      <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+      <Route path="/incoming" element={<ProtectedRoute><IncomingManagementPage /></ProtectedRoute>} />
+      <Route path="/outgoing" element={<ProtectedRoute><OutgoingManagementPage /></ProtectedRoute>} />
+      <Route path="/closing" element={<ProtectedRoute><ClosingManagementPage /></ProtectedRoute>} />
+      <Route path="/inventory" element={<ProtectedRoute><InventoryManagementPage /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
