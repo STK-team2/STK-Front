@@ -1,8 +1,10 @@
 import axios from 'axios';
 import { useAuthStore } from '../../entities/auth/model/authStore';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
+
 export const instance = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE_URL,
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -11,7 +13,7 @@ let refreshRequest: Promise<string> | null = null;
 const requestAccessTokenRefresh = async (refreshToken: string) => {
   if (!refreshRequest) {
     refreshRequest = axios
-      .post('/api/auth/refresh', { refreshToken })
+      .post(`${API_BASE_URL}/auth/refresh`, { refreshToken })
       .then(({ data }) => {
         const newAccessToken = data.data.accessToken as string;
         useAuthStore.getState().setAccessToken(newAccessToken);

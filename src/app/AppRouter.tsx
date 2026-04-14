@@ -12,10 +12,8 @@ import ClosingManagementPage from '../pages/ClosingManagement';
 import InventoryManagementPage from '../pages/InventoryManagement';
 
 const ProtectedRoute = ({ children }: { children: ReactElement }) => {
-  const { isAuthenticated, isAuthReady } = useAuthStore((state) => ({
-    isAuthenticated: state.isAuthenticated,
-    isAuthReady: state.isAuthReady,
-  }));
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isAuthReady = useAuthStore((state) => state.isAuthReady);
 
   if (!isAuthReady) {
     return null;
@@ -25,10 +23,8 @@ const ProtectedRoute = ({ children }: { children: ReactElement }) => {
 };
 
 const PublicRoute = ({ children }: { children: ReactElement }) => {
-  const { isAuthenticated, isAuthReady } = useAuthStore((state) => ({
-    isAuthenticated: state.isAuthenticated,
-    isAuthReady: state.isAuthReady,
-  }));
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isAuthReady = useAuthStore((state) => state.isAuthReady);
 
   if (!isAuthReady) {
     return null;
@@ -38,17 +34,10 @@ const PublicRoute = ({ children }: { children: ReactElement }) => {
 };
 
 const RouterContent = () => {
-  const {
-    refreshToken,
-    setAccessToken,
-    setAuthReady,
-    clearTokens,
-  } = useAuthStore((state) => ({
-    refreshToken: state.refreshToken,
-    setAccessToken: state.setAccessToken,
-    setAuthReady: state.setAuthReady,
-    clearTokens: state.clearTokens,
-  }));
+  const refreshToken = useAuthStore((state) => state.refreshToken);
+  const setAccessToken = useAuthStore((state) => state.setAccessToken);
+  const setAuthReady = useAuthStore((state) => state.setAuthReady);
+  const clearTokens = useAuthStore((state) => state.clearTokens);
 
   useEffect(() => {
     let cancelled = false;
