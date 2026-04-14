@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import type { ReactElement } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { authApi } from '../entities/auth/api/authApi';
 import { useAuthStore } from '../entities/auth/model/authStore';
@@ -9,6 +10,22 @@ import IncomingManagementPage from '../pages/IncomingManagement';
 import OutgoingManagementPage from '../pages/OutgoingManagement';
 import ClosingManagementPage from '../pages/ClosingManagement';
 import InventoryManagementPage from '../pages/InventoryManagement';
+
+const ProtectedRoute = ({ children }: { children: ReactElement }) => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isAuthReady = useAuthStore((state) => state.isAuthReady);
+
+  if (!isAuthReady) return null;
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+};
+
+const PublicRoute = ({ children }: { children: ReactElement }) => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isAuthReady = useAuthStore((state) => state.isAuthReady);
+
+  if (!isAuthReady) return null;
+  return isAuthenticated ? <Navigate to="/incoming" replace /> : children;
+};
 
 const RouterContent = () => {
   const refreshToken = useAuthStore((state) => state.refreshToken);
