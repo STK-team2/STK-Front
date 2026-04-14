@@ -5,29 +5,26 @@ import { SearchInput } from '../../shared/ui/SearchInput';
 import { ActionMenu } from '../../shared/ui/ActionMenu';
 import { Checkbox } from '../../shared/ui/Checkbox';
 import {
+  useDownloadCurrentStock,
+  useGetCurrentStock,
+} from '../../features/stock/api/queries';
+import {
   Backdrop, PageInner, PageTitle, Toolbar, Filters, ToolbarRight,
   QtyLabel, QtyInputRow, QtyInput, QtySep, SortOptionList, SortOption,
   TableWrap, Table, HeaderRow, Th, DataRow, Td,
 } from './style';
 
-type FilterType = 'date' | 'sort' | 'qty' | 'status' | null;
-type StockStatus = null | 'current' | 'inout' | 'changed';
+type FilterType = 'qty' | 'status' | null;
+type StockStatus = null | 'all' | 'empty' | 'available';
 
 interface Row {
   id: string;
-  changedAt: string;
-  ioNumber: string;
-  workScreen: string;
+  boxNumber: string;
   location: string;
-  name: string;
   code: string;
-  changedQty: number;
-  manager: string;
+  name: string;
+  currentStock: number;
 }
-
-const mockData: Row[] = [
-  { id: '1', changedAt: '2025/01/02', ioNumber: '001/002', workScreen: '001/002', location: 'P1', name: '콘센트', code: 'BGE2301031231293', changedQty: 2, manager: '김미냥' },
-];
 
 const INVENTORY_ACTIONS = ['재고 없는 품목', '다운로드'];
 
@@ -37,19 +34,53 @@ const InventoryManagementPage = () => {
   const [search, setSearch] = useState('');
   const [qtyMin, setQtyMin] = useState('');
   const [qtyMax, setQtyMax] = useState('');
-  const [stockStatus, setStockStatus] = useState<StockStatus>(null);
-  const [rows] = useState<Row[]>(mockData);
+  const [stockStatus, setStockStatus] = useState<StockStatus>('all');
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
 
-  const allSelected = rows.length > 0 && selectedRows.size === rows.length;
+  const { data: currentStock = [] } = useGetCurrentStock();
+  const downloadCurrentStockMutation = useDownloadCurrentStock();
+
+  const rows: Row[] = currentStock.map((item) => ({
+    id: item.itemId,
+    boxNumber: item.boxNumber || '-',
+    location: item.location,
+    code: item.itemCode,
+    name: item.itemName,
+    currentStock: item.currentStock,
+  }));
+
+  const filteredRows = rows.filter((row) => {
+    const normalizedSearch = search.trim().toLowerCase();
+    if (
+      normalizedSearch &&
+      ![row.boxNumber, row.location, row.code, row.name]
+        .join(' ')
+        .toLowerCase()
+        .includes(normalizedSearch)
+    ) {
+      return false;
+    }
+
+    if (qtyMin && row.currentStock < Number(qtyMin)) return false;
+    if (qtyMax && row.currentStock > Number(qtyMax)) return false;
+    if (stockStatus === 'empty' && row.currentStock !== 0) return false;
+    if (stockStatus === 'available' && row.currentStock <= 0) return false;
+    return true;
+  });
+
+  const allSelected = filteredRows.length > 0 && selectedRows.size === filteredRows.length;
 
   const toggleSelectAll = () => {
-    if (allSelected) setSelectedRows(new Set());
-    else setSelectedRows(new Set(rows.map(r => r.id)));
+    if (allSelected) {
+      setSelectedRows(new Set());
+      return;
+    }
+
+    setSelectedRows(new Set(filteredRows.map((row) => row.id)));
   };
 
   const toggleRow = (id: string) => {
-    setSelectedRows(prev => {
+    setSelectedRows((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
@@ -57,7 +88,23 @@ const InventoryManagementPage = () => {
     });
   };
 
-  const closeAll = () => { setOpenFilter(null); setActionOpen(false); };
+  const closeAll = () => {
+    setOpenFilter(null);
+    setActionOpen(false);
+  };
+
+  const handleActionItem = async (item: string) => {
+    if (item === '재고 없는 품목') {
+      setStockStatus('empty');
+      setActionOpen(false);
+      return;
+    }
+
+    if (item === '다운로드') {
+      await downloadCurrentStockMutation.mutateAsync();
+      setActionOpen(false);
+    }
+  };
 
   return (
     <Layout>
@@ -69,25 +116,15 @@ const InventoryManagementPage = () => {
         <Toolbar>
           <Filters>
             <FilterButton
-              label="날짜"
-              isOpen={openFilter === 'date'}
-              onToggle={() => setOpenFilter(openFilter === 'date' ? null : 'date')}
-            />
-            <FilterButton
-              label="정렬"
-              isOpen={openFilter === 'sort'}
-              onToggle={() => setOpenFilter(openFilter === 'sort' ? null : 'sort')}
-            />
-            <FilterButton
               label="수량"
               isOpen={openFilter === 'qty'}
               onToggle={() => setOpenFilter(openFilter === 'qty' ? null : 'qty')}
             >
-              <QtyLabel>수량</QtyLabel>
+              <QtyLabel>현재 재고</QtyLabel>
               <QtyInputRow>
-                <QtyInput type="number" value={qtyMin} onChange={e => setQtyMin(e.target.value)} />
+                <QtyInput type="number" value={qtyMin} onChange={(e) => setQtyMin(e.target.value)} />
                 <QtySep>~</QtySep>
-                <QtyInput type="number" value={qtyMax} onChange={e => setQtyMax(e.target.value)} />
+                <QtyInput type="number" value={qtyMax} onChange={(e) => setQtyMax(e.target.value)} />
               </QtyInputRow>
             </FilterButton>
             <FilterButton
@@ -96,9 +133,9 @@ const InventoryManagementPage = () => {
               onToggle={() => setOpenFilter(openFilter === 'status' ? null : 'status')}
             >
               <SortOptionList>
-                <SortOption active={stockStatus === 'current'} type="button" onClick={() => setStockStatus('current')}>현재 재고</SortOption>
-                <SortOption active={stockStatus === 'inout'} type="button" onClick={() => setStockStatus('inout')}>재고 수불</SortOption>
-                <SortOption active={stockStatus === 'changed'} type="button" onClick={() => setStockStatus('changed')}>변경 재고</SortOption>
+                <SortOption active={stockStatus === 'all'} type="button" onClick={() => setStockStatus('all')}>전체</SortOption>
+                <SortOption active={stockStatus === 'available'} type="button" onClick={() => setStockStatus('available')}>재고 있음</SortOption>
+                <SortOption active={stockStatus === 'empty'} type="button" onClick={() => setStockStatus('empty')}>재고 없음</SortOption>
               </SortOptionList>
             </FilterButton>
           </Filters>
@@ -108,8 +145,9 @@ const InventoryManagementPage = () => {
             <ActionMenu
               label="재고 관리"
               isOpen={actionOpen}
-              onToggle={() => setActionOpen(v => !v)}
+              onToggle={() => setActionOpen((value) => !value)}
               items={INVENTORY_ACTIONS}
+              onItemClick={(item) => void handleActionItem(item)}
             />
           </ToolbarRight>
         </Toolbar>
@@ -119,39 +157,30 @@ const InventoryManagementPage = () => {
             <colgroup>
               <col style={{ width: '48px' }} />
               <col style={{ width: '130px' }} />
-              <col style={{ width: '120px' }} />
-              <col style={{ width: '120px' }} />
-              <col style={{ width: '90px' }} />
-              <col style={{ width: '100px' }} />
-              <col style={{ width: '180px' }} />
-              <col style={{ width: '100px' }} />
-              <col style={{ width: '100px' }} />
+              <col style={{ width: '140px' }} />
+              <col style={{ width: '140px' }} />
+              <col />
+              <col style={{ width: '110px' }} />
             </colgroup>
             <thead>
               <HeaderRow>
                 <Th><Checkbox checked={allSelected} onChange={toggleSelectAll} /></Th>
-                <Th>변경일시</Th>
-                <Th>입/출고번호</Th>
-                <Th>작업화면</Th>
-                <Th>자재위치</Th>
+                <Th>BOX 번호</Th>
+                <Th>자재 위치</Th>
                 <Th>자재코드</Th>
                 <Th>자재명</Th>
-                <Th>변경수량</Th>
-                <Th>변경자</Th>
+                <Th>현재 재고</Th>
               </HeaderRow>
             </thead>
             <tbody>
-              {rows.map(row => (
+              {filteredRows.map((row) => (
                 <DataRow key={row.id}>
                   <Td><Checkbox checked={selectedRows.has(row.id)} onChange={() => toggleRow(row.id)} /></Td>
-                  <Td>{row.changedAt}</Td>
-                  <Td>{row.ioNumber}</Td>
-                  <Td>{row.workScreen}</Td>
+                  <Td>{row.boxNumber}</Td>
                   <Td>{row.location}</Td>
                   <Td>{row.code}</Td>
                   <Td>{row.name}</Td>
-                  <Td>{row.changedQty}</Td>
-                  <Td>{row.manager}</Td>
+                  <Td>{row.currentStock}</Td>
                 </DataRow>
               ))}
             </tbody>
