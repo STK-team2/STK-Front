@@ -1,5 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -182,6 +183,11 @@ const IconUser = () => (
 /* ── 페이지 ── */
 const DashboardPage = () => {
   const [activeTab, setActiveTab] = useState<'in' | 'out'>('in');
+  const navigate = useNavigate();
+
+  const handleActivityClick = () => {
+    navigate(activeTab === 'in' ? '/incoming' : '/outgoing');
+  };
 
   return (
     <Layout>
@@ -373,7 +379,7 @@ const DashboardPage = () => {
             </div>
             <div css={s.activityList}>
               {recentActivities.map((item, i) => (
-                <div css={s.activityItem} key={i}>
+                <div css={s.activityItem} key={i} onClick={handleActivityClick} role="button" tabIndex={0}>
                   <div css={s.activityDot} style={{ background: '#4C8BF5' }} />
                   <div css={s.activityInfo}>
                     <div css={s.activityName}>{item.name}</div>

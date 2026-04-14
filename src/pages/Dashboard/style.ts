@@ -358,7 +358,11 @@ export const activityItem = css`
   gap: 10px;
   padding: 20px 0;
   border-bottom: 1px solid #f0f1f4;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.15s;
 
+  &:hover { background: #f5f8ff; }
   &:last-child { border-bottom: none; }
 `;
 
