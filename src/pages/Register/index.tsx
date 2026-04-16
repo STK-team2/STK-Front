@@ -8,6 +8,7 @@ import {
   useVerifyEmail,
 } from '@/features/auth/api/queries';
 import type { ApiResponse } from '@/shared/types/api';
+import { showApiErrorToast, showErrorToast } from '@/shared/lib/toast';
 import {
   RegisterWrapper, LeftPanel, LeftBgImage, LeftBgOverlay,
   RightPanel, FormContainer, Heading, Title, Subtitle,
@@ -82,6 +83,7 @@ const RegisterPage = () => {
     if (!isValidEmail) {
       setStatusMessage('@stk-eng.com 이메일만 인증할 수 있습니다.');
       setIsStatusError(true);
+      showErrorToast('@stk-eng.com 이메일만 인증할 수 있습니다.');
       return;
     }
 
@@ -100,6 +102,7 @@ const RegisterPage = () => {
         setStatusMessage('인증번호 전송에 실패했습니다.');
       }
       setIsStatusError(true);
+      showApiErrorToast(error, '인증번호 전송에 실패했습니다.');
     }
   };
 
@@ -111,12 +114,14 @@ const RegisterPage = () => {
     if (!isValidEmail) {
       setStatusMessage('@stk-eng.com 이메일만 인증할 수 있습니다.');
       setIsStatusError(true);
+      showErrorToast('@stk-eng.com 이메일만 인증할 수 있습니다.');
       return;
     }
 
     if (!isValidVerifyCode) {
       setStatusMessage('인증번호는 6자리 숫자여야 합니다.');
       setIsStatusError(true);
+      showErrorToast('인증번호는 6자리 숫자여야 합니다.');
       return;
     }
 
@@ -136,6 +141,7 @@ const RegisterPage = () => {
         setStatusMessage('인증번호 확인에 실패했습니다.');
       }
       setIsStatusError(true);
+      showApiErrorToast(error, '인증번호 확인에 실패했습니다.');
     }
   };
 
@@ -145,30 +151,35 @@ const RegisterPage = () => {
     if (!isValidName) {
       setStatusMessage('이름은 2자 이상 20자 이하여야 합니다.');
       setIsStatusError(true);
+      showErrorToast('이름은 2자 이상 20자 이하여야 합니다.');
       return;
     }
 
     if (!isValidEmail) {
       setStatusMessage('@stk-eng.com 이메일만 가입할 수 있습니다.');
       setIsStatusError(true);
+      showErrorToast('@stk-eng.com 이메일만 가입할 수 있습니다.');
       return;
     }
 
     if (!isValidVerifyCode) {
       setStatusMessage('인증번호는 6자리 숫자여야 합니다.');
       setIsStatusError(true);
+      showErrorToast('인증번호는 6자리 숫자여야 합니다.');
       return;
     }
 
     if (!isValidPassword) {
       setStatusMessage('비밀번호는 8자 이상 20자 이하여야 합니다.');
       setIsStatusError(true);
+      showErrorToast('비밀번호는 8자 이상 20자 이하여야 합니다.');
       return;
     }
 
     if (!isPasswordMatched) {
       setStatusMessage('비밀번호가 일치하지 않습니다.');
       setIsStatusError(true);
+      showErrorToast('비밀번호가 일치하지 않습니다.');
       return;
     }
 
@@ -176,6 +187,7 @@ const RegisterPage = () => {
       if (!isEmailVerified) {
         setStatusMessage('이메일 인증을 완료해주세요.');
         setIsStatusError(true);
+        showErrorToast('이메일 인증을 완료해주세요.');
       }
       return;
     }
@@ -197,6 +209,7 @@ const RegisterPage = () => {
         setStatusMessage('회원가입에 실패했습니다.');
       }
       setIsStatusError(true);
+      showApiErrorToast(error, '회원가입에 실패했습니다.');
     }
   };
 
