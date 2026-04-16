@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import axios from 'axios';
 import Layout from '../../widgets/Layout';
 import { FilterButton } from '../../shared/ui/FilterButton';
 import { SearchInput } from '../../shared/ui/SearchInput';
 import { Checkbox } from '../../shared/ui/Checkbox';
-import type { ApiResponse } from '../../shared/types/api';
+import { showApiErrorToast } from '../../shared/lib/toast';
 import {
   useCancelClosing,
   useCloseMonth,
@@ -18,14 +17,6 @@ import {
 
 type FilterType = 'period' | 'status' | null;
 type ClosingFilterStatus = 'ALL' | 'CLOSED' | 'CANCELLED';
-
-const getErrorMessage = (error: unknown, fallback: string) => {
-  if (axios.isAxiosError<ApiResponse<null>>(error)) {
-    return error.response?.data?.error?.message ?? fallback;
-  }
-
-  return fallback;
-};
 
 const ClosingManagementPage = () => {
   const [openFilter, setOpenFilter] = useState<FilterType>(null);
@@ -86,7 +77,7 @@ const ClosingManagementPage = () => {
         await closeMonthMutation.mutateAsync({ closingYm: closingYmValue });
       }
     } catch (error) {
-      window.alert(getErrorMessage(error, isClosed ? '마감 취소에 실패했습니다.' : '마감 처리에 실패했습니다.'));
+      showApiErrorToast(error, isClosed ? '마감 취소에 실패했습니다.' : '마감 처리에 실패했습니다.');
     }
   };
 

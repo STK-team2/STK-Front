@@ -7,8 +7,8 @@ import { ActionMenu } from '../../shared/ui/ActionMenu';
 import { Checkbox } from '../../shared/ui/Checkbox';
 import { itemApi } from '../../entities/item/api/itemApi';
 import type { ItemResponse } from '../../entities/item/types';
-import type { ApiResponse } from '../../shared/types/api';
 import type { MovementResponse } from '../../entities/movement/types';
+import { getApiErrorMessage, showApiErrorToast, showErrorToast } from '../../shared/lib/toast';
 import {
   useDeleteMovement,
   useDownloadMovements,
@@ -78,14 +78,6 @@ const mapMovementToRow = (movement: MovementResponse): Row => ({
   note: movement.note ?? '',
   reference: movement.reference ?? '',
 });
-
-const getErrorMessage = (error: unknown, fallback: string) => {
-  if (axios.isAxiosError<ApiResponse<null>>(error)) {
-    return error.response?.data?.error?.message ?? fallback;
-  }
-
-  return fallback;
-};
 
 const isSameItem = (item: ItemResponse, row: NewRowData) =>
   item.itemCode === row.code.trim() || item.itemName === row.name.trim();
@@ -198,7 +190,7 @@ const IncomingManagementPage = () => {
       setSelectedRows(new Set());
       setDeleteMode(false);
     } catch (error) {
-      window.alert(getErrorMessage(error, '입고 삭제에 실패했습니다.'));
+      showApiErrorToast(error, '입고 삭제에 실패했습니다.');
     }
   };
 
@@ -231,7 +223,7 @@ const IncomingManagementPage = () => {
         },
       });
     } catch (error) {
-      window.alert(getErrorMessage(error, '입고 수정에 실패했습니다.'));
+      showApiErrorToast(error, '입고 수정에 실패했습니다.');
     }
   };
 
@@ -265,7 +257,7 @@ const IncomingManagementPage = () => {
     if (!row) return;
 
     if (!row.site || !row.date || !row.code || !row.name || !row.qty) {
-      window.alert('사업장, 날짜, 자재 코드, 자재명, 수량은 필수입니다.');
+      showErrorToast('사업장, 날짜, 자재 코드, 자재명, 수량은 필수입니다.');
       return;
     }
 
@@ -283,7 +275,7 @@ const IncomingManagementPage = () => {
         });
       } else {
         if (!row.location) {
-          window.alert('신규 자재 입고는 자재 위치가 필요합니다.');
+          showErrorToast('신규 자재 입고는 자재 위치가 필요합니다.');
           return;
         }
 
@@ -301,7 +293,11 @@ const IncomingManagementPage = () => {
 
       setNewRows((prev) => prev.filter((value) => value.id !== id));
     } catch (error) {
-      window.alert(getErrorMessage(error, '입고 등록에 실패했습니다.'));
+      if (axios.isAxiosError(error)) {
+        showErrorToast(getApiErrorMessage(error, '입고 등록에 실패했습니다.'));
+        return;
+      }
+      showApiErrorToast(error, '입고 등록에 실패했습니다.');
     }
   };
 
