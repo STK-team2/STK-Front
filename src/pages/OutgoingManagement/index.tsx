@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import axios from 'axios';
 import Layout from '../../widgets/Layout';
 import { FilterButton } from '../../shared/ui/FilterButton';
 import { SearchInput } from '../../shared/ui/SearchInput';
@@ -7,8 +6,8 @@ import { ActionMenu } from '../../shared/ui/ActionMenu';
 import { Checkbox } from '../../shared/ui/Checkbox';
 import { itemApi } from '../../entities/item/api/itemApi';
 import type { ItemResponse } from '../../entities/item/types';
-import type { ApiResponse } from '../../shared/types/api';
 import type { MovementResponse } from '../../entities/movement/types';
+import { showApiErrorToast, showErrorToast } from '../../shared/lib/toast';
 import {
   useDeleteMovement,
   useDownloadMovements,
@@ -80,14 +79,6 @@ const mapMovementToRow = (movement: MovementResponse): Row => ({
   note: movement.note ?? '',
   reference: movement.reference ?? '',
 });
-
-const getErrorMessage = (error: unknown, fallback: string) => {
-  if (axios.isAxiosError<ApiResponse<null>>(error)) {
-    return error.response?.data?.error?.message ?? fallback;
-  }
-
-  return fallback;
-};
 
 const isSameItem = (item: ItemResponse, row: NewRowData) =>
   item.itemCode === row.code.trim() || item.itemName === row.name.trim();
@@ -192,7 +183,7 @@ const OutgoingManagementPage = () => {
       setSelectedRows(new Set());
       setDeleteMode(false);
     } catch (error) {
-      window.alert(getErrorMessage(error, '출고 삭제에 실패했습니다.'));
+      showApiErrorToast(error, '출고 삭제에 실패했습니다.');
     }
   };
 
@@ -225,7 +216,7 @@ const OutgoingManagementPage = () => {
         },
       });
     } catch (error) {
-      window.alert(getErrorMessage(error, '출고 수정에 실패했습니다.'));
+      showApiErrorToast(error, '출고 수정에 실패했습니다.');
     }
   };
 
@@ -259,14 +250,14 @@ const OutgoingManagementPage = () => {
     if (!row) return;
 
     if (!row.site || !row.date || !row.code || !row.name || !row.qty) {
-      window.alert('사업장, 날짜, 자재 코드, 자재명, 수량은 필수입니다.');
+      showErrorToast('사업장, 날짜, 자재 코드, 자재명, 수량은 필수입니다.');
       return;
     }
 
     try {
       const resolvedItem = await resolveItem(row);
       if (!resolvedItem) {
-        window.alert('등록된 자재만 출고할 수 있습니다. 자재 코드 또는 자재명을 확인해주세요.');
+        showErrorToast('등록된 자재만 출고할 수 있습니다. 자재 코드 또는 자재명을 확인해주세요.');
         return;
       }
 
@@ -281,7 +272,7 @@ const OutgoingManagementPage = () => {
 
       setNewRows((prev) => prev.filter((value) => value.id !== id));
     } catch (error) {
-      window.alert(getErrorMessage(error, '출고 등록에 실패했습니다.'));
+      showApiErrorToast(error, '출고 등록에 실패했습니다.');
     }
   };
 

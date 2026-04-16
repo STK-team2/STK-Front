@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useAuthStore } from '../../entities/auth/model/authStore';
+import { showErrorToast } from '../lib/toast';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 
@@ -71,6 +72,7 @@ instance.interceptors.response.use(
 
     if (error.response?.status === 403) {
       useAuthStore.getState().clearTokens();
+      showErrorToast(error.response?.data?.error?.message ?? '인증이 만료되었습니다. 다시 로그인해주세요.');
       window.location.href = '/login';
       return Promise.reject(error);
     }

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { EyeIcon, ArrowIcon } from '@/shared/ui/Icons';
 import { useSignIn } from '@/features/auth/api/queries';
 import type { ApiResponse } from '@/shared/types/api';
+import { showApiErrorToast, showErrorToast } from '@/shared/lib/toast';
 import {
   LoginWrapper, FormContainer, LogoContainer, LogoImage,
   FieldsContainer, InputGroup, InputLabel, InputField,
@@ -46,6 +47,7 @@ const LoginPage = () => {
     if (!isValidEmail) {
       setStatusMessage('`@stk-eng.com` 이메일만 로그인할 수 있습니다.');
       setIsStatusError(true);
+      showErrorToast('@stk-eng.com 이메일만 로그인할 수 있습니다.');
       return;
     }
 
@@ -61,6 +63,7 @@ const LoginPage = () => {
         setStatusMessage('로그인에 실패했습니다.');
       }
       setIsStatusError(true);
+      showApiErrorToast(error, '로그인에 실패했습니다.');
     }
   };
 
