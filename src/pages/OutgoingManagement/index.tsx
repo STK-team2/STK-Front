@@ -162,10 +162,14 @@ const OutgoingManagementPage = () => {
     }
 
     if (item === '다운로드') {
-      await downloadMovementsMutation.mutateAsync({
-        type: 'OUTBOUND',
-        query: search.trim() || undefined,
-      });
+      try {
+        await downloadMovementsMutation.mutateAsync({
+          type: 'OUTBOUND',
+          query: search.trim() || undefined,
+        });
+      } catch (error) {
+        window.alert(getErrorMessage(error, '다운로드에 실패했습니다.'));
+      }
       setActionOpen(false);
     }
   };

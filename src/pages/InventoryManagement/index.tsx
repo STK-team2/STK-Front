@@ -101,7 +101,11 @@ const InventoryManagementPage = () => {
     }
 
     if (item === '다운로드') {
-      await downloadCurrentStockMutation.mutateAsync();
+      try {
+        await downloadCurrentStockMutation.mutateAsync();
+      } catch {
+        window.alert('다운로드에 실패했습니다.');
+      }
       setActionOpen(false);
     }
   };
