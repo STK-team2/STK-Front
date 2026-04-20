@@ -2,7 +2,12 @@ import axios from 'axios';
 import { useAuthStore } from '../../entities/auth/model/authStore';
 import { showErrorToast } from '../lib/toast';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
+const resolveApiBaseUrl = () => {
+  const configuredBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
+  return configuredBaseUrl ? configuredBaseUrl.replace(/\/$/, '') : '/api';
+};
+
+const API_BASE_URL = resolveApiBaseUrl();
 
 export const instance = axios.create({
   baseURL: API_BASE_URL,
