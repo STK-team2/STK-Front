@@ -24,7 +24,7 @@ const PublicRoute = ({ children }: { children: ReactElement }) => {
   const isAuthReady = useAuthStore((state) => state.isAuthReady);
 
   if (!isAuthReady) return null;
-  return isAuthenticated ? <Navigate to="/incoming" replace /> : children;
+  return isAuthenticated ? <Navigate to="/dashboard" replace /> : children;
 };
 
 const RouterContent = () => {
