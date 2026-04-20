@@ -33,3 +33,11 @@ export interface ClosingStatus {
   totalClosedAll: number;
   closed: boolean;
 }
+
+export interface DashboardData {
+  summary: DashboardSummary;
+  weeklyMovements: WeeklyMovement[];
+  recentMovements: RecentMovement[];
+  monthlyTrend: MonthlyTrend[];
+  closingStatus: ClosingStatus;
+}

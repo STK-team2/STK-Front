@@ -1,6 +1,5 @@
 /** @jsxImportSource @emotion/react */
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -14,7 +13,7 @@ import {
 } from 'chart.js';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import Layout from '../../widgets/Layout';
-import { dashboardApi } from '../../entities/dashboard/api/dashboardApi';
+import { useGetDashboardOverview } from '../../features/dashboard/api/queries';
 import * as s from './style';
 
 ChartJS.register(
@@ -25,12 +24,15 @@ ChartJS.register(
 
 /* ── 요일 변환 ── */
 const DAY_LABELS: Record<number, string> = { 1: '월', 2: '화', 3: '수', 4: '목', 5: '금', 6: '토', 0: '일' };
+const parseLocalDate = (dateStr: string) => {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
 const toWeekdayLabel = (dateStr: string) => {
-  const day = new Date(dateStr).getDay();
+  const day = parseLocalDate(dateStr).getDay();
   return DAY_LABELS[day] ?? dateStr;
 };
 
-/* ── 월 라벨 변환 (2025-11 → 11월) ── */
 const toMonthLabel = (month: string) => {
   const [, m] = month.split('-');
   return `${Number(m)}월`;
@@ -123,45 +125,28 @@ const IconUser = () => (
 /* ── 페이지 ── */
 const DashboardPage = () => {
   const [activeTab, setActiveTab] = useState<'in' | 'out'>('in');
-
-  const { data: summaryRes } = useQuery({
-    queryKey: ['dashboard', 'summary'],
-    queryFn: dashboardApi.getSummary,
-  });
-
-  const { data: weeklyRes } = useQuery({
-    queryKey: ['dashboard', 'weekly-movements'],
-    queryFn: dashboardApi.getWeeklyMovements,
-  });
-
-  const { data: recentRes } = useQuery({
-    queryKey: ['dashboard', 'recent-movements'],
-    queryFn: () => dashboardApi.getRecentMovements(10),
-  });
-
-  const { data: monthlyRes } = useQuery({
-    queryKey: ['dashboard', 'monthly-trend'],
-    queryFn: dashboardApi.getMonthlyTrend,
-  });
-
-  const { data: closingRes } = useQuery({
-    queryKey: ['dashboard', 'closing-status'],
-    queryFn: dashboardApi.getClosingStatus,
-  });
+  const todayDate = new Date();
+  const { data: dashboard, isLoading, isError } = useGetDashboardOverview();
 
   /* ── 데이터 가공 ── */
-  const summary = summaryRes?.data;
-  const weekly = weeklyRes?.data ?? [];
-  const recentAll = recentRes?.data ?? [];
-  const monthly = monthlyRes?.data ?? [];
-  const closing = closingRes?.data;
+  const totalItems = dashboard?.summary.totalItems ?? 0;
+  const todayInbound = dashboard?.summary.todayInbound ?? 0;
+  const todayOutbound = dashboard?.summary.todayOutbound ?? 0;
+  const currentMonth = dashboard?.closingStatus.closingYm ?? '';
+  const closedCount = dashboard?.closingStatus.closedCount ?? 0;
+  const unclosedCount = dashboard?.closingStatus.unclosedCount ?? 0;
+  const totalClosedAll = dashboard?.closingStatus.totalClosedAll ?? 0;
+  const isCurrentMonthClosed = dashboard?.closingStatus.closed ?? false;
+  const closedPct = closedCount + unclosedCount > 0
+    ? Math.round((closedCount / (closedCount + unclosedCount)) * 1000) / 10
+    : 0;
 
   const weeklyChartData = {
-    labels: weekly.map((d) => toWeekdayLabel(d.date)),
+    labels: (dashboard?.weeklyMovements ?? []).map((movement) => toWeekdayLabel(movement.date)),
     datasets: [
       {
         label: '입고',
-        data: weekly.map((d) => d.inboundCount),
+        data: (dashboard?.weeklyMovements ?? []).map((movement) => movement.inboundCount),
         backgroundColor: '#4C8BF5',
         borderRadius: 3,
         barPercentage: 0.75,
@@ -169,7 +154,7 @@ const DashboardPage = () => {
       },
       {
         label: '출고',
-        data: weekly.map((d) => d.outboundCount),
+        data: (dashboard?.weeklyMovements ?? []).map((movement) => movement.outboundCount),
         backgroundColor: '#F9A8C9',
         borderRadius: 3,
         barPercentage: 0.75,
@@ -177,11 +162,6 @@ const DashboardPage = () => {
       },
     ],
   };
-
-  const totalClosingCount = (closing?.closedCount ?? 0) + (closing?.unclosedCount ?? 0);
-  const closedPct = totalClosingCount > 0
-    ? Math.round((closing!.closedCount / totalClosingCount) * 1000) / 10
-    : 0;
 
   const donutData = {
     datasets: [{
@@ -192,11 +172,11 @@ const DashboardPage = () => {
   };
 
   const monthlyChartData = {
-    labels: monthly.map((d) => toMonthLabel(d.month)),
+    labels: (dashboard?.monthlyTrend ?? []).map((trend) => toMonthLabel(trend.month)),
     datasets: [
       {
         label: '입고',
-        data: monthly.map((d) => d.inboundTotal),
+        data: (dashboard?.monthlyTrend ?? []).map((trend) => trend.inboundTotal),
         borderColor: '#4C8BF5',
         backgroundColor: 'rgba(76,139,245,0.20)',
         fill: true,
@@ -206,7 +186,7 @@ const DashboardPage = () => {
       },
       {
         label: '출고',
-        data: monthly.map((d) => d.outboundTotal),
+        data: (dashboard?.monthlyTrend ?? []).map((trend) => trend.outboundTotal),
         borderColor: '#F4A261',
         backgroundColor: 'rgba(244,162,97,0.12)',
         fill: true,
@@ -217,13 +197,33 @@ const DashboardPage = () => {
     ],
   };
 
-  const filteredRecent = recentAll.filter((m) =>
-    activeTab === 'in' ? m.type === 'INBOUND' : m.type === 'OUTBOUND',
+  const filteredRecent = (dashboard?.recentMovements ?? []).filter((movement) =>
+    activeTab === 'in' ? movement.type === 'INBOUND' : movement.type === 'OUTBOUND',
   );
 
-  const today = new Date().toLocaleDateString('ko-KR', {
+  const today = todayDate.toLocaleDateString('ko-KR', {
     year: 'numeric', month: '2-digit', day: '2-digit',
   });
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div css={s.page}>
+          <div css={s.card}>대시보드 데이터를 불러오는 중입니다.</div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (isError || !dashboard) {
+    return (
+      <Layout>
+        <div css={s.page}>
+          <div css={s.card}>대시보드 데이터를 불러오지 못했습니다.</div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -245,7 +245,7 @@ const DashboardPage = () => {
 
           <div css={s.summaryCard}>
             <span css={s.summaryLabel}>오늘 입고</span>
-            <span css={s.summaryValue}>{summary?.todayInbound ?? '-'}</span>
+            <span css={s.summaryValue}>{todayInbound}</span>
             <span css={s.summaryUnit}>건</span>
             <div css={s.summaryIconBox} style={{ background: '#EEF4FF' }}>
               <IconIncoming />
@@ -254,7 +254,7 @@ const DashboardPage = () => {
 
           <div css={s.summaryCard}>
             <span css={s.summaryLabel}>오늘 출고</span>
-            <span css={s.summaryValue}>{summary?.todayOutbound ?? '-'}</span>
+            <span css={s.summaryValue}>{todayOutbound}</span>
             <span css={s.summaryUnit}>건</span>
             <div css={s.summaryIconBox} style={{ background: '#FFF0F5' }}>
               <IconOutgoing />
@@ -263,7 +263,7 @@ const DashboardPage = () => {
 
           <div css={s.summaryCard}>
             <span css={s.summaryLabel}>전체 품목 수</span>
-            <span css={s.summaryValue}>{summary?.totalItems ?? '-'}</span>
+            <span css={s.summaryValue}>{totalItems}</span>
             <span css={s.summaryUnit}>목</span>
             <div css={s.summaryIconBox} style={{ background: '#F0FFF4' }}>
               <IconSparkle />
@@ -272,10 +272,10 @@ const DashboardPage = () => {
 
           <div css={s.summaryCard}>
             <span css={s.summaryLabel}>이번 달 마감</span>
-            <span css={s.summaryBadge} style={closing?.closed
+            <span css={s.summaryBadge} style={isCurrentMonthClosed
               ? { background: '#C6F6D5', color: '#276749' }
               : { background: '#FDE68A', color: '#92400E' }}>
-              {closing ? (closing.closed ? '마감' : '미마감') : '-'}
+              {isCurrentMonthClosed ? '마감' : '미마감'}
             </span>
             <div css={s.summaryIconBox} style={{ background: '#FFFBEB' }}>
               <IconMail />
@@ -314,20 +314,20 @@ const DashboardPage = () => {
                 <div css={s.donutMeta}>
                   <span>월간 누적</span>
                   <span css={s.donutMetaDivider}>|</span>
-                  <span>{closing?.closingYm ?? '-'}</span>
+                  <span>{currentMonth}</span>
                 </div>
                 <div css={s.donutStatGrid}>
                   <div css={s.donutStatItem}>
                     <span css={s.donutStatLabel}>미마감</span>
-                    <span css={s.donutStatValue}>{closing?.unclosedCount ?? '-'}건</span>
+                    <span css={s.donutStatValue}>{unclosedCount}건</span>
                   </div>
                   <div css={s.donutStatItem}>
                     <span css={s.donutStatLabel}>마감</span>
-                    <span css={s.donutStatValue}>{closing?.closedCount ?? '-'}건</span>
+                    <span css={s.donutStatValue}>{closedCount}건</span>
                   </div>
                   <div css={s.donutStatItem}>
                     <span css={s.donutStatLabel}>전체 마감</span>
-                    <span css={s.donutStatValue}>{closing?.totalClosedAll ?? '-'}건</span>
+                    <span css={s.donutStatValue}>{totalClosedAll}건</span>
                   </div>
                 </div>
               </div>
@@ -392,7 +392,9 @@ const DashboardPage = () => {
                     <div css={s.activityQty}>
                       {item.type === 'INBOUND' ? '+' : '-'}{item.quantity}
                     </div>
-                    <div css={s.activityTime}>{item.movementDate}</div>
+                    <div css={s.activityTime}>
+                      {parseLocalDate(item.movementDate).toLocaleDateString('ko-KR')}
+                    </div>
                   </div>
                 </div>
               ))}
