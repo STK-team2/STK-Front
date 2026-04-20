@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import Layout from '../../widgets/Layout';
 import { FilterButton } from '../../shared/ui/FilterButton';
 import { SearchInput } from '../../shared/ui/SearchInput';
@@ -8,6 +8,7 @@ import { itemApi } from '../../entities/item/api/itemApi';
 import type { ItemResponse } from '../../entities/item/types';
 import type { MovementResponse } from '../../entities/movement/types';
 import { showApiErrorToast, showErrorToast } from '../../shared/lib/toast';
+import { useSubmitOnOutsideClick } from '../../shared/lib/useSubmitOnOutsideClick';
 import {
   useDeleteMovement,
   useDownloadMovements,
@@ -94,6 +95,7 @@ const OutgoingManagementPage = () => {
   const [deleteMode, setDeleteMode] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [editValues, setEditValues] = useState<Record<string, Row>>({});
+  const [newRowElement, setNewRowElement] = useState<HTMLTableRowElement | null>(null);
 
   const { data: movements = [] } = useGetMovements({
     type: 'OUTBOUND',
@@ -285,6 +287,21 @@ const OutgoingManagementPage = () => {
     }
   };
 
+  const submitPendingNewRow = useCallback(() => {
+    const pendingRowId = newRows[0]?.id;
+    if (!pendingRowId) {
+      return;
+    }
+
+    void submitRow(pendingRowId);
+  }, [newRows]);
+
+  useSubmitOnOutsideClick({
+    container: newRowElement,
+    enabled: newRows.length > 0,
+    onOutsideClick: submitPendingNewRow,
+  });
+
   const closeAll = () => {
     setOpenFilter(null);
     setActionOpen(false);
@@ -400,7 +417,10 @@ const OutgoingManagementPage = () => {
                 )
               ))}
               {newRows.map((row) => (
-                <NewRow key={row.id}>
+                <NewRow
+                  key={row.id}
+                  ref={row === newRows[0] ? setNewRowElement : undefined}
+                >
                   <Td />
                   <Td><NewRowInput type="text" value={row.site} onChange={(e) => updateNewRow(row.id, 'site', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></Td>
                   <Td><NewRowDateWrap><NewRowDateInput type="date" value={row.date} onChange={(e) => updateNewRow(row.id, 'date', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></NewRowDateWrap></Td>
