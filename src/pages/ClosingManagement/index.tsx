@@ -3,6 +3,12 @@ import Layout from '../../widgets/Layout';
 import { FilterButton } from '../../shared/ui/FilterButton';
 import { SearchInput } from '../../shared/ui/SearchInput';
 import { Checkbox } from '../../shared/ui/Checkbox';
+import { showApiErrorToast } from '../../shared/lib/toast';
+import {
+  useCancelClosing,
+  useCloseMonth,
+  useGetClosingStock,
+} from '../../features/closing/api/queries';
 import {
   Backdrop, PageInner, PageTitle, Toolbar, Filters,
   TableWrap, Table, HeaderRow, Th, DataRow, Td,
@@ -10,36 +16,52 @@ import {
 } from './style';
 
 type FilterType = 'period' | 'status' | null;
-type ClosingStatus = '마감' | '미마감';
-
-interface Row {
-  id: string;
-  site: string;
-  period: string;
-  status: ClosingStatus;
-}
-
-const mockData: Row[] = [
-  { id: '1', site: 'ABCD/WW', period: '2025.01', status: '마감' },
-  { id: '2', site: 'ABCD/WW', period: '2025.01', status: '미마감' },
-  { id: '3', site: 'ABCD/WW', period: '2025.01', status: '마감' },
-];
+type ClosingFilterStatus = 'ALL' | 'CLOSED' | 'CANCELLED';
 
 const ClosingManagementPage = () => {
   const [openFilter, setOpenFilter] = useState<FilterType>(null);
   const [search, setSearch] = useState('');
-  const [rows, setRows] = useState<Row[]>(mockData);
+  const [closingYm, setClosingYm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<ClosingFilterStatus>('ALL');
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
 
-  const allSelected = rows.length > 0 && selectedRows.size === rows.length;
+  const { data: closingRows = [] } = useGetClosingStock({
+    closingYm: closingYm || undefined,
+    status: statusFilter === 'ALL' ? undefined : statusFilter,
+  });
+  const closeMonthMutation = useCloseMonth();
+  const cancelClosingMutation = useCancelClosing();
+
+  const filteredRows = closingRows.filter((row) => {
+    const normalizedSearch = search.trim().toLowerCase();
+    if (!normalizedSearch) return true;
+
+    return [
+      row.itemCode,
+      row.itemName,
+      row.boxNumber,
+      row.location,
+      row.userName,
+      row.closingYm,
+    ]
+      .join(' ')
+      .toLowerCase()
+      .includes(normalizedSearch);
+  });
+
+  const allSelected = filteredRows.length > 0 && selectedRows.size === filteredRows.length;
 
   const toggleSelectAll = () => {
-    if (allSelected) setSelectedRows(new Set());
-    else setSelectedRows(new Set(rows.map(r => r.id)));
+    if (allSelected) {
+      setSelectedRows(new Set());
+      return;
+    }
+
+    setSelectedRows(new Set(filteredRows.map((row) => row.closingId)));
   };
 
   const toggleRow = (id: string) => {
-    setSelectedRows(prev => {
+    setSelectedRows((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
@@ -47,10 +69,16 @@ const ClosingManagementPage = () => {
     });
   };
 
-  const toggleStatus = (id: string) => {
-    setRows(prev => prev.map(r =>
-      r.id === id ? { ...r, status: r.status === '마감' ? '미마감' : '마감' } : r
-    ));
+  const toggleStatus = async (id: string, closingYmValue: string, isClosed: boolean) => {
+    try {
+      if (isClosed) {
+        await cancelClosingMutation.mutateAsync(id);
+      } else {
+        await closeMonthMutation.mutateAsync({ closingYm: closingYmValue });
+      }
+    } catch (error) {
+      showApiErrorToast(error, isClosed ? '마감 취소에 실패했습니다.' : '마감 처리에 실패했습니다.');
+    }
   };
 
   const closeFilter = () => setOpenFilter(null);
@@ -68,12 +96,24 @@ const ClosingManagementPage = () => {
               label="기간"
               isOpen={openFilter === 'period'}
               onToggle={() => setOpenFilter(openFilter === 'period' ? null : 'period')}
-            />
+            >
+              <input
+                type="month"
+                value={closingYm}
+                onChange={(e) => setClosingYm(e.target.value)}
+              />
+            </FilterButton>
             <FilterButton
               label="마감 상태"
               isOpen={openFilter === 'status'}
               onToggle={() => setOpenFilter(openFilter === 'status' ? null : 'status')}
-            />
+            >
+              <div>
+                <button type="button" onClick={() => setStatusFilter('ALL')}>전체</button>
+                <button type="button" onClick={() => setStatusFilter('CLOSED')}>마감</button>
+                <button type="button" onClick={() => setStatusFilter('CANCELLED')}>취소</button>
+              </div>
+            </FilterButton>
           </Filters>
 
           <SearchInput value={search} onChange={setSearch} />
@@ -83,38 +123,48 @@ const ClosingManagementPage = () => {
           <Table>
             <colgroup>
               <col style={{ width: '48px' }} />
-              <col style={{ width: '200px' }} />
+              <col style={{ width: '140px' }} />
               <col />
-              <col style={{ width: '160px' }} />
+              <col style={{ width: '120px' }} />
+              <col style={{ width: '120px' }} />
+              <col style={{ width: '120px' }} />
               <col style={{ width: '120px' }} />
             </colgroup>
             <thead>
               <HeaderRow>
                 <Th><Checkbox checked={allSelected} onChange={toggleSelectAll} /></Th>
-                <Th>사업장</Th>
+                <Th>자재코드</Th>
+                <Th>자재명</Th>
+                <Th>자재 위치</Th>
                 <Th>기간</Th>
                 <Th>상태</Th>
                 <Th>마감</Th>
               </HeaderRow>
             </thead>
             <tbody>
-              {rows.map(row => (
-                <DataRow key={row.id}>
-                  <Td><Checkbox checked={selectedRows.has(row.id)} onChange={() => toggleRow(row.id)} /></Td>
-                  <Td>{row.site}</Td>
-                  <Td>{row.period}</Td>
-                  <Td>
-                    <StatusText closed={row.status === '마감'}>{row.status}</StatusText>
-                  </Td>
-                  <Td>
-                    {row.status === '마감' ? (
-                      <CancelBtn type="button" onClick={() => toggleStatus(row.id)}>취소</CancelBtn>
-                    ) : (
-                      <CloseBtn type="button" onClick={() => toggleStatus(row.id)}>마감</CloseBtn>
-                    )}
-                  </Td>
-                </DataRow>
-              ))}
+              {filteredRows.map((row) => {
+                const isClosed = row.status === 'CLOSED';
+
+                return (
+                  <DataRow key={row.closingId}>
+                    <Td><Checkbox checked={selectedRows.has(row.closingId)} onChange={() => toggleRow(row.closingId)} /></Td>
+                    <Td>{row.itemCode}</Td>
+                    <Td>{row.itemName}</Td>
+                    <Td>{row.location}</Td>
+                    <Td>{row.closingYm}</Td>
+                    <Td>
+                      <StatusText closed={isClosed}>{isClosed ? '마감' : '취소'}</StatusText>
+                    </Td>
+                    <Td>
+                      {isClosed ? (
+                        <CancelBtn type="button" onClick={() => void toggleStatus(row.closingId, row.closingYm, true)}>취소</CancelBtn>
+                      ) : (
+                        <CloseBtn type="button" onClick={() => void toggleStatus(row.closingId, row.closingYm, false)}>마감</CloseBtn>
+                      )}
+                    </Td>
+                  </DataRow>
+                );
+              })}
             </tbody>
           </Table>
         </TableWrap>

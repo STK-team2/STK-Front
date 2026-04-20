@@ -14,6 +14,7 @@ import {
 } from 'chart.js';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import Layout from '../../widgets/Layout';
+import { useGetDashboardOverview } from '../../features/dashboard/api/queries';
 import * as s from './style';
 
 ChartJS.register(
@@ -22,29 +23,23 @@ ChartJS.register(
   Filler, Tooltip,
 );
 
-/* ── 차트 데이터 ── */
-const weeklyData = {
-  labels: ['월', '화', '수', '목', '금', '토', '일'],
-  datasets: [
-    {
-      label: '입고',
-      data: [28, 42, 22, 58, 38, 18, 12],
-      backgroundColor: '#4C8BF5',
-      borderRadius: 3,
-      barPercentage: 0.75,
-      categoryPercentage: 0.6,
-    },
-    {
-      label: '출고',
-      data: [18, 28, 32, 22, 48, 13, 9],
-      backgroundColor: '#F9A8C9',
-      borderRadius: 3,
-      barPercentage: 0.75,
-      categoryPercentage: 0.6,
-    },
-  ],
+/* ── 요일 변환 ── */
+const DAY_LABELS: Record<number, string> = { 1: '월', 2: '화', 3: '수', 4: '목', 5: '금', 6: '토', 0: '일' };
+const parseLocalDate = (dateStr: string) => {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
+const toWeekdayLabel = (dateStr: string) => {
+  const day = parseLocalDate(dateStr).getDay();
+  return DAY_LABELS[day] ?? dateStr;
 };
 
+const toMonthLabel = (month: string) => {
+  const [, m] = month.split('-');
+  return `${Number(m)}월`;
+};
+
+/* ── 차트 공통 옵션 ── */
 const weeklyOptions = {
   responsive: true,
   maintainAspectRatio: false,
@@ -52,24 +47,16 @@ const weeklyOptions = {
   scales: {
     x: {
       grid: { display: false },
-      ticks: { font: { size: 11 }, color: '#9497a0' },
+      ticks: { font: { size: 13 }, color: '#9497a0' },
       border: { display: false },
     },
     y: {
       grid: { color: '#f0f1f4' },
-      ticks: { font: { size: 11 }, color: '#9497a0', maxTicksLimit: 4 },
+      ticks: { font: { size: 13 }, color: '#9497a0', maxTicksLimit: 5 },
       border: { display: false },
     },
   },
 } as const;
-
-const donutData = {
-  datasets: [{
-    data: [78.6, 21.4],
-    backgroundColor: ['#0068e0', '#eaecf0'],
-    borderWidth: 0,
-  }],
-};
 
 const donutOptions = {
   responsive: true,
@@ -78,32 +65,6 @@ const donutOptions = {
   plugins: { legend: { display: false }, tooltip: { enabled: false } },
 } as const;
 
-const monthlyData = {
-  labels: ['11월', '12월', '1월', '2월', '3월', '4월'],
-  datasets: [
-    {
-      label: '입고',
-      data: [105, 120, 138, 155, 162, 165],
-      borderColor: '#4C8BF5',
-      backgroundColor: 'rgba(76,139,245,0.20)',
-      fill: true,
-      tension: 0.5,
-      pointRadius: 0,
-      borderWidth: 2,
-    },
-    {
-      label: '출고',
-      data: [98, 102, 112, 122, 130, 152],
-      borderColor: '#F4A261',
-      backgroundColor: 'rgba(244,162,97,0.12)',
-      fill: true,
-      tension: 0.5,
-      pointRadius: 0,
-      borderWidth: 2,
-    },
-  ],
-};
-
 const monthlyOptions = {
   responsive: true,
   maintainAspectRatio: false,
@@ -111,34 +72,20 @@ const monthlyOptions = {
   scales: {
     x: {
       grid: { display: false },
-      ticks: { font: { size: 11 }, color: '#9497a0' },
+      ticks: { font: { size: 13 }, color: '#9497a0' },
       border: { display: false },
     },
     y: {
-      min: 0, max: 200,
-      ticks: { stepSize: 50, font: { size: 11 }, color: '#9497a0' },
+      ticks: { font: { size: 13 }, color: '#9497a0' },
       grid: { color: '#f0f1f4' },
       border: { display: false },
     },
   },
 } as const;
 
-const inventoryRows = [
-  { code: '1001', name: 'BGE2301031231293', box: 'ㅁ-12', qty: 2123, total: 34234134 },
-  { code: '1001', name: 'BGE2301031231293', box: 'ㅁ-12', qty: 2123, total: 34234134 },
-  { code: '1001', name: 'BGE2301031231293', box: 'ㅁ-12', qty: 2123, total: 34234134 },
-];
-
-const recentActivities = [
-  { name: '스테인리스 볼트 M6', code: 'MAT-B01 · A-12', qty: '+50', time: '10:42' },
-  { name: '알루미늄 판재 2T',   code: 'MAT-B02 · B-03', qty: '+20', time: '09:15' },
-  { name: '육각 너트 M10',      code: 'MAT-B04 · A-01', qty: '+30', time: '어제'  },
-];
-
-/* ── 아이콘 컴포넌트 ── */
+/* ── 아이콘 ── */
 const IconIncoming = () => (
-  /* 시계방향 순환 화살표 (입고) */
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
     stroke="#4C8BF5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M23 4v6h-6"/>
     <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
@@ -146,8 +93,7 @@ const IconIncoming = () => (
 );
 
 const IconOutgoing = () => (
-  /* 반시계방향 순환 화살표 (출고) */
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
     stroke="#F06292" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M1 4v6h6"/>
     <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
@@ -155,25 +101,22 @@ const IconOutgoing = () => (
 );
 
 const IconSparkle = () => (
-  /* 4방향 반짝이 (전체 품목 수) */
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
     stroke="#48BB78" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M12 2 L13.8 10.2 L22 12 L13.8 13.8 L12 22 L10.2 13.8 L2 12 L10.2 10.2 Z"/>
   </svg>
 );
 
 const IconMail = () => (
-  /* 봉투 (이번 달 마감) */
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
     stroke="#F6AD55" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
     <polyline points="22,6 12,13 2,6"/>
   </svg>
 );
 
-/* ── 유저 아이콘 ── */
 const IconUser = () => (
-  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
     stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
     <circle cx="12" cy="7" r="4"/>
@@ -184,10 +127,109 @@ const IconUser = () => (
 const DashboardPage = () => {
   const [activeTab, setActiveTab] = useState<'in' | 'out'>('in');
   const navigate = useNavigate();
+  const todayDate = new Date();
 
   const handleActivityClick = () => {
     navigate(activeTab === 'in' ? '/incoming' : '/outgoing');
   };
+  const { data: dashboard, isLoading, isError } = useGetDashboardOverview();
+
+  /* ── 데이터 가공 ── */
+  const totalItems = dashboard?.summary.totalItems ?? 0;
+  const todayInbound = dashboard?.summary.todayInbound ?? 0;
+  const todayOutbound = dashboard?.summary.todayOutbound ?? 0;
+  const currentMonth = dashboard?.closingStatus.closingYm ?? '';
+  const closedCount = dashboard?.closingStatus.closedCount ?? 0;
+  const unclosedCount = dashboard?.closingStatus.unclosedCount ?? 0;
+  const totalClosedAll = dashboard?.closingStatus.totalClosedAll ?? 0;
+  const isCurrentMonthClosed = dashboard?.closingStatus.closed ?? false;
+  const closedPct = closedCount + unclosedCount > 0
+    ? Math.round((closedCount / (closedCount + unclosedCount)) * 1000) / 10
+    : 0;
+
+  const weeklyChartData = {
+    labels: (dashboard?.weeklyMovements ?? []).map((movement) => toWeekdayLabel(movement.date)),
+    datasets: [
+      {
+        label: '입고',
+        data: (dashboard?.weeklyMovements ?? []).map((movement) => movement.inboundCount),
+        backgroundColor: '#4C8BF5',
+        borderRadius: 3,
+        barPercentage: 0.75,
+        categoryPercentage: 0.6,
+      },
+      {
+        label: '출고',
+        data: (dashboard?.weeklyMovements ?? []).map((movement) => movement.outboundCount),
+        backgroundColor: '#F9A8C9',
+        borderRadius: 3,
+        barPercentage: 0.75,
+        categoryPercentage: 0.6,
+      },
+    ],
+  };
+
+  const donutData = {
+    datasets: [{
+      data: [closedPct, 100 - closedPct],
+      backgroundColor: ['#0068e0', '#eaecf0'],
+      borderWidth: 0,
+    }],
+  };
+
+  const monthlyChartData = {
+    labels: (dashboard?.monthlyTrend ?? []).map((trend) => toMonthLabel(trend.month)),
+    datasets: [
+      {
+        label: '입고',
+        data: (dashboard?.monthlyTrend ?? []).map((trend) => trend.inboundTotal),
+        borderColor: '#4C8BF5',
+        backgroundColor: 'rgba(76,139,245,0.20)',
+        fill: true,
+        tension: 0.5,
+        pointRadius: 0,
+        borderWidth: 2,
+      },
+      {
+        label: '출고',
+        data: (dashboard?.monthlyTrend ?? []).map((trend) => trend.outboundTotal),
+        borderColor: '#F4A261',
+        backgroundColor: 'rgba(244,162,97,0.12)',
+        fill: true,
+        tension: 0.5,
+        pointRadius: 0,
+        borderWidth: 2,
+      },
+    ],
+  };
+
+  const filteredRecent = (dashboard?.recentMovements ?? []).filter((movement) =>
+    activeTab === 'in' ? movement.type === 'INBOUND' : movement.type === 'OUTBOUND',
+  );
+
+  const today = todayDate.toLocaleDateString('ko-KR', {
+    year: 'numeric', month: '2-digit', day: '2-digit',
+  });
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div css={s.page}>
+          <div css={s.card}>대시보드 데이터를 불러오는 중입니다.</div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (isError || !dashboard) {
+    return (
+      <Layout>
+        <div css={s.page}>
+          <div css={s.card}>대시보드 데이터를 불러오지 못했습니다.</div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -197,10 +239,9 @@ const DashboardPage = () => {
         <div css={s.pageHeader}>
           <h1 css={s.pageTitle}>대시보드</h1>
           <div css={s.headerMeta}>
-            <span>2026. 04. 07.</span>
+            <span>{today}</span>
             <span css={s.headerUser}>
               <IconUser />
-              example@gmail.com
             </span>
           </div>
         </div>
@@ -208,36 +249,60 @@ const DashboardPage = () => {
         {/* ── 요약 카드 ── */}
         <div css={s.summaryRow}>
 
-          <div css={s.summaryCard}>
+          <div
+            css={s.summaryCard}
+            onClick={() => navigate('/incoming')}
+            role="button"
+            tabIndex={0}
+          >
             <span css={s.summaryLabel}>오늘 입고</span>
-            <span css={s.summaryValue}>12</span>
+            <span css={s.summaryValue}>{todayInbound}</span>
             <span css={s.summaryUnit}>건</span>
             <div css={s.summaryIconBox} style={{ background: '#EEF4FF' }}>
               <IconIncoming />
             </div>
           </div>
 
-          <div css={s.summaryCard}>
+          <div
+            css={s.summaryCard}
+            onClick={() => navigate('/outgoing')}
+            role="button"
+            tabIndex={0}
+          >
             <span css={s.summaryLabel}>오늘 출고</span>
-            <span css={s.summaryValue}>8</span>
+            <span css={s.summaryValue}>{todayOutbound}</span>
             <span css={s.summaryUnit}>건</span>
             <div css={s.summaryIconBox} style={{ background: '#FFF0F5' }}>
               <IconOutgoing />
             </div>
           </div>
 
-          <div css={s.summaryCard}>
+          <div
+            css={s.summaryCard}
+            onClick={() => navigate('/inventory')}
+            role="button"
+            tabIndex={0}
+          >
             <span css={s.summaryLabel}>전체 품목 수</span>
-            <span css={s.summaryValue}>247</span>
+            <span css={s.summaryValue}>{totalItems}</span>
             <span css={s.summaryUnit}>목</span>
             <div css={s.summaryIconBox} style={{ background: '#F0FFF4' }}>
               <IconSparkle />
             </div>
           </div>
 
-          <div css={s.summaryCard}>
+          <div
+            css={s.summaryCard}
+            onClick={() => navigate('/closing')}
+            role="button"
+            tabIndex={0}
+          >
             <span css={s.summaryLabel}>이번 달 마감</span>
-            <span css={s.summaryBadge}>미마감</span>
+            <span css={s.summaryBadge} style={isCurrentMonthClosed
+              ? { background: '#C6F6D5', color: '#276749' }
+              : { background: '#FDE68A', color: '#92400E' }}>
+              {isCurrentMonthClosed ? '마감' : '미마감'}
+            </span>
             <div css={s.summaryIconBox} style={{ background: '#FFFBEB' }}>
               <IconMail />
             </div>
@@ -257,7 +322,7 @@ const DashboardPage = () => {
               <div css={s.donutLeft}>
                 <div css={s.donutWrap}>
                   <Doughnut data={donutData} options={donutOptions} />
-                  <div css={s.donutCenter}>78.6%</div>
+                  <div css={s.donutCenter}>{closedPct}%</div>
                 </div>
                 <div css={s.donutLegendRow}>
                   <div css={s.donutLegendItem}>
@@ -275,24 +340,20 @@ const DashboardPage = () => {
                 <div css={s.donutMeta}>
                   <span>월간 누적</span>
                   <span css={s.donutMetaDivider}>|</span>
-                  <span>날짜 기준(04.01 - 04.07)</span>
+                  <span>{currentMonth}</span>
                 </div>
                 <div css={s.donutStatGrid}>
                   <div css={s.donutStatItem}>
                     <span css={s.donutStatLabel}>미마감</span>
-                    <span css={s.donutStatValue}>134건</span>
+                    <span css={s.donutStatValue}>{unclosedCount}건</span>
                   </div>
                   <div css={s.donutStatItem}>
                     <span css={s.donutStatLabel}>마감</span>
-                    <span css={s.donutStatValue}>14건</span>
+                    <span css={s.donutStatValue}>{closedCount}건</span>
                   </div>
                   <div css={s.donutStatItem}>
                     <span css={s.donutStatLabel}>전체 마감</span>
-                    <span css={s.donutStatValue}>1329건</span>
-                  </div>
-                  <div css={s.donutStatItem}>
-                    <span css={s.donutStatLabel}>취하량</span>
-                    <span css={s.donutStatValue}>후ㅜㅜ</span>
+                    <span css={s.donutStatValue}>{totalClosedAll}건</span>
                   </div>
                 </div>
               </div>
@@ -312,8 +373,8 @@ const DashboardPage = () => {
                 </div>
               </div>
             </div>
-            <div css={s.chartWrap} style={{ height: '170px' }}>
-              <Bar data={weeklyData} options={weeklyOptions} />
+            <div css={s.chartWrap} style={{ height: '220px' }}>
+              <Bar data={weeklyChartData} options={weeklyOptions} />
             </div>
           </div>
 
@@ -321,44 +382,6 @@ const DashboardPage = () => {
 
         {/* ── 하단 행 ── */}
         <div css={s.bottomRow}>
-
-          {/* 재고 현황 */}
-          <div css={s.card}>
-            <div css={s.cardHeader}>
-              <p css={s.cardTitle}>재고 현황</p>
-              <button css={s.downloadBtn} type="button">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                  <polyline points="7 10 12 15 17 10"/>
-                  <line x1="12" y1="15" x2="12" y2="3"/>
-                </svg>
-                다운로드
-              </button>
-            </div>
-            <table css={s.table}>
-              <thead>
-                <tr>
-                  <th css={s.th}>자재코드</th>
-                  <th css={s.th}>자재명</th>
-                  <th css={s.th}>BOX</th>
-                  <th css={s.th}>수량</th>
-                  <th css={s.th}>총수량</th>
-                </tr>
-              </thead>
-              <tbody>
-                {inventoryRows.map((row, i) => (
-                  <tr key={i}>
-                    <td css={s.td}>{row.code}</td>
-                    <td css={s.td}>{row.name}</td>
-                    <td css={s.td}>{row.box}</td>
-                    <td css={s.td}>{row.qty.toLocaleString()}</td>
-                    <td css={s.td}>{row.total.toLocaleString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
 
           {/* 최근 입출고 */}
           <div css={s.card}>
@@ -378,40 +401,56 @@ const DashboardPage = () => {
               </div>
             </div>
             <div css={s.activityList}>
-              {recentActivities.map((item, i) => (
-                <div css={s.activityItem} key={i} onClick={handleActivityClick} role="button" tabIndex={0}>
-                  <div css={s.activityDot} style={{ background: '#4C8BF5' }} />
+              {filteredRecent.length === 0 && (
+                <div css={s.activityItem} style={{ justifyContent: 'center', color: '#9497a0', fontSize: 13 }}>
+                  내역이 없습니다.
+                </div>
+              )}
+              {filteredRecent.map((item) => (
+                <div
+                  css={s.activityItem}
+                  key={item.movementId}
+                  onClick={handleActivityClick}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <div css={s.activityDot}
+                    style={{ background: item.type === 'INBOUND' ? '#4C8BF5' : '#F9A8C9' }} />
                   <div css={s.activityInfo}>
-                    <div css={s.activityName}>{item.name}</div>
-                    <div css={s.activityCode}>{item.code}</div>
+                    <div css={s.activityName}>{item.itemName}</div>
+                    <div css={s.activityCode}>{item.itemCode} · {item.site}</div>
                   </div>
                   <div css={s.activityRight}>
-                    <div css={s.activityQty}>{item.qty}</div>
-                    <div css={s.activityTime}>{item.time}</div>
+                    <div css={s.activityQty}>
+                      {item.type === 'INBOUND' ? '+' : '-'}{item.quantity}
+                    </div>
+                    <div css={s.activityTime}>
+                      {parseLocalDate(item.movementDate).toLocaleDateString('ko-KR')}
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-        </div>
-
-        {/* ── 월별 재고 추이 ── */}
-        <div css={s.areaCard}>
-          <div css={s.cardHeader}>
-            <p css={s.cardTitle}>월별 재고 추이</p>
-            <div css={s.chartLegend}>
-              <div css={s.legendItem}>
-                <div css={s.legendDot} style={{ background: '#4C8BF5' }} />입고
-              </div>
-              <div css={s.legendItem}>
-                <div css={s.legendDot} style={{ background: '#F4A261' }} />출고
+          {/* 월별 재고 추이 */}
+          <div css={s.card}>
+            <div css={s.cardHeader}>
+              <p css={s.cardTitle}>월별 재고 추이</p>
+              <div css={s.chartLegend}>
+                <div css={s.legendItem}>
+                  <div css={s.legendDot} style={{ background: '#4C8BF5' }} />입고
+                </div>
+                <div css={s.legendItem}>
+                  <div css={s.legendDot} style={{ background: '#F4A261' }} />출고
+                </div>
               </div>
             </div>
+            <div css={s.chartWrap} style={{ height: '240px' }}>
+              <Line data={monthlyChartData} options={monthlyOptions} />
+            </div>
           </div>
-          <div css={s.chartWrap} style={{ height: '180px' }}>
-            <Line data={monthlyData} options={monthlyOptions} />
-          </div>
+
         </div>
 
       </div>

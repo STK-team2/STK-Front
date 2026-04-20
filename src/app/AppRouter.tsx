@@ -15,10 +15,7 @@ const ProtectedRoute = ({ children }: { children: ReactElement }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isAuthReady = useAuthStore((state) => state.isAuthReady);
 
-  if (!isAuthReady) {
-    return null;
-  }
-
+  if (!isAuthReady) return null;
   return isAuthenticated ? children : <Navigate to="/login" replace />;
 };
 
@@ -26,11 +23,8 @@ const PublicRoute = ({ children }: { children: ReactElement }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isAuthReady = useAuthStore((state) => state.isAuthReady);
 
-  if (!isAuthReady) {
-    return null;
-  }
-
-  return isAuthenticated ? <Navigate to="/incoming" replace /> : children;
+  if (!isAuthReady) return null;
+  return isAuthenticated ? <Navigate to="/dashboard" replace /> : children;
 };
 
 const RouterContent = () => {

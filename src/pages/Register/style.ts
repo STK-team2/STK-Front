@@ -215,6 +215,14 @@ export const verifyBtn = css`
   }
 `;
 
+export const statusMessage = css`
+  min-height: 24px;
+  margin: 0;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+`;
+
 export const passwordWrapper = css`
   position: relative;
   display: flex;
@@ -298,6 +306,12 @@ export const InputField = styled.input`${inputField}`;
 export const VerifyRow = styled.div`${verifyRow}`;
 export const VerifyInput = styled.input`${verifyInput}`;
 export const VerifyBtn = styled.button`${verifyBtn}`;
+export const StatusMessage = styled('p', {
+  shouldForwardProp: (prop) => prop !== 'error',
+})<{ error?: boolean }>`
+  ${statusMessage}
+  color: ${({ error }) => (error ? '#d92d20' : '#0068e0')};
+`;
 export const PasswordWrapper = styled.div`${passwordWrapper}`;
 export const PasswordInput = styled.input`${passwordInput}`;
 export const VisibilityBtn = styled.button`${visibilityBtn}`;
