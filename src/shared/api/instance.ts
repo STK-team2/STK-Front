@@ -64,6 +64,7 @@ instance.interceptors.response.use(
       headers?: Record<string, string>;
     };
 
+    const AUTH_ONLY_PATHS = ['/auth/refresh', '/auth/sign-in', '/auth/sign-up'];
     if (
       error.response?.status === 401 &&
       !originalRequest?._retry &&
