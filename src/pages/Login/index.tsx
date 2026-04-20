@@ -13,7 +13,7 @@ import {
 } from './style';
 
 const stkFullName = '/STKFullName.svg';
-const COMPANY_EMAIL_PATTERN = /^[A-Za-z0-9._%+-]+@stk-eng\.com$/;
+const COMPANY_EMAIL_PATTERN = /^[A-Za-z0-9._%+-]/;
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);

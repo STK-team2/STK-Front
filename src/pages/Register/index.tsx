@@ -18,7 +18,7 @@ import {
 } from './style';
 
 const stkBg = '/STK.svg';
-const COMPANY_EMAIL_PATTERN = /^[A-Za-z0-9._%+-]+@stk-eng\.com$/;
+const COMPANY_EMAIL_PATTERN = /^[A-Za-z0-9._%+-]/;
 const VERIFICATION_CODE_PATTERN = /^\d{6}$/;
 
 const RegisterPage = () => {
