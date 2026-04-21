@@ -76,7 +76,7 @@ const mapMovementToRow = (movement: MovementResponse): Row => ({
   code: movement.itemCode,
   name: movement.itemName,
   qty: movement.quantity,
-  location: '-',
+  location: movement.location ?? '',
   note: movement.note ?? '',
   reference: movement.reference ?? '',
 });

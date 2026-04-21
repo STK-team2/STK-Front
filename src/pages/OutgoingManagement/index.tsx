@@ -8,7 +8,7 @@ import { RecordDetailPanel } from '../../shared/ui/RecordDetailPanel';
 import { itemApi } from '../../entities/item/api/itemApi';
 import type { ItemResponse } from '../../entities/item/types';
 import type { MovementResponse } from '../../entities/movement/types';
-import { showApiErrorToast, showErrorToast } from '../../shared/lib/toast';
+import { getApiErrorMessage, showApiErrorToast, showErrorToast } from '../../shared/lib/toast';
 import { useSubmitOnOutsideClick } from '../../shared/lib/useSubmitOnOutsideClick';
 import {
   useDeleteMovement,
@@ -76,7 +76,7 @@ const mapMovementToRow = (movement: MovementResponse): Row => ({
   code: movement.itemCode,
   name: movement.itemName,
   qty: movement.quantity,
-  location: '-',
+  location: movement.location ?? '',
   manager: movement.userName ?? '-',
   note: movement.note ?? '',
   reference: movement.reference ?? '',
