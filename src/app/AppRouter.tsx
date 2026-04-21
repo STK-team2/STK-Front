@@ -64,7 +64,7 @@ const RouterContent = () => {
 
   return (
     <Routes>
-      <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+      <Route path="/login" element={<PublicRoute><RegisterPage /></PublicRoute>} />
       <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
       <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
       <Route path="/incoming" element={<ProtectedRoute><IncomingManagementPage /></ProtectedRoute>} />

@@ -14,6 +14,9 @@ export const pageInner = css`
   @media (max-width: 1280px) {
     padding: 24px;
   }
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
 `;
 
 export const pageTitle = css`
@@ -28,6 +31,10 @@ export const pageTitle = css`
     font-size: 22px;
     margin-bottom: 16px;
   }
+  @media (max-width: 768px) {
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
 `;
 
 export const toolbar = css`
@@ -35,18 +42,34 @@ export const toolbar = css`
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 8px;
+  }
 `;
 
 export const filters = css`
   display: flex;
   align-items: center;
   gap: 8px;
+
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
 `;
 
 export const toolbarRight = css`
   display: flex;
   align-items: center;
   gap: 8px;
+
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
 `;
 
 export const qtyLabel = css`
@@ -122,15 +145,22 @@ export const totalLabel = css`
   color: #595b66;
   margin: 16px 0 8px;
   font-feature-settings: 'ss05' 1;
+
+  @media (max-width: 768px) {
+    font-size: 13px;
+    margin: 12px 0 6px;
+  }
 `;
 
 export const tableWrap = css`
   width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 `;
 
 export const table = css`
   width: 100%;
+  min-width: 1080px;
   border-collapse: collapse;
   table-layout: fixed;
 `;
@@ -148,7 +178,14 @@ export const th = css`
   font-weight: 500;
   color: #595b66;
   text-align: left;
+  white-space: nowrap;
   font-feature-settings: 'ss05' 1;
+
+  @media (max-width: 768px) {
+    height: 36px;
+    padding: 0 8px;
+    font-size: 13px;
+  }
 `;
 
 export const dataRow = css`
@@ -169,6 +206,12 @@ export const td = css`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+
+  @media (max-width: 768px) {
+    height: 44px;
+    padding: 0 8px;
+    font-size: 13px;
+  }
 `;
 
 export const newRow = css`

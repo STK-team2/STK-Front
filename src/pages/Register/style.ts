@@ -48,16 +48,12 @@ export const rightPanel = css`
   justify-content: flex-start;
   padding: 80px 64px;
   box-sizing: border-box;
+  overflow-x: hidden;
   overflow-y: auto;
 
   @media (max-width: 1280px) {
     width: 560px;
-    padding: 60px 52px;
-  }
-
-  @media (max-width: 1280px) {
-    width: 500px;
-    padding: 60px 44px;
+    padding: 60px 48px;
   }
 
   @media (max-width: 768px) {
@@ -158,6 +154,17 @@ export const inputField = css`
   &:focus {
     border-color: #0068e0;
   }
+
+  @media (max-width: 1280px) {
+    height: 48px;
+    font-size: 16px;
+    padding: 10px 16px;
+  }
+
+  @media (max-width: 480px) {
+    height: 44px;
+    font-size: 15px;
+  }
 `;
 
 export const verifyRow = css`
@@ -170,7 +177,7 @@ export const verifyInput = css`
   flex: 1;
   min-width: 0;
   height: 52px;
-  padding: 12px 20px;
+  padding: 12px 16px;
   border: 1px solid #bbbcc2;
   border-radius: 6px;
   font-family: 'Pretendard Variable', sans-serif;
@@ -187,6 +194,16 @@ export const verifyInput = css`
   }
   &:focus {
     border-color: #0068e0;
+  }
+
+  @media (max-width: 1280px) {
+    height: 48px;
+    font-size: 16px;
+  }
+
+  @media (max-width: 480px) {
+    height: 44px;
+    font-size: 15px;
   }
 `;
 
@@ -212,6 +229,18 @@ export const verifyBtn = css`
   &:disabled {
     background: #dddee3;
     cursor: not-allowed;
+  }
+
+  @media (max-width: 1280px) {
+    font-size: 15px;
+    padding: 10px 14px;
+    height: 48px;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+    padding: 10px 12px;
+    height: 44px;
   }
 `;
 
