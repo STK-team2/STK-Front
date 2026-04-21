@@ -1,5 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -46,12 +47,12 @@ const weeklyOptions = {
   scales: {
     x: {
       grid: { display: false },
-      ticks: { font: { size: 11 }, color: '#9497a0' },
+      ticks: { font: { size: 13 }, color: '#9497a0' },
       border: { display: false },
     },
     y: {
       grid: { color: '#f0f1f4' },
-      ticks: { font: { size: 11 }, color: '#9497a0', maxTicksLimit: 4 },
+      ticks: { font: { size: 13 }, color: '#9497a0', maxTicksLimit: 5 },
       border: { display: false },
     },
   },
@@ -71,11 +72,11 @@ const monthlyOptions = {
   scales: {
     x: {
       grid: { display: false },
-      ticks: { font: { size: 11 }, color: '#9497a0' },
+      ticks: { font: { size: 13 }, color: '#9497a0' },
       border: { display: false },
     },
     y: {
-      ticks: { font: { size: 11 }, color: '#9497a0' },
+      ticks: { font: { size: 13 }, color: '#9497a0' },
       grid: { color: '#f0f1f4' },
       border: { display: false },
     },
@@ -84,7 +85,7 @@ const monthlyOptions = {
 
 /* ── 아이콘 ── */
 const IconIncoming = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
     stroke="#4C8BF5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M23 4v6h-6"/>
     <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
@@ -92,7 +93,7 @@ const IconIncoming = () => (
 );
 
 const IconOutgoing = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
     stroke="#F06292" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M1 4v6h6"/>
     <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
@@ -100,14 +101,14 @@ const IconOutgoing = () => (
 );
 
 const IconSparkle = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
     stroke="#48BB78" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M12 2 L13.8 10.2 L22 12 L13.8 13.8 L12 22 L10.2 13.8 L2 12 L10.2 10.2 Z"/>
   </svg>
 );
 
 const IconMail = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
     stroke="#F6AD55" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
     <polyline points="22,6 12,13 2,6"/>
@@ -115,7 +116,7 @@ const IconMail = () => (
 );
 
 const IconUser = () => (
-  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
     stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
     <circle cx="12" cy="7" r="4"/>
@@ -125,7 +126,12 @@ const IconUser = () => (
 /* ── 페이지 ── */
 const DashboardPage = () => {
   const [activeTab, setActiveTab] = useState<'in' | 'out'>('in');
+  const navigate = useNavigate();
   const todayDate = new Date();
+
+  const handleActivityClick = () => {
+    navigate(activeTab === 'in' ? '/incoming' : '/outgoing');
+  };
   const { data: dashboard, isLoading, isError } = useGetDashboardOverview();
 
   /* ── 데이터 가공 ── */
@@ -243,7 +249,12 @@ const DashboardPage = () => {
         {/* ── 요약 카드 ── */}
         <div css={s.summaryRow}>
 
-          <div css={s.summaryCard}>
+          <div
+            css={s.summaryCard}
+            onClick={() => navigate('/incoming')}
+            role="button"
+            tabIndex={0}
+          >
             <span css={s.summaryLabel}>오늘 입고</span>
             <span css={s.summaryValue}>{todayInbound}</span>
             <span css={s.summaryUnit}>건</span>
@@ -252,7 +263,12 @@ const DashboardPage = () => {
             </div>
           </div>
 
-          <div css={s.summaryCard}>
+          <div
+            css={s.summaryCard}
+            onClick={() => navigate('/outgoing')}
+            role="button"
+            tabIndex={0}
+          >
             <span css={s.summaryLabel}>오늘 출고</span>
             <span css={s.summaryValue}>{todayOutbound}</span>
             <span css={s.summaryUnit}>건</span>
@@ -261,7 +277,12 @@ const DashboardPage = () => {
             </div>
           </div>
 
-          <div css={s.summaryCard}>
+          <div
+            css={s.summaryCard}
+            onClick={() => navigate('/inventory')}
+            role="button"
+            tabIndex={0}
+          >
             <span css={s.summaryLabel}>전체 품목 수</span>
             <span css={s.summaryValue}>{totalItems}</span>
             <span css={s.summaryUnit}>목</span>
@@ -270,7 +291,12 @@ const DashboardPage = () => {
             </div>
           </div>
 
-          <div css={s.summaryCard}>
+          <div
+            css={s.summaryCard}
+            onClick={() => navigate('/closing')}
+            role="button"
+            tabIndex={0}
+          >
             <span css={s.summaryLabel}>이번 달 마감</span>
             <span css={s.summaryBadge} style={isCurrentMonthClosed
               ? { background: '#C6F6D5', color: '#276749' }
@@ -347,7 +373,7 @@ const DashboardPage = () => {
                 </div>
               </div>
             </div>
-            <div css={s.chartWrap} style={{ height: '170px' }}>
+            <div css={s.chartWrap} style={{ height: '220px' }}>
               <Bar data={weeklyChartData} options={weeklyOptions} />
             </div>
           </div>
@@ -381,7 +407,13 @@ const DashboardPage = () => {
                 </div>
               )}
               {filteredRecent.map((item) => (
-                <div css={s.activityItem} key={item.movementId}>
+                <div
+                  css={s.activityItem}
+                  key={item.movementId}
+                  onClick={handleActivityClick}
+                  role="button"
+                  tabIndex={0}
+                >
                   <div css={s.activityDot}
                     style={{ background: item.type === 'INBOUND' ? '#4C8BF5' : '#F9A8C9' }} />
                   <div css={s.activityInfo}>
@@ -414,7 +446,7 @@ const DashboardPage = () => {
                 </div>
               </div>
             </div>
-            <div css={s.chartWrap} style={{ height: '180px' }}>
+            <div css={s.chartWrap} style={{ height: '240px' }}>
               <Line data={monthlyChartData} options={monthlyOptions} />
             </div>
           </div>
