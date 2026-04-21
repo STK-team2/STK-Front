@@ -29,9 +29,9 @@ export const actionBtn = css`
     font-size: 15px;
   }
   @media (max-width: 768px) {
-    height: 34px;
-    font-size: 13px;
-    padding: 0 12px;
+    height: 38px;
+    font-size: 18px;
+    padding: 0 14px;
   }
 `;
 
@@ -75,8 +75,8 @@ export const actionOption = css`
   }
 
   @media (max-width: 768px) {
-    height: 36px;
-    font-size: 14px;
-    padding: 0 12px;
+    height: 44px;
+    font-size: 18px;
+    padding: 0 14px;
   }
 `;

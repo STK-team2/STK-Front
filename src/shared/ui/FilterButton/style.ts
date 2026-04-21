@@ -28,10 +28,10 @@ export const filterBtn = css`
     font-size: 15px;
   }
   @media (max-width: 768px) {
-    height: 34px;
-    min-width: 76px;
-    font-size: 13px;
-    padding: 0 10px;
+    height: 38px;
+    min-width: 84px;
+    font-size: 18px;
+    padding: 0 12px;
   }
 `;
 
@@ -55,7 +55,7 @@ export const filterPopover = css`
   @media (max-width: 480px) {
     min-width: 160px;
     max-width: calc(100vw - 32px);
-    padding: 12px;
+    padding: 16px;
   }
 `;
 
@@ -83,6 +83,11 @@ export const sortOption = css`
   font-feature-settings: 'ss05' 1;
   &:hover {
     background: #f5f6f8;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 18px;
+    height: 44px;
   }
 `;
 
