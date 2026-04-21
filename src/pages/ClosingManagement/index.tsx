@@ -147,15 +147,15 @@ const ClosingManagementPage = () => {
 
                 return (
                   <DataRow key={row.closingId}>
-                    <Td><Checkbox checked={selectedRows.has(row.closingId)} onChange={() => toggleRow(row.closingId)} /></Td>
-                    <Td>{row.itemCode}</Td>
-                    <Td>{row.itemName}</Td>
-                    <Td>{row.location}</Td>
-                    <Td>{row.closingYm}</Td>
-                    <Td>
+                    <Td data-label="선택"><Checkbox checked={selectedRows.has(row.closingId)} onChange={() => toggleRow(row.closingId)} /></Td>
+                    <Td data-label="자재코드">{row.itemCode}</Td>
+                    <Td data-label="자재명">{row.itemName}</Td>
+                    <Td data-label="자재 위치">{row.location}</Td>
+                    <Td data-label="기간">{row.closingYm}</Td>
+                    <Td data-label="상태">
                       <StatusText closed={isClosed}>{isClosed ? '마감' : '취소'}</StatusText>
                     </Td>
-                    <Td>
+                    <Td data-label="마감">
                       {isClosed ? (
                         <CancelBtn type="button" onClick={() => void toggleStatus(row.closingId, row.closingYm, true)}>취소</CancelBtn>
                       ) : (
