@@ -44,10 +44,17 @@ const RouterContent = () => {
 
       try {
         const response = await authApi.refresh({ refreshToken });
-        if (!cancelled && response.success) {
+        if (cancelled) {
+          return;
+        }
+
+        if (response.success && response.data?.accessToken) {
           setAccessToken(response.data.accessToken);
           setAuthReady(true);
+          return;
         }
+
+        clearTokens();
       } catch {
         if (!cancelled) {
           clearTokens();

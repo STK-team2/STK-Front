@@ -1,6 +1,9 @@
 import axios from 'axios';
+import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { useAuthStore } from '../../entities/auth/model/authStore';
+import type { RefreshTokenResponse } from '../../entities/auth/types';
 import { showErrorToast } from '../lib/toast';
+import type { ApiResponse } from '../types/api';
 
 const resolveApiBaseUrl = () => {
   const configuredBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
@@ -33,9 +36,17 @@ const getStoredRefreshToken = () =>
 const requestAccessTokenRefresh = async (refreshToken: string) => {
   if (!refreshRequest) {
     refreshRequest = axios
-      .post(`${API_BASE_URL}/auth/refresh`, { refreshToken })
+      .post<ApiResponse<RefreshTokenResponse>>(
+        `${API_BASE_URL}/auth/refresh`,
+        { refreshToken },
+        { headers: { 'Content-Type': 'application/json' } },
+      )
       .then(({ data }) => {
-        const newAccessToken = data.data.accessToken as string;
+        if (!data.success || !data.data?.accessToken) {
+          throw new Error('Access token refresh failed');
+        }
+
+        const newAccessToken = data.data.accessToken;
         useAuthStore.getState().setAccessToken(newAccessToken);
         return newAccessToken;
       })
@@ -58,14 +69,15 @@ instance.interceptors.request.use((config) => {
 instance.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config as {
+    const originalRequest = (error as AxiosError).config as
+      | (InternalAxiosRequestConfig & {
       _retry?: boolean;
-      url?: string;
-      headers?: Record<string, string>;
-    };
+    })
+      | undefined;
 
     if (
       error.response?.status === 401 &&
+      originalRequest &&
       !originalRequest?._retry &&
       !isBypassedAuthRequest(originalRequest?.url)
     ) {
@@ -80,10 +92,7 @@ instance.interceptors.response.use(
 
       try {
         const newAccessToken = await requestAccessTokenRefresh(refreshToken);
-        originalRequest.headers = {
-          ...originalRequest.headers,
-          Authorization: `Bearer ${newAccessToken}`,
-        };
+        originalRequest.headers.set('Authorization', `Bearer ${newAccessToken}`);
         return instance(originalRequest);
       } catch {
         useAuthStore.getState().clearTokens();
