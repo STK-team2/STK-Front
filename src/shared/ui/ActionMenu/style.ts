@@ -28,6 +28,11 @@ export const actionBtn = css`
     height: 36px;
     font-size: 15px;
   }
+  @media (max-width: 768px) {
+    height: 34px;
+    font-size: 13px;
+    padding: 0 12px;
+  }
 `;
 
 export const actionBtnActive = css`
@@ -45,6 +50,11 @@ export const actionDropdown = css`
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   min-width: 140px;
   overflow: hidden;
+
+  @media (max-width: 480px) {
+    min-width: 120px;
+    max-width: calc(100vw - 32px);
+  }
 `;
 
 export const actionOption = css`
@@ -62,5 +72,11 @@ export const actionOption = css`
   font-feature-settings: 'ss05' 1;
   &:hover {
     background: #f5f6f8;
+  }
+
+  @media (max-width: 768px) {
+    height: 36px;
+    font-size: 14px;
+    padding: 0 12px;
   }
 `;

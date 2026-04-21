@@ -7,6 +7,10 @@ export const wrapper = css`
   height: 100vh;
   overflow: hidden;
   background: #ffffff;
+
+  @media (max-width: 768px) {
+    height: 100dvh;
+  }
 `;
 
 export const sidebar = css`
@@ -20,6 +24,9 @@ export const sidebar = css`
 
   @media (max-width: 1280px) {
     width: 190px;
+  }
+  @media (max-width: 768px) {
+    display: none;
   }
 `;
 
@@ -102,6 +109,49 @@ export const content = css`
   height: 100vh;
   overflow-y: auto;
   background: #ffffff;
+
+  @media (max-width: 768px) {
+    height: 100dvh;
+    padding-bottom: 60px;
+  }
+`;
+
+export const bottomNav = css`
+  display: none;
+
+  @media (max-width: 768px) {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: #fff;
+    border-top: 1px solid #f0f1f4;
+    z-index: 100;
+  }
+`;
+
+const bottomNavItemBase = css`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: 10px;
+  color: #9497a0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-feature-settings: 'ss05' 1;
+  padding: 0;
+  line-height: 1;
+`;
+
+const bottomNavItemActiveStyle = css`
+  color: #0068e0;
 `;
 
 export const Wrapper = styled.div`${wrapper}`;
@@ -118,3 +168,10 @@ export const NavItem = styled('button', {
 `;
 export const LogoutBtn = styled.button`${logoutBtn}`;
 export const Content = styled.main`${content}`;
+export const BottomNav = styled.nav`${bottomNav}`;
+export const BottomNavItem = styled('button', {
+  shouldForwardProp: (prop) => prop !== 'active',
+})<{ active?: boolean }>`
+  ${bottomNavItemBase}
+  ${({ active }) => active && bottomNavItemActiveStyle}
+`;

@@ -9,6 +9,12 @@ export const page = css`
   @media (max-width: 1440px) {
     padding: 32px 38px 40px;
   }
+  @media (max-width: 768px) {
+    padding: 20px 16px 24px;
+  }
+  @media (max-width: 480px) {
+    padding: 16px 12px 20px;
+  }
 `;
 
 /* ── Header ── */
@@ -17,6 +23,10 @@ export const pageHeader = css`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 28px;
+
+  @media (max-width: 768px) {
+    margin-bottom: 16px;
+  }
 `;
 
 export const pageTitle = css`
@@ -24,6 +34,10 @@ export const pageTitle = css`
   font-weight: 700;
   color: #1a1c23;
   margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: 22px;
+  }
 `;
 
 export const headerMeta = css`
@@ -32,6 +46,11 @@ export const headerMeta = css`
   gap: 14px;
   color: #8b8e9b;
   font-size: 16px;
+
+  @media (max-width: 768px) {
+    font-size: 13px;
+    gap: 8px;
+  }
 `;
 
 export const headerUser = css`
@@ -49,6 +68,14 @@ export const summaryRow = css`
 
   @media (max-width: 1280px) {
     grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 768px) {
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  @media (max-width: 480px) {
+    gap: 10px;
+    margin-bottom: 12px;
   }
 `;
 
@@ -69,12 +96,24 @@ export const summaryCard = css`
     border-color: #c9d3e5;
     box-shadow: 0 6px 16px rgba(23, 43, 77, 0.08);
   }
+
+  @media (max-width: 768px) {
+    padding: 18px 16px;
+    border-radius: 12px;
+  }
+  @media (max-width: 480px) {
+    padding: 14px 12px;
+  }
 `;
 
 export const summaryLabel = css`
   font-size: 16px;
   color: #9497a0;
   font-weight: 500;
+
+  @media (max-width: 768px) {
+    font-size: 12px;
+  }
 `;
 
 export const summaryValue = css`
@@ -87,11 +126,22 @@ export const summaryValue = css`
   @media (max-width: 1440px) {
     font-size: 34px;
   }
+  @media (max-width: 768px) {
+    font-size: 28px;
+    margin-top: 4px;
+  }
+  @media (max-width: 480px) {
+    font-size: 24px;
+  }
 `;
 
 export const summaryUnit = css`
   font-size: 15px;
   color: #9497a0;
+
+  @media (max-width: 768px) {
+    font-size: 12px;
+  }
 `;
 
 export const summaryIconBox = css`
@@ -109,6 +159,18 @@ export const summaryIconBox = css`
     width: 26px;
     height: 26px;
   }
+
+  @media (max-width: 768px) {
+    top: 14px;
+    right: 14px;
+    width: 36px;
+    height: 36px;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
 `;
 
 export const summaryBadge = css`
@@ -122,6 +184,12 @@ export const summaryBadge = css`
   margin-top: 10px;
   background: #FDE68A;
   color: #92400E;
+
+  @media (max-width: 768px) {
+    font-size: 12px;
+    padding: 3px 8px;
+    margin-top: 6px;
+  }
 `;
 
 /* ── Shared card ── */
@@ -132,6 +200,11 @@ export const card = css`
   padding: 24px 26px;
   overflow: hidden;
   min-width: 0;
+
+  @media (max-width: 768px) {
+    padding: 16px 14px;
+    border-radius: 12px;
+  }
 `;
 
 export const cardHeader = css`
@@ -139,6 +212,12 @@ export const cardHeader = css`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 18px;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    margin-bottom: 12px;
+  }
 `;
 
 export const cardTitle = css`
@@ -146,6 +225,10 @@ export const cardTitle = css`
   font-weight: 600;
   color: #1a1c23;
   margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: 15px;
+  }
 `;
 
 /* ── Chart legend ── */
@@ -155,6 +238,12 @@ export const chartLegend = css`
   gap: 16px;
   font-size: 14px;
   color: #595b66;
+  flex-shrink: 0;
+
+  @media (max-width: 480px) {
+    gap: 10px;
+    font-size: 12px;
+  }
 `;
 
 export const legendItem = css`
@@ -183,6 +272,10 @@ export const midRow = css`
   @media (max-width: 1280px) {
     grid-template-columns: 1fr;
   }
+  @media (max-width: 768px) {
+    gap: 12px;
+    margin-bottom: 12px;
+  }
 `;
 
 /* ── Donut card ── */
@@ -190,6 +283,12 @@ export const donutBody = css`
   display: flex;
   gap: 22px;
   align-items: center;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+  }
 `;
 
 export const donutLeft = css`
@@ -204,6 +303,11 @@ export const donutWrap = css`
   position: relative;
   width: 170px;
   height: 170px;
+
+  @media (max-width: 480px) {
+    width: 130px;
+    height: 130px;
+  }
 `;
 
 export const donutCenter = css`
@@ -215,6 +319,10 @@ export const donutCenter = css`
   font-size: 26px;
   font-weight: 700;
   color: #1a1c23;
+
+  @media (max-width: 480px) {
+    font-size: 20px;
+  }
 `;
 
 export const donutLegendRow = css`
@@ -233,6 +341,10 @@ export const donutLegendItem = css`
 export const donutRight = css`
   flex: 1;
   min-width: 0;
+
+  @media (max-width: 480px) {
+    width: 100%;
+  }
 `;
 
 export const donutMeta = css`
@@ -269,6 +381,10 @@ export const donutStatValue = css`
   font-size: 22px;
   font-weight: 700;
   color: #1a1c23;
+
+  @media (max-width: 768px) {
+    font-size: 18px;
+  }
 `;
 
 /* ── Bottom row ── */
@@ -284,6 +400,10 @@ export const bottomRow = css`
   }
   @media (max-width: 1280px) {
     grid-template-columns: 1fr;
+  }
+  @media (max-width: 768px) {
+    gap: 12px;
+    margin-bottom: 12px;
   }
 `;
 
@@ -377,6 +497,11 @@ export const activityItem = css`
 
   &:hover { background: #f5f8ff; }
   &:last-child { border-bottom: none; }
+
+  @media (max-width: 768px) {
+    padding: 14px 6px;
+    gap: 10px;
+  }
 `;
 
 export const activityDot = css`
@@ -398,6 +523,10 @@ export const activityName = css`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  @media (max-width: 768px) {
+    font-size: 13px;
+  }
 `;
 
 export const activityCode = css`
@@ -438,4 +567,47 @@ export const chartWrap = css`
   overflow: hidden;
   min-width: 0;
   width: 100%;
+`;
+
+export const weeklyChartWrap = css`
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  width: 100%;
+  height: 220px;
+
+  @media (max-width: 768px) {
+    height: 180px;
+  }
+  @media (max-width: 480px) {
+    height: 160px;
+  }
+`;
+
+export const monthlyChartWrap = css`
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  width: 100%;
+  height: 240px;
+
+  @media (max-width: 768px) {
+    height: 200px;
+  }
+  @media (max-width: 480px) {
+    height: 170px;
+  }
+`;
+
+export const activityEmpty = css`
+  display: flex;
+  justify-content: center;
+  color: #9497a0;
+  font-size: 13px;
+  padding: 22px 10px;
+
+  @media (max-width: 768px) {
+    font-size: 12px;
+    padding: 14px 6px;
+  }
 `;

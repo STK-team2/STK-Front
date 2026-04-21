@@ -373,7 +373,7 @@ const DashboardPage = () => {
                 </div>
               </div>
             </div>
-            <div css={s.chartWrap} style={{ height: '220px' }}>
+            <div css={s.weeklyChartWrap}>
               <Bar data={weeklyChartData} options={weeklyOptions} />
             </div>
           </div>
@@ -402,7 +402,7 @@ const DashboardPage = () => {
             </div>
             <div css={s.activityList}>
               {filteredRecent.length === 0 && (
-                <div css={s.activityItem} style={{ justifyContent: 'center', color: '#9497a0', fontSize: 13 }}>
+                <div css={s.activityEmpty}>
                   내역이 없습니다.
                 </div>
               )}
@@ -446,7 +446,7 @@ const DashboardPage = () => {
                 </div>
               </div>
             </div>
-            <div css={s.chartWrap} style={{ height: '240px' }}>
+            <div css={s.monthlyChartWrap}>
               <Line data={monthlyChartData} options={monthlyOptions} />
             </div>
           </div>

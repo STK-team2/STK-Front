@@ -27,6 +27,12 @@ export const filterBtn = css`
     min-width: 84px;
     font-size: 15px;
   }
+  @media (max-width: 768px) {
+    height: 34px;
+    min-width: 76px;
+    font-size: 13px;
+    padding: 0 10px;
+  }
 `;
 
 export const filterBtnActive = css`
@@ -45,6 +51,12 @@ export const filterPopover = css`
   padding: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   min-width: 180px;
+
+  @media (max-width: 480px) {
+    min-width: 160px;
+    max-width: calc(100vw - 32px);
+    padding: 12px;
+  }
 `;
 
 export const sortOptionList = css`
