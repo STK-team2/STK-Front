@@ -321,6 +321,24 @@ export const deleteBtn = css`
   }
 `;
 
+export const saveBtn = css`
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 20px;
+  background: #0068e0;
+  border: none;
+  border-radius: 6px;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #ffffff;
+  cursor: pointer;
+  &:hover {
+    background: #0056b8;
+  }
+`;
+
 export const Backdrop = styled.div`${backdrop}`;
 export const PageInner = styled.div`${pageInner}`;
 export const PageTitle = styled.h1`${pageTitle}`;
@@ -358,3 +376,4 @@ export const NewRowDateWrap = styled.div`${newRowDateWrap}`;
 export const NewRowDateInput = styled.input`${newRowDateInput}`;
 export const CancelBtn = styled.button`${cancelBtn}`;
 export const DeleteBtn = styled.button`${deleteBtn}`;
+export const SaveBtn = styled.button`${saveBtn}`;

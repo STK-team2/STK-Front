@@ -24,7 +24,7 @@ import {
   QtyLabel, QtyInputRow, QtyInput, QtySep, SortOptionList, SortOption,
   TotalLabel, TableWrap, Table, HeaderRow, Th, DataRow, Td,
   NewRow, NewRowInput, NewRowDateWrap, NewRowDateInput,
-  CancelBtn, DeleteBtn,
+  CancelBtn, DeleteBtn, SaveBtn,
 } from './style';
 
 type FilterType = 'date' | 'qty' | 'sort' | null;
@@ -188,7 +188,7 @@ const IncomingManagementPage = () => {
           query: search.trim() || undefined,
         });
       } catch (error) {
-        window.alert(getErrorMessage(error, '다운로드에 실패했습니다.'));
+        window.alert(getApiErrorMessage(error, '다운로드에 실패했습니다.'));
       }
       setActionOpen(false);
     }
@@ -217,6 +217,30 @@ const IncomingManagementPage = () => {
     setEditMode(false);
     setEditValues({});
     setNewRows([]);
+  };
+
+  const confirmAllEdits = async () => {
+    try {
+      await Promise.all(
+        Object.keys(editValues).map((id) => {
+          const row = editValues[id];
+          return updateMovementMutation.mutateAsync({
+            id,
+            body: {
+              site: row.site,
+              movementDate: row.date,
+              quantity: row.qty,
+              note: row.note,
+              reference: row.reference,
+            },
+          });
+        }),
+      );
+      setEditMode(false);
+      setEditValues({});
+    } catch (error) {
+      showApiErrorToast(error, '입고 수정에 실패했습니다.');
+    }
   };
 
   const updateEditValue = (id: string, field: keyof Omit<Row, 'id'>, value: string) => {
@@ -329,6 +353,7 @@ const IncomingManagementPage = () => {
           movementDate: row.date,
           itemId: resolvedItem.id,
           quantity: Number(row.qty),
+          location: row.location || undefined,
           note: row.note,
           reference: row.reference,
         });
@@ -436,7 +461,10 @@ const IncomingManagementPage = () => {
                 <DeleteBtn type="button" onClick={() => void confirmDelete()}>삭제</DeleteBtn>
               </>
             ) : editMode ? (
-              <CancelBtn type="button" onClick={cancelEditMode}>취소</CancelBtn>
+              <>
+                <CancelBtn type="button" onClick={cancelEditMode}>취소</CancelBtn>
+                <SaveBtn type="button" onClick={() => void confirmAllEdits()}>수정</SaveBtn>
+              </>
             ) : (
               <ActionMenu
                 label="입고 관리"

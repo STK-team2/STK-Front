@@ -217,6 +217,68 @@ export const td = css`
   }
 `;
 
+export const newRow = css`
+  border-bottom: 1px solid #e5e6ea;
+  background: #fafbfc;
+`;
+
+export const newRowInput = css`
+  width: 100%;
+  height: 34px;
+  padding: 0 8px;
+  border: 1px solid #bbbcc2;
+  border-radius: 4px;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 15px;
+  color: #1a1b1e;
+  outline: none;
+  box-sizing: border-box;
+  background: #ffffff;
+  &:focus {
+    border-color: #0068e0;
+  }
+  &:disabled {
+    background: #f5f6f8;
+    color: #9497a0;
+  }
+`;
+
+export const cancelBtn = css`
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 16px;
+  background: #ffffff;
+  border: 1px solid #bbbcc2;
+  border-radius: 6px;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #595b66;
+  cursor: pointer;
+  &:hover {
+    background: #f5f6f8;
+  }
+`;
+
+export const saveBtn = css`
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 20px;
+  background: #0068e0;
+  border: none;
+  border-radius: 6px;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #ffffff;
+  cursor: pointer;
+  &:hover {
+    background: #0056b8;
+  }
+`;
+
 export const Backdrop = styled.div`${backdrop}`;
 export const PageInner = styled.div`${pageInner}`;
 export const PageTitle = styled.h1`${pageTitle}`;
@@ -247,3 +309,7 @@ export const DataRow = styled('tr', {
   ${({ active }) => active && dataRowActive}
 `;
 export const Td = styled.td`${td}`;
+export const NewRow = styled.tr`${newRow}`;
+export const NewRowInput = styled.input`${newRowInput}`;
+export const CancelBtn = styled.button`${cancelBtn}`;
+export const SaveBtn = styled.button`${saveBtn}`;

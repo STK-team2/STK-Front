@@ -15,6 +15,7 @@ import {
   Backdrop, PageInner, PageTitle, Toolbar, Filters, ToolbarRight,
   QtyLabel, QtyInputRow, QtyInput, QtySep, SortOptionList, SortOption,
   TableWrap, Table, HeaderRow, Th, DataRow, Td,
+  NewRow, NewRowInput, CancelBtn, SaveBtn,
 } from './style';
 
 type FilterType = 'qty' | 'status' | null;
@@ -29,7 +30,7 @@ interface Row {
   currentStock: number;
 }
 
-const INVENTORY_ACTIONS = ['재고 없는 품목', '다운로드'];
+const INVENTORY_ACTIONS = ['자재 수정', '재고 없는 품목', '다운로드'];
 
 const InventoryManagementPage = () => {
   const [openFilter, setOpenFilter] = useState<FilterType>(null);
@@ -40,6 +41,8 @@ const InventoryManagementPage = () => {
   const [stockStatus, setStockStatus] = useState<StockStatus>('all');
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [selectedDetailId, setSelectedDetailId] = useState<string | null>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [editValues, setEditValues] = useState<Record<string, Row>>({});
 
   const { data: currentStock = [] } = useGetCurrentStock();
   const downloadCurrentStockMutation = useDownloadCurrentStock();
@@ -107,7 +110,55 @@ const InventoryManagementPage = () => {
     setActionOpen(false);
   };
 
+  const cancelEditMode = () => {
+    setEditMode(false);
+    setEditValues({});
+  };
+
+  const updateEditValue = (id: string, field: keyof Omit<Row, 'id' | 'currentStock'>, value: string) => {
+    setEditValues((prev) => ({
+      ...prev,
+      [id]: { ...prev[id], [field]: value },
+    }));
+  };
+
+  const confirmAllEdits = async () => {
+    try {
+      await Promise.all(
+        filteredRows.map((row) => {
+          const edit = editValues[row.id];
+          if (!edit) return Promise.resolve();
+          return updateItemMutation.mutateAsync({
+            id: row.id,
+            body: {
+              itemCode: edit.code,
+              itemName: edit.name,
+              boxNumber: edit.boxNumber === '-' ? '' : edit.boxNumber,
+              location: edit.location,
+            },
+          });
+        }),
+      );
+      setEditMode(false);
+      setEditValues({});
+    } catch (error) {
+      showApiErrorToast(error, '자재 수정에 실패했습니다.');
+    }
+  };
+
   const handleActionItem = async (item: string) => {
+    if (item === '자재 수정') {
+      const nextValues: Record<string, Row> = {};
+      filteredRows.forEach((row) => {
+        nextValues[row.id] = { ...row };
+      });
+      setEditValues(nextValues);
+      setEditMode(true);
+      setSelectedDetailId(null);
+      setActionOpen(false);
+      return;
+    }
+
     if (item === '재고 없는 품목') {
       setStockStatus('empty');
       setActionOpen(false);
@@ -196,13 +247,20 @@ const InventoryManagementPage = () => {
 
           <ToolbarRight>
             <SearchInput value={search} onChange={setSearch} />
-            <ActionMenu
-              label="재고 관리"
-              isOpen={actionOpen}
-              onToggle={() => setActionOpen((value) => !value)}
-              items={INVENTORY_ACTIONS}
-              onItemClick={(item) => void handleActionItem(item)}
-            />
+            {editMode ? (
+              <>
+                <CancelBtn type="button" onClick={cancelEditMode}>취소</CancelBtn>
+                <SaveBtn type="button" onClick={() => void confirmAllEdits()}>수정</SaveBtn>
+              </>
+            ) : (
+              <ActionMenu
+                label="재고 관리"
+                isOpen={actionOpen}
+                onToggle={() => setActionOpen((value) => !value)}
+                items={INVENTORY_ACTIONS}
+                onItemClick={(item) => void handleActionItem(item)}
+              />
+            )}
           </ToolbarRight>
         </Toolbar>
 
@@ -228,18 +286,29 @@ const InventoryManagementPage = () => {
                 </thead>
                 <tbody>
                   {filteredRows.map((row) => (
-                    <DataRow
-                      key={row.id}
-                      active={selectedDetailId === row.id}
-                      onClick={() => openDetail(row.id)}
-                    >
-                      <Td onClick={(e) => e.stopPropagation()}><Checkbox checked={selectedRows.has(row.id)} onChange={() => toggleRow(row.id)} /></Td>
-                      <Td>{row.boxNumber}</Td>
-                      <Td>{row.location}</Td>
-                      <Td>{row.code}</Td>
-                      <Td>{row.name}</Td>
-                      <Td>{row.currentStock}</Td>
-                    </DataRow>
+                    editMode ? (
+                      <NewRow key={row.id}>
+                        <Td onClick={(e) => e.stopPropagation()}><Checkbox checked={selectedRows.has(row.id)} onChange={() => toggleRow(row.id)} /></Td>
+                        <Td><NewRowInput type="text" value={editValues[row.id]?.boxNumber ?? (row.boxNumber === '-' ? '' : row.boxNumber)} onChange={(e) => updateEditValue(row.id, 'boxNumber', e.target.value)} /></Td>
+                        <Td><NewRowInput type="text" value={editValues[row.id]?.location ?? row.location} onChange={(e) => updateEditValue(row.id, 'location', e.target.value)} /></Td>
+                        <Td><NewRowInput type="text" value={editValues[row.id]?.code ?? row.code} onChange={(e) => updateEditValue(row.id, 'code', e.target.value)} /></Td>
+                        <Td><NewRowInput type="text" value={editValues[row.id]?.name ?? row.name} onChange={(e) => updateEditValue(row.id, 'name', e.target.value)} /></Td>
+                        <Td>{row.currentStock}</Td>
+                      </NewRow>
+                    ) : (
+                      <DataRow
+                        key={row.id}
+                        active={selectedDetailId === row.id}
+                        onClick={() => openDetail(row.id)}
+                      >
+                        <Td onClick={(e) => e.stopPropagation()}><Checkbox checked={selectedRows.has(row.id)} onChange={() => toggleRow(row.id)} /></Td>
+                        <Td>{row.boxNumber}</Td>
+                        <Td>{row.location}</Td>
+                        <Td>{row.code}</Td>
+                        <Td>{row.name}</Td>
+                        <Td>{row.currentStock}</Td>
+                      </DataRow>
+                    )
                   ))}
                 </tbody>
               </Table>

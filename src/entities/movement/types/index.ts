@@ -26,6 +26,7 @@ export interface RegisterInboundRequest {
   itemId: string;
   quantity: number;
   movementDate: string;
+  location?: string;
   reference?: string;
   note?: string;
 }

@@ -62,6 +62,48 @@ export const filters = css`
   }
 `;
 
+export const toolbarRight = css`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+export const toolbarSaveBtn = css`
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 20px;
+  background: #0068e0;
+  border: none;
+  border-radius: 6px;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #ffffff;
+  cursor: pointer;
+  &:hover {
+    background: #0056b8;
+  }
+`;
+
+export const toolbarCancelBtn = css`
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 16px;
+  background: #ffffff;
+  border: 1px solid #bbbcc2;
+  border-radius: 6px;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #595b66;
+  cursor: pointer;
+  &:hover {
+    background: #f5f6f8;
+  }
+`;
+
 export const contentLayout = css`
   display: flex;
   align-items: flex-start;
@@ -217,6 +259,9 @@ export const PageInner = styled.div`${pageInner}`;
 export const PageTitle = styled.h1`${pageTitle}`;
 export const Toolbar = styled.div`${toolbar}`;
 export const Filters = styled.div`${filters}`;
+export const ToolbarRight = styled.div`${toolbarRight}`;
+export const ToolbarCancelBtn = styled.button`${toolbarCancelBtn}`;
+export const ToolbarSaveBtn = styled.button`${toolbarSaveBtn}`;
 export const ContentLayout = styled.div`${contentLayout}`;
 export const TableSection = styled.div`${tableSection}`;
 export const TableWrap = styled.div`${tableWrap}`;
