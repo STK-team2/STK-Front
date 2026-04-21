@@ -208,6 +208,39 @@ export const fieldInput = css`
   background: #ffffff;
 `;
 
+export const memoSection = css`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+`;
+
+export const memoTextarea = css`
+  width: 100%;
+  min-height: 120px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  outline: none;
+  box-sizing: border-box;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 15px;
+  color: #111827;
+  background: #f8fafc;
+  resize: vertical;
+  line-height: 1.6;
+  transition: border-color 0.15s;
+
+  &:focus {
+    border-color: #0068e0;
+    background: #ffffff;
+  }
+
+  &::placeholder {
+    color: #b0b7c3;
+  }
+`;
+
 export const footer = css`
   position: sticky;
   bottom: 0;
@@ -264,3 +297,5 @@ export const FieldValue = styled('div', {
 export const FieldInput = styled.input`${fieldInput}`;
 export const Footer = styled.div`${footer}`;
 export const DeleteButton = styled.button`${deleteButton}`;
+export const MemoSection = styled.div`${memoSection}`;
+export const MemoTextarea = styled.textarea`${memoTextarea}`;

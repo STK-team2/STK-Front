@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import * as s from './style';
 
@@ -23,6 +23,8 @@ interface RecordDetailPanelProps {
   onClose: () => void;
   deleteLabel?: string;
   onDelete?: () => void | Promise<void>;
+  memo?: string;
+  onMemoSave?: (value: string) => void | Promise<void>;
 }
 
 export const RecordDetailPanel = ({
@@ -32,9 +34,16 @@ export const RecordDetailPanel = ({
   onClose,
   deleteLabel = '삭제',
   onDelete,
+  memo,
+  onMemoSave,
 }: RecordDetailPanelProps) => {
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState('');
+  const [memoValue, setMemoValue] = useState(memo ?? '');
+
+  useEffect(() => {
+    setMemoValue(memo ?? '');
+  }, [memo]);
   const [isClosing, setIsClosing] = useState(false);
 
   const requestClose = () => {
@@ -118,6 +127,18 @@ export const RecordDetailPanel = ({
               </s.FieldList>
             </s.Section>
           ))}
+
+          {onMemoSave !== undefined && (
+            <s.MemoSection>
+              <s.SectionTitle>메모</s.SectionTitle>
+              <s.MemoTextarea
+                placeholder="메모를 입력하세요..."
+                value={memoValue}
+                onChange={(e) => setMemoValue(e.target.value)}
+                onBlur={() => void onMemoSave(memoValue)}
+              />
+            </s.MemoSection>
+          )}
         </s.Body>
 
         {onDelete ? (

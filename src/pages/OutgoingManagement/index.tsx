@@ -268,7 +268,7 @@ const OutgoingManagementPage = () => {
 
   const saveDetailField = async (
     row: Row,
-    field: 'site' | 'date' | 'qty' | 'note' | 'reference',
+    field: 'site' | 'date' | 'qty' | 'location' | 'note' | 'reference',
     value: string,
   ) => {
     const nextRow = {
@@ -281,6 +281,8 @@ const OutgoingManagementPage = () => {
         id: row.id,
         body: {
           site: nextRow.site,
+          itemCode: nextRow.code,
+          location: nextRow.location || undefined,
           movementDate: nextRow.date,
           quantity: nextRow.qty,
           note: nextRow.note,
@@ -542,18 +544,14 @@ const OutgoingManagementPage = () => {
                     { label: '사업장', value: selectedDetailRow.site, editable: true, onSave: (value) => saveDetailField(selectedDetailRow, 'site', value) },
                     { label: '출고 날짜', value: selectedDetailRow.date, editable: true, inputType: 'date', onSave: (value) => saveDetailField(selectedDetailRow, 'date', value) },
                     { label: '수량', value: selectedDetailRow.qty, editable: true, inputType: 'number', onSave: (value) => saveDetailField(selectedDetailRow, 'qty', value) },
-                    { label: '자재 위치', value: selectedDetailRow.location },
+                    { label: '자재 위치', value: selectedDetailRow.location, editable: true, onSave: (value) => saveDetailField(selectedDetailRow, 'location', value) },
                     { label: '담당자', value: selectedDetailRow.manager },
-                  ],
-                },
-                {
-                  title: '메모',
-                  fields: [
-                    { label: '비고', value: selectedDetailRow.note || '', muted: !selectedDetailRow.note, editable: true, onSave: (value) => saveDetailField(selectedDetailRow, 'note', value) },
                     { label: '참고', value: selectedDetailRow.reference || '', muted: !selectedDetailRow.reference, editable: true, onSave: (value) => saveDetailField(selectedDetailRow, 'reference', value) },
                   ],
                 },
               ]}
+              memo={selectedDetailRow.note ?? ''}
+              onMemoSave={(value) => saveDetailField(selectedDetailRow, 'note', value)}
             />
           )}
       </PageInner>
