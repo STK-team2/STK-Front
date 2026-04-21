@@ -11,28 +11,33 @@ import {
 } from '../../features/closing/api/queries';
 import {
   Backdrop, PageInner, PageTitle, Toolbar, Filters,
+  SortOptionList, SortOption,
+  DateFilterWrap, DateFilterLabel, DateRangeRow, DateRangeInput, DateRangeSep,
   TableWrap, Table, HeaderRow, Th, DataRow, Td,
   StatusText, CloseBtn, CancelBtn,
 } from './style';
 
-type FilterType = 'period' | 'status' | null;
+type FilterType = 'date' | 'status' | null;
 type ClosingFilterStatus = 'ALL' | 'CLOSED' | 'CANCELLED';
 
 const ClosingManagementPage = () => {
   const [openFilter, setOpenFilter] = useState<FilterType>(null);
   const [search, setSearch] = useState('');
-  const [closingYm, setClosingYm] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const [statusFilter, setStatusFilter] = useState<ClosingFilterStatus>('ALL');
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
 
   const { data: closingRows = [] } = useGetClosingStock({
-    closingYm: closingYm || undefined,
     status: statusFilter === 'ALL' ? undefined : statusFilter,
   });
   const closeMonthMutation = useCloseMonth();
   const cancelClosingMutation = useCancelClosing();
 
   const filteredRows = closingRows.filter((row) => {
+    if (dateFrom && row.closingYm < dateFrom.substring(0, 7)) return false;
+    if (dateTo && row.closingYm > dateTo.substring(0, 7)) return false;
+
     const normalizedSearch = search.trim().toLowerCase();
     if (!normalizedSearch) return true;
 
@@ -93,26 +98,29 @@ const ClosingManagementPage = () => {
         <Toolbar>
           <Filters>
             <FilterButton
-              label="기간"
-              isOpen={openFilter === 'period'}
-              onToggle={() => setOpenFilter(openFilter === 'period' ? null : 'period')}
+              label="날짜"
+              isOpen={openFilter === 'date'}
+              onToggle={() => setOpenFilter(openFilter === 'date' ? null : 'date')}
             >
-              <input
-                type="month"
-                value={closingYm}
-                onChange={(e) => setClosingYm(e.target.value)}
-              />
+              <DateFilterWrap>
+                <DateFilterLabel>날짜</DateFilterLabel>
+                <DateRangeRow>
+                  <DateRangeInput type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
+                  <DateRangeSep>~</DateRangeSep>
+                  <DateRangeInput type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
+                </DateRangeRow>
+              </DateFilterWrap>
             </FilterButton>
             <FilterButton
               label="마감 상태"
               isOpen={openFilter === 'status'}
               onToggle={() => setOpenFilter(openFilter === 'status' ? null : 'status')}
             >
-              <div>
-                <button type="button" onClick={() => setStatusFilter('ALL')}>전체</button>
-                <button type="button" onClick={() => setStatusFilter('CLOSED')}>마감</button>
-                <button type="button" onClick={() => setStatusFilter('CANCELLED')}>취소</button>
-              </div>
+              <SortOptionList>
+                <SortOption active={statusFilter === 'ALL'} type="button" onClick={() => { setStatusFilter('ALL'); setOpenFilter(null); }}>전체</SortOption>
+                <SortOption active={statusFilter === 'CLOSED'} type="button" onClick={() => { setStatusFilter('CLOSED'); setOpenFilter(null); }}>마감</SortOption>
+                <SortOption active={statusFilter === 'CANCELLED'} type="button" onClick={() => { setStatusFilter('CANCELLED'); setOpenFilter(null); }}>취소</SortOption>
+              </SortOptionList>
             </FilterButton>
           </Filters>
 

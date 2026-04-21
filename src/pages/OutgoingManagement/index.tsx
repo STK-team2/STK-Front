@@ -19,6 +19,7 @@ import {
 import {
   Backdrop, PageInner, PageTitle, Toolbar, Filters, ToolbarRight,
   QtyLabel, QtyInputRow, QtyInput, QtySep, TotalLabel,
+  DateFilterWrap, DateFilterLabel, DateRangeRow, DateRangeInput, DateRangeSep,
   TableWrap, Table, HeaderRow, Th, DataRow, Td,
   NewRow, NewRowInput, NewRowDateWrap, NewRowDateInput,
   CancelBtn, DeleteBtn,
@@ -88,6 +89,8 @@ const OutgoingManagementPage = () => {
   const [openFilter, setOpenFilter] = useState<FilterType>(null);
   const [actionOpen, setActionOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const [qtyMin, setQtyMin] = useState('');
   const [qtyMax, setQtyMax] = useState('');
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
@@ -108,6 +111,8 @@ const OutgoingManagementPage = () => {
 
   const rows = movements.map(mapMovementToRow);
   const filteredRows = rows.filter((row) => {
+    if (dateFrom && row.date < dateFrom) return false;
+    if (dateTo && row.date > dateTo) return false;
     if (qtyMin && row.qty < Number(qtyMin)) return false;
     if (qtyMax && row.qty > Number(qtyMax)) return false;
     return true;
@@ -324,7 +329,16 @@ const OutgoingManagementPage = () => {
               label="날짜"
               isOpen={openFilter === 'date'}
               onToggle={() => setOpenFilter(openFilter === 'date' ? null : 'date')}
-            />
+            >
+              <DateFilterWrap>
+                <DateFilterLabel>날짜</DateFilterLabel>
+                <DateRangeRow>
+                  <DateRangeInput type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
+                  <DateRangeSep>~</DateRangeSep>
+                  <DateRangeInput type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
+                </DateRangeRow>
+              </DateFilterWrap>
+            </FilterButton>
             <FilterButton
               label="수량"
               isOpen={openFilter === 'qty'}

@@ -62,6 +62,81 @@ export const filters = css`
   }
 `;
 
+export const sortOptionList = css`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 120px;
+`;
+
+export const sortOption = css`
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 8px;
+  border-radius: 4px;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 15px;
+  color: #1a1b1e;
+  cursor: pointer;
+  background: none;
+  border: none;
+  text-align: left;
+  width: 100%;
+  font-feature-settings: 'ss05' 1;
+  &:hover {
+    background: #f5f6f8;
+  }
+`;
+
+export const sortOptionActive = css`
+  color: #0068e0;
+  font-weight: 500;
+`;
+
+export const dateFilterWrap = css`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 210px;
+`;
+
+export const dateFilterLabel = css`
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 14px;
+  color: #595b66;
+  margin: 0;
+  font-feature-settings: 'ss05' 1;
+`;
+
+export const dateRangeRow = css`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+export const dateRangeInput = css`
+  width: 110px;
+  height: 28px;
+  border: none;
+  border-bottom: 1.5px solid #0068e0;
+  outline: none;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 14px;
+  color: #1a1b1e;
+  background: transparent;
+  cursor: pointer;
+  &::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+  }
+`;
+
+export const dateRangeSep = css`
+  font-size: 16px;
+  color: #595b66;
+`;
+
 export const tableWrap = css`
   width: 100%;
   overflow-x: auto;
@@ -279,5 +354,17 @@ export const StatusText = styled('span', {
 })<{ closed?: boolean }>`
   ${({ closed }) => (closed ? statusClosed : statusOpen)}
 `;
+export const SortOptionList = styled.div`${sortOptionList}`;
+export const SortOption = styled('button', {
+  shouldForwardProp: (prop) => prop !== 'active',
+})<{ active?: boolean }>`
+  ${sortOption}
+  ${({ active }) => active && sortOptionActive}
+`;
+export const DateFilterWrap = styled.div`${dateFilterWrap}`;
+export const DateFilterLabel = styled.p`${dateFilterLabel}`;
+export const DateRangeRow = styled.div`${dateRangeRow}`;
+export const DateRangeInput = styled.input`${dateRangeInput}`;
+export const DateRangeSep = styled.span`${dateRangeSep}`;
 export const CloseBtn = styled.button`${closeBtn}`;
 export const CancelBtn = styled.button`${cancelBtn}`;

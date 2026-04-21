@@ -107,6 +107,49 @@ export const qtySep = css`
   color: #595b66;
 `;
 
+export const dateFilterWrap = css`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 210px;
+`;
+
+export const dateFilterLabel = css`
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 14px;
+  color: #595b66;
+  margin: 0;
+  font-feature-settings: 'ss05' 1;
+`;
+
+export const dateRangeRow = css`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+export const dateRangeInput = css`
+  width: 110px;
+  height: 28px;
+  border: none;
+  border-bottom: 1.5px solid #0068e0;
+  outline: none;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 14px;
+  color: #1a1b1e;
+  background: transparent;
+  cursor: pointer;
+  &::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+  }
+`;
+
+export const dateRangeSep = css`
+  font-size: 16px;
+  color: #595b66;
+`;
+
 export const sortOptionList = css`
   display: flex;
   flex-direction: column;
@@ -399,5 +442,10 @@ export const NewRow = styled.tr`${newRow}`;
 export const NewRowInput = styled.input`${newRowInput}`;
 export const NewRowDateWrap = styled.div`${newRowDateWrap}`;
 export const NewRowDateInput = styled.input`${newRowDateInput}`;
+export const DateFilterWrap = styled.div`${dateFilterWrap}`;
+export const DateFilterLabel = styled.p`${dateFilterLabel}`;
+export const DateRangeRow = styled.div`${dateRangeRow}`;
+export const DateRangeInput = styled.input`${dateRangeInput}`;
+export const DateRangeSep = styled.span`${dateRangeSep}`;
 export const CancelBtn = styled.button`${cancelBtn}`;
 export const DeleteBtn = styled.button`${deleteBtn}`;

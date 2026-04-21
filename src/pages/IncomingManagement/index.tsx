@@ -21,6 +21,7 @@ import {
 import {
   Backdrop, PageInner, PageTitle, Toolbar, Filters, ToolbarRight,
   QtyLabel, QtyInputRow, QtyInput, QtySep, SortOptionList, SortOption,
+  DateFilterWrap, DateFilterLabel, DateRangeRow, DateRangeInput, DateRangeSep,
   TotalLabel, TableWrap, Table, HeaderRow, Th, DataRow, Td,
   NewRow, NewRowInput, NewRowDateWrap, NewRowDateInput,
   CancelBtn, DeleteBtn,
@@ -87,6 +88,8 @@ const IncomingManagementPage = () => {
   const [openFilter, setOpenFilter] = useState<FilterType>(null);
   const [actionOpen, setActionOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const [qtyMin, setQtyMin] = useState('');
   const [qtyMax, setQtyMax] = useState('');
   const [sortOrder, setSortOrder] = useState<SortOrder>(null);
@@ -111,6 +114,8 @@ const IncomingManagementPage = () => {
 
   const filteredRows = rows
     .filter((row) => {
+      if (dateFrom && row.date < dateFrom) return false;
+      if (dateTo && row.date > dateTo) return false;
       if (qtyMin && row.qty < Number(qtyMin)) return false;
       if (qtyMax && row.qty > Number(qtyMax)) return false;
       return true;
@@ -480,7 +485,16 @@ const IncomingManagementPage = () => {
               label="날짜"
               isOpen={openFilter === 'date'}
               onToggle={() => setOpenFilter(openFilter === 'date' ? null : 'date')}
-            />
+            >
+              <DateFilterWrap>
+                <DateFilterLabel>날짜</DateFilterLabel>
+                <DateRangeRow>
+                  <DateRangeInput type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
+                  <DateRangeSep>~</DateRangeSep>
+                  <DateRangeInput type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
+                </DateRangeRow>
+              </DateFilterWrap>
+            </FilterButton>
             <FilterButton
               label="수량"
               isOpen={openFilter === 'qty'}
@@ -499,9 +513,9 @@ const IncomingManagementPage = () => {
               onToggle={() => setOpenFilter(openFilter === 'sort' ? null : 'sort')}
             >
               <SortOptionList>
-                <SortOption active={sortOrder === null} type="button" onClick={() => setSortOrder(null)}>정렬 초기화</SortOption>
-                <SortOption active={sortOrder === 'asc'} type="button" onClick={() => setSortOrder('asc')}>오름차순</SortOption>
-                <SortOption active={sortOrder === 'desc'} type="button" onClick={() => setSortOrder('desc')}>내림차순</SortOption>
+                <SortOption active={sortOrder === null} type="button" onClick={() => { setSortOrder(null); setOpenFilter(null); }}>정렬 초기화</SortOption>
+                <SortOption active={sortOrder === 'asc'} type="button" onClick={() => { setSortOrder('asc'); setOpenFilter(null); }}>오름차순</SortOption>
+                <SortOption active={sortOrder === 'desc'} type="button" onClick={() => { setSortOrder('desc'); setOpenFilter(null); }}>내림차순</SortOption>
               </SortOptionList>
             </FilterButton>
           </Filters>
