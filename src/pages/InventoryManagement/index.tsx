@@ -179,12 +179,12 @@ const InventoryManagementPage = () => {
             <tbody>
               {filteredRows.map((row) => (
                 <DataRow key={row.id}>
-                  <Td><Checkbox checked={selectedRows.has(row.id)} onChange={() => toggleRow(row.id)} /></Td>
-                  <Td>{row.boxNumber}</Td>
-                  <Td>{row.location}</Td>
-                  <Td>{row.code}</Td>
-                  <Td>{row.name}</Td>
-                  <Td>{row.currentStock}</Td>
+                  <Td data-label="선택"><Checkbox checked={selectedRows.has(row.id)} onChange={() => toggleRow(row.id)} /></Td>
+                  <Td data-label="BOX 번호">{row.boxNumber}</Td>
+                  <Td data-label="자재 위치">{row.location}</Td>
+                  <Td data-label="자재코드">{row.code}</Td>
+                  <Td data-label="자재명">{row.name}</Td>
+                  <Td data-label="현재 재고">{row.currentStock}</Td>
                 </DataRow>
               ))}
             </tbody>

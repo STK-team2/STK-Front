@@ -108,6 +108,7 @@ const IncomingManagementPage = () => {
   const downloadMovementsMutation = useDownloadMovements();
 
   const rows = movements.map(mapMovementToRow);
+
   const filteredRows = rows
     .filter((row) => {
       if (qtyMin && row.qty < Number(qtyMin)) return false;
@@ -175,7 +176,7 @@ const IncomingManagementPage = () => {
           query: search.trim() || undefined,
         });
       } catch (error) {
-        window.alert(getErrorMessage(error, '다운로드에 실패했습니다.'));
+        window.alert(getApiErrorMessage(error, '다운로드에 실패했습니다.'));
       }
       setActionOpen(false);
     }
@@ -240,15 +241,6 @@ const IncomingManagementPage = () => {
     setEditValues((prev) => ({ ...prev, [id]: { ...original } }));
   };
 
-  const handleEditRowKeyDown = (id: string, e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      void saveEditRow(id);
-    } else if (e.key === 'Escape') {
-      revertEditRow(id);
-    }
-  };
-
   const updateNewRow = (id: string, field: keyof Omit<NewRowData, 'id'>, value: string) => {
     setNewRows((prev) => prev.map((row) => (row.id === id ? { ...row, [field]: value } : row)));
   };
@@ -307,15 +299,6 @@ const IncomingManagementPage = () => {
     }
   };
 
-  const handleNewRowKeyDown = (id: string, e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      void submitRow(id);
-    } else if (e.key === 'Escape') {
-      setNewRows((prev) => prev.filter((row) => row.id !== id));
-    }
-  };
-
   const submitPendingNewRow = useCallback(() => {
     const pendingRowId = newRows[0]?.id;
     if (!pendingRowId) {
@@ -334,6 +317,154 @@ const IncomingManagementPage = () => {
   const closeAll = () => {
     setOpenFilter(null);
     setActionOpen(false);
+  };
+
+  const renderRow = (row: Row) => {
+    const isChecked = selectedRows.has(row.id);
+    const isEditing = editMode && !!editValues[row.id];
+    const itemData = isEditing ? editValues[row.id] : row;
+    
+    return (
+      <DataRow key={row.id} style={isChecked ? { background: '#f0f6ff' } : {}}>
+        <Td style={{ width: 48, textAlign: 'center' }} data-label="선택">
+          <Checkbox 
+            checked={isChecked}
+            onChange={() => toggleRow(row.id)}
+          />
+        </Td>
+        <Td data-label="사업장">
+          {isEditing ? (
+            <NewRowInput 
+              value={itemData.site}
+              onChange={(e) => updateEditValue(row.id, 'site', e.target.value)}
+            />
+          ) : row.site}
+        </Td>
+        <Td data-label="입고 날짜">
+          {isEditing ? (
+            <NewRowDateWrap>
+              <NewRowDateInput 
+                type="date"
+                value={itemData.date}
+                onChange={(e) => updateEditValue(row.id, 'date', e.target.value)}
+              />
+            </NewRowDateWrap>
+          ) : row.date}
+        </Td>
+        <Td data-label="자재 코드">
+          {isEditing ? (
+            <NewRowInput 
+              value={itemData.code}
+              onChange={(e) => updateEditValue(row.id, 'code', e.target.value)}
+            />
+          ) : row.code}
+        </Td>
+        <Td data-label="자재명">
+          {isEditing ? (
+            <NewRowInput 
+              value={itemData.name}
+              onChange={(e) => updateEditValue(row.id, 'name', e.target.value)}
+            />
+          ) : row.name}
+        </Td>
+        <Td style={{ textAlign: 'right' }} data-label="입고 수량">
+          {isEditing ? (
+            <NewRowInput 
+              type="number"
+              style={{ textAlign: 'right' }}
+              value={itemData.qty}
+              onChange={(e) => updateEditValue(row.id, 'qty', e.target.value)}
+            />
+          ) : row.qty.toLocaleString()}
+        </Td>
+        <Td data-label="자재 위치">
+          {isEditing ? (
+            <NewRowInput 
+              value={itemData.location}
+              onChange={(e) => updateEditValue(row.id, 'location', e.target.value)}
+            />
+          ) : row.location}
+        </Td>
+        <Td data-label="비고">
+          {isEditing ? (
+            <NewRowInput 
+              value={itemData.note}
+              onChange={(e) => updateEditValue(row.id, 'note', e.target.value)}
+            />
+          ) : row.note}
+        </Td>
+        <Td data-label="참고">
+          {isEditing ? (
+            <NewRowInput 
+              value={itemData.reference}
+              onChange={(e) => updateEditValue(row.id, 'reference', e.target.value)}
+            />
+          ) : row.reference}
+        </Td>
+      </DataRow>
+    );
+  };
+
+  const renderNewRows = () => {
+    return newRows.map((row, index) => (
+      <NewRow key={row.id} ref={index === newRows.length - 1 ? setNewRowElement : null}>
+        <Td style={{ width: 48 }} data-label="선택"></Td>
+        <Td data-label="사업장">
+          <NewRowInput 
+            placeholder="사업장 입력" 
+            value={row.site}
+            onChange={(e) => updateNewRow(row.id, 'site', e.target.value)}
+          />
+        </Td>
+        <Td data-label="입고 날짜">
+          <NewRowDateWrap>
+            <NewRowDateInput 
+              type="date" 
+              value={row.date}
+              onChange={(e) => updateNewRow(row.id, 'date', e.target.value)}
+            />
+          </NewRowDateWrap>
+        </Td>
+        <Td data-label="자재 코드">
+          <NewRowInput 
+            placeholder="자재 코드 검색하여 입력" 
+            value={row.code}
+            onChange={(e) => updateNewRow(row.id, 'code', e.target.value)}
+            onBlur={() => handleNewRowBlur(row.id)}
+          />
+        </Td>
+        <Td data-label="자재명">
+          <NewRowInput 
+            placeholder="자동 입력" 
+            value={row.name}
+            onChange={(e) => updateNewRow(row.id, 'name', e.target.value)}
+            onBlur={() => handleNewRowBlur(row.id)}
+          />
+        </Td>
+        <Td data-label="입고 수량">
+          <NewRowInput 
+            placeholder="숫자만 입력" 
+            type="number"
+            value={row.qty}
+            onChange={(e) => updateNewRow(row.id, 'qty', e.target.value)}
+          />
+        </Td>
+        <Td data-label="자재 위치">
+          <NewRowInput 
+            placeholder="자동 입력" 
+            value={row.location}
+            onChange={(e) => updateNewRow(row.id, 'location', e.target.value)}
+          />
+        </Td>
+        <Td data-label="비고">
+          <NewRowInput 
+            placeholder="비고 입력"
+            value={row.note}
+            onChange={(e) => updateNewRow(row.id, 'note', e.target.value)}
+          />
+        </Td>
+      </NewRow>
+    ));
   };
 
   return (
@@ -425,49 +556,8 @@ const IncomingManagementPage = () => {
               </HeaderRow>
             </thead>
             <tbody>
-              {filteredRows.map((row) => (
-                editMode ? (
-                  <NewRow key={row.id}>
-                    <Td />
-                    <Td><NewRowInput type="text" value={editValues[row.id]?.site ?? row.site} onChange={(e) => updateEditValue(row.id, 'site', e.target.value)} onKeyDown={(e) => handleEditRowKeyDown(row.id, e)} /></Td>
-                    <Td><NewRowDateWrap><NewRowDateInput type="date" value={editValues[row.id]?.date ?? row.date} onChange={(e) => updateEditValue(row.id, 'date', e.target.value)} onKeyDown={(e) => handleEditRowKeyDown(row.id, e)} /></NewRowDateWrap></Td>
-                    <Td><NewRowInput type="text" value={row.code} disabled /></Td>
-                    <Td><NewRowInput type="text" value={row.name} disabled /></Td>
-                    <Td><NewRowInput type="number" value={editValues[row.id]?.qty ?? row.qty} onChange={(e) => updateEditValue(row.id, 'qty', e.target.value)} onKeyDown={(e) => handleEditRowKeyDown(row.id, e)} /></Td>
-                    <Td><NewRowInput type="text" value={row.location} disabled /></Td>
-                    <Td><NewRowInput type="text" value={editValues[row.id]?.note ?? row.note} onChange={(e) => updateEditValue(row.id, 'note', e.target.value)} onKeyDown={(e) => handleEditRowKeyDown(row.id, e)} /></Td>
-                    <Td><NewRowInput type="text" value={editValues[row.id]?.reference ?? row.reference} onChange={(e) => updateEditValue(row.id, 'reference', e.target.value)} onKeyDown={(e) => handleEditRowKeyDown(row.id, e)} /></Td>
-                  </NewRow>
-                ) : (
-                  <DataRow key={row.id}>
-                    <Td><Checkbox checked={selectedRows.has(row.id)} onChange={() => toggleRow(row.id)} /></Td>
-                    <Td>{row.site}</Td>
-                    <Td>{row.date}</Td>
-                    <Td>{row.code}</Td>
-                    <Td>{row.name}</Td>
-                    <Td>{row.qty}</Td>
-                    <Td>{row.location}</Td>
-                    <Td>{row.note || '-'}</Td>
-                    <Td>{row.reference || '-'}</Td>
-                  </DataRow>
-                )
-              ))}
-              {newRows.map((row) => (
-                <NewRow
-                  key={row.id}
-                  ref={row === newRows[0] ? setNewRowElement : undefined}
-                >
-                  <Td />
-                  <Td><NewRowInput type="text" value={row.site} onChange={(e) => updateNewRow(row.id, 'site', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></Td>
-                  <Td><NewRowDateWrap><NewRowDateInput type="date" value={row.date} onChange={(e) => updateNewRow(row.id, 'date', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></NewRowDateWrap></Td>
-                  <Td><NewRowInput type="text" value={row.code} onChange={(e) => updateNewRow(row.id, 'code', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></Td>
-                  <Td><NewRowInput type="text" value={row.name} onChange={(e) => updateNewRow(row.id, 'name', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></Td>
-                  <Td><NewRowInput type="number" value={row.qty} onChange={(e) => updateNewRow(row.id, 'qty', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></Td>
-                  <Td><NewRowInput type="text" value={row.location} onChange={(e) => updateNewRow(row.id, 'location', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></Td>
-                  <Td><NewRowInput type="text" value={row.note} onChange={(e) => updateNewRow(row.id, 'note', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></Td>
-                  <Td><NewRowInput type="text" value={row.reference} onChange={(e) => updateNewRow(row.id, 'reference', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></Td>
-                </NewRow>
-              ))}
+              {filteredRows.map((row) => renderRow(row))}
+              {newRows.length > 0 && renderNewRows()}
             </tbody>
           </Table>
         </TableWrap>

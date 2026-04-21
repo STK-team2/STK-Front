@@ -66,18 +66,45 @@ export const tableWrap = css`
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  margin-top: 16px;
+
+  @media (max-width: 768px) {
+    overflow-x: visible;
+  }
 `;
 
 export const table = css`
   width: 100%;
-  min-width: 870px;
+  min-width: 1080px;
   border-collapse: collapse;
   table-layout: fixed;
+
+  @media (max-width: 768px) {
+    min-width: unset;
+    display: block;
+    table-layout: auto;
+    width: 100%;
+
+    colgroup {
+      display: none;
+    }
+
+    tbody {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+  }
 `;
 
 export const headerRow = css`
   background: #f8f9fa;
   border-bottom: 1px solid #bbbcc2;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 export const th = css`
@@ -95,6 +122,7 @@ export const th = css`
     height: 36px;
     padding: 0 8px;
     font-size: 13px;
+    display: none;
   }
 `;
 
@@ -102,6 +130,23 @@ export const dataRow = css`
   border-bottom: 1px solid #e5e6ea;
   &:hover {
     background: #f8f9fa;
+  }
+
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #e5e6ea;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    box-sizing: border-box;
+    margin-bottom: 0;
+
+    &:hover {
+      background: #ffffff;
+    }
   }
 `;
 
@@ -118,9 +163,35 @@ export const td = css`
   white-space: nowrap;
 
   @media (max-width: 768px) {
-    height: 44px;
-    padding: 0 8px;
-    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: auto;
+    padding: 12px 0;
+    max-width: none;
+    overflow: visible;
+    white-space: normal;
+    word-break: keep-all;
+    font-size: 21px;
+    line-height: 1.4;
+    border-bottom: 1px dashed #f0f0f5;
+    box-sizing: border-box;
+    text-align: right;
+    
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &::before {
+      content: attr(data-label);
+      font-weight: 600;
+      color: #595b66;
+      margin-right: 12px;
+      flex-shrink: 0;
+      text-align: left;
+      font-size: 20px;
+    }
   }
 `;
 
