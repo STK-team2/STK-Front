@@ -62,6 +62,8 @@ export interface NewItemInboundResponse {
 
 export interface UpdateMovementRequest {
   site: string;
+  itemCode?: string;
+  location?: string;
   quantity: number;
   movementDate: string;
   reference?: string;

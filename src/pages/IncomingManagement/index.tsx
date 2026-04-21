@@ -228,6 +228,8 @@ const IncomingManagementPage = () => {
             id,
             body: {
               site: row.site,
+              itemCode: row.code,
+              location: row.location || undefined,
               movementDate: row.date,
               quantity: row.qty,
               note: row.note,
@@ -259,6 +261,7 @@ const IncomingManagementPage = () => {
         id,
         body: {
           site: row.site,
+          itemCode: row.code,
           movementDate: row.date,
           quantity: row.qty,
           note: row.note,
@@ -512,10 +515,10 @@ const IncomingManagementPage = () => {
                         <Td />
                         <Td><NewRowInput type="text" value={editValues[row.id]?.site ?? row.site} onChange={(e) => updateEditValue(row.id, 'site', e.target.value)} onKeyDown={(e) => handleEditRowKeyDown(row.id, e)} /></Td>
                         <Td><NewRowDateWrap><NewRowDateInput type="date" value={editValues[row.id]?.date ?? row.date} onChange={(e) => updateEditValue(row.id, 'date', e.target.value)} onKeyDown={(e) => handleEditRowKeyDown(row.id, e)} /></NewRowDateWrap></Td>
-                        <Td><NewRowInput type="text" value={row.code} disabled /></Td>
+                        <Td><NewRowInput type="text" value={editValues[row.id]?.code ?? row.code} onChange={(e) => updateEditValue(row.id, 'code', e.target.value)} onKeyDown={(e) => handleEditRowKeyDown(row.id, e)} /></Td>
                         <Td><NewRowInput type="text" value={row.name} disabled /></Td>
                         <Td><NewRowInput type="number" value={editValues[row.id]?.qty ?? row.qty} onChange={(e) => updateEditValue(row.id, 'qty', e.target.value)} onKeyDown={(e) => handleEditRowKeyDown(row.id, e)} /></Td>
-                        <Td><NewRowInput type="text" value={row.location} disabled /></Td>
+                        <Td><NewRowInput type="text" value={editValues[row.id]?.location ?? row.location} onChange={(e) => updateEditValue(row.id, 'location', e.target.value)} onKeyDown={(e) => handleEditRowKeyDown(row.id, e)} /></Td>
                         <Td><NewRowInput type="text" value={editValues[row.id]?.note ?? row.note} onChange={(e) => updateEditValue(row.id, 'note', e.target.value)} onKeyDown={(e) => handleEditRowKeyDown(row.id, e)} /></Td>
                         <Td><NewRowInput type="text" value={editValues[row.id]?.reference ?? row.reference} onChange={(e) => updateEditValue(row.id, 'reference', e.target.value)} onKeyDown={(e) => handleEditRowKeyDown(row.id, e)} /></Td>
                       </NewRow>
