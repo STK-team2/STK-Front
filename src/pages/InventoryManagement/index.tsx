@@ -238,9 +238,9 @@ const InventoryManagementPage = () => {
               onToggle={() => setOpenFilter(openFilter === 'status' ? null : 'status')}
             >
               <SortOptionList>
-                <SortOption active={stockStatus === 'all'} type="button" onClick={() => setStockStatus('all')}>전체</SortOption>
-                <SortOption active={stockStatus === 'available'} type="button" onClick={() => setStockStatus('available')}>재고 있음</SortOption>
-                <SortOption active={stockStatus === 'empty'} type="button" onClick={() => setStockStatus('empty')}>재고 없음</SortOption>
+                <SortOption active={stockStatus === 'all'} type="button" onClick={() => { setStockStatus('all'); setOpenFilter(null); }}>전체</SortOption>
+                <SortOption active={stockStatus === 'available'} type="button" onClick={() => { setStockStatus('available'); setOpenFilter(null); }}>재고 있음</SortOption>
+                <SortOption active={stockStatus === 'empty'} type="button" onClick={() => { setStockStatus('empty'); setOpenFilter(null); }}>재고 없음</SortOption>
               </SortOptionList>
             </FilterButton>
           </Filters>
