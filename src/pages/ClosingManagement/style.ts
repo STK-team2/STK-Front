@@ -62,6 +62,21 @@ export const filters = css`
   }
 `;
 
+export const contentLayout = css`
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+
+  @media (max-width: 1280px) {
+    flex-direction: column;
+  }
+`;
+
+export const tableSection = css`
+  flex: 1;
+  min-width: 0;
+`;
+
 export const tableWrap = css`
   width: 100%;
   overflow-x: auto;
@@ -100,9 +115,14 @@ export const th = css`
 
 export const dataRow = css`
   border-bottom: 1px solid #e5e6ea;
+  cursor: pointer;
   &:hover {
     background: #f8f9fa;
   }
+`;
+
+export const dataRowActive = css`
+  background: #eef5ff;
 `;
 
 export const td = css`
@@ -197,11 +217,18 @@ export const PageInner = styled.div`${pageInner}`;
 export const PageTitle = styled.h1`${pageTitle}`;
 export const Toolbar = styled.div`${toolbar}`;
 export const Filters = styled.div`${filters}`;
+export const ContentLayout = styled.div`${contentLayout}`;
+export const TableSection = styled.div`${tableSection}`;
 export const TableWrap = styled.div`${tableWrap}`;
 export const Table = styled.table`${table}`;
 export const HeaderRow = styled.tr`${headerRow}`;
 export const Th = styled.th`${th}`;
-export const DataRow = styled.tr`${dataRow}`;
+export const DataRow = styled('tr', {
+  shouldForwardProp: (prop) => prop !== 'active',
+})<{ active?: boolean }>`
+  ${dataRow}
+  ${({ active }) => active && dataRowActive}
+`;
 export const Td = styled.td`${td}`;
 export const StatusText = styled('span', {
   shouldForwardProp: (prop) => prop !== 'closed',

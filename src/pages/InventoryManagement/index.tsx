@@ -4,10 +4,13 @@ import { FilterButton } from '../../shared/ui/FilterButton';
 import { SearchInput } from '../../shared/ui/SearchInput';
 import { ActionMenu } from '../../shared/ui/ActionMenu';
 import { Checkbox } from '../../shared/ui/Checkbox';
+import { RecordDetailPanel } from '../../shared/ui/RecordDetailPanel';
 import {
   useDownloadCurrentStock,
   useGetCurrentStock,
 } from '../../features/stock/api/queries';
+import { useDeleteItem, useUpdateItem } from '../../features/item/api/queries';
+import { showApiErrorToast } from '../../shared/lib/toast';
 import {
   Backdrop, PageInner, PageTitle, Toolbar, Filters, ToolbarRight,
   QtyLabel, QtyInputRow, QtyInput, QtySep, SortOptionList, SortOption,
@@ -36,9 +39,12 @@ const InventoryManagementPage = () => {
   const [qtyMax, setQtyMax] = useState('');
   const [stockStatus, setStockStatus] = useState<StockStatus>('all');
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  const [selectedDetailId, setSelectedDetailId] = useState<string | null>(null);
 
   const { data: currentStock = [] } = useGetCurrentStock();
   const downloadCurrentStockMutation = useDownloadCurrentStock();
+  const updateItemMutation = useUpdateItem();
+  const deleteItemMutation = useDeleteItem();
 
   const rows: Row[] = currentStock.map((item) => ({
     id: item.itemId,
@@ -69,6 +75,14 @@ const InventoryManagementPage = () => {
   });
 
   const allSelected = filteredRows.length > 0 && selectedRows.size === filteredRows.length;
+  const selectedDetailRow = selectedDetailId
+    ? filteredRows.find((row) => row.id === selectedDetailId) ?? null
+    : null;
+
+  const openDetail = (id: string) => {
+    if (window.matchMedia('(max-width: 768px)').matches) return;
+    setSelectedDetailId(id);
+  };
 
   const toggleSelectAll = () => {
     if (allSelected) {
@@ -107,6 +121,42 @@ const InventoryManagementPage = () => {
         window.alert('다운로드에 실패했습니다.');
       }
       setActionOpen(false);
+    }
+  };
+
+  const saveDetailField = async (
+    row: Row,
+    field: 'boxNumber' | 'location' | 'code' | 'name',
+    value: string,
+  ) => {
+    const nextRow = { ...row, [field]: value };
+
+    try {
+      await updateItemMutation.mutateAsync({
+        id: row.id,
+        body: {
+          itemCode: nextRow.code,
+          itemName: nextRow.name,
+          boxNumber: nextRow.boxNumber === '-' ? '' : nextRow.boxNumber,
+          location: nextRow.location,
+        },
+      });
+    } catch (error) {
+      showApiErrorToast(error, '자재 수정에 실패했습니다.');
+    }
+  };
+
+  const deleteDetailRow = async (id: string) => {
+    try {
+      await deleteItemMutation.mutateAsync(id);
+      setSelectedDetailId(null);
+      setSelectedRows((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    } catch (error) {
+      showApiErrorToast(error, '자재 삭제에 실패했습니다.');
     }
   };
 
@@ -157,39 +207,65 @@ const InventoryManagementPage = () => {
         </Toolbar>
 
         <TableWrap>
-          <Table>
-            <colgroup>
-              <col style={{ width: '48px' }} />
-              <col style={{ width: '130px' }} />
-              <col style={{ width: '140px' }} />
-              <col style={{ width: '140px' }} />
-              <col />
-              <col style={{ width: '110px' }} />
-            </colgroup>
-            <thead>
-              <HeaderRow>
-                <Th><Checkbox checked={allSelected} onChange={toggleSelectAll} /></Th>
-                <Th>BOX 번호</Th>
-                <Th>자재 위치</Th>
-                <Th>자재코드</Th>
-                <Th>자재명</Th>
-                <Th>현재 재고</Th>
-              </HeaderRow>
-            </thead>
-            <tbody>
-              {filteredRows.map((row) => (
-                <DataRow key={row.id}>
-                  <Td><Checkbox checked={selectedRows.has(row.id)} onChange={() => toggleRow(row.id)} /></Td>
-                  <Td>{row.boxNumber}</Td>
-                  <Td>{row.location}</Td>
-                  <Td>{row.code}</Td>
-                  <Td>{row.name}</Td>
-                  <Td>{row.currentStock}</Td>
-                </DataRow>
-              ))}
-            </tbody>
-          </Table>
+              <Table>
+                <colgroup>
+                  <col style={{ width: '48px' }} />
+                  <col style={{ width: '130px' }} />
+                  <col style={{ width: '140px' }} />
+                  <col style={{ width: '140px' }} />
+                  <col />
+                  <col style={{ width: '110px' }} />
+                </colgroup>
+                <thead>
+                  <HeaderRow>
+                    <Th onClick={(e) => e.stopPropagation()}><Checkbox checked={allSelected} onChange={toggleSelectAll} /></Th>
+                    <Th>BOX 번호</Th>
+                    <Th>자재 위치</Th>
+                    <Th>자재코드</Th>
+                    <Th>자재명</Th>
+                    <Th>현재 재고</Th>
+                  </HeaderRow>
+                </thead>
+                <tbody>
+                  {filteredRows.map((row) => (
+                    <DataRow
+                      key={row.id}
+                      active={selectedDetailId === row.id}
+                      onClick={() => openDetail(row.id)}
+                    >
+                      <Td onClick={(e) => e.stopPropagation()}><Checkbox checked={selectedRows.has(row.id)} onChange={() => toggleRow(row.id)} /></Td>
+                      <Td>{row.boxNumber}</Td>
+                      <Td>{row.location}</Td>
+                      <Td>{row.code}</Td>
+                      <Td>{row.name}</Td>
+                      <Td>{row.currentStock}</Td>
+                    </DataRow>
+                  ))}
+                </tbody>
+              </Table>
         </TableWrap>
+
+          {selectedDetailRow && (
+            <RecordDetailPanel
+              title={selectedDetailRow.name}
+              subtitle={`${selectedDetailRow.code} · 현재 재고 ${selectedDetailRow.currentStock.toLocaleString()}개`}
+              onClose={() => setSelectedDetailId(null)}
+              deleteLabel="자재 삭제"
+              onDelete={() => deleteDetailRow(selectedDetailRow.id)}
+              sections={[
+                {
+                  title: '재고 정보',
+                  fields: [
+                    { label: 'BOX 번호', value: selectedDetailRow.boxNumber === '-' ? '' : selectedDetailRow.boxNumber, editable: true, onSave: (value) => saveDetailField(selectedDetailRow, 'boxNumber', value) },
+                    { label: '자재 위치', value: selectedDetailRow.location, editable: true, onSave: (value) => saveDetailField(selectedDetailRow, 'location', value) },
+                    { label: '자재 코드', value: selectedDetailRow.code, editable: true, onSave: (value) => saveDetailField(selectedDetailRow, 'code', value) },
+                    { label: '자재명', value: selectedDetailRow.name, editable: true, onSave: (value) => saveDetailField(selectedDetailRow, 'name', value) },
+                    { label: '현재 재고', value: selectedDetailRow.currentStock.toLocaleString() },
+                  ],
+                },
+              ]}
+            />
+          )}
       </PageInner>
     </Layout>
   );

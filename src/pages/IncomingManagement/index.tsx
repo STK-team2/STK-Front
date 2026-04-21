@@ -1,10 +1,11 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import Layout from '../../widgets/Layout';
 import { FilterButton } from '../../shared/ui/FilterButton';
 import { SearchInput } from '../../shared/ui/SearchInput';
 import { ActionMenu } from '../../shared/ui/ActionMenu';
 import { Checkbox } from '../../shared/ui/Checkbox';
+import { RecordDetailPanel } from '../../shared/ui/RecordDetailPanel';
 import { itemApi } from '../../entities/item/api/itemApi';
 import type { ItemResponse } from '../../entities/item/types';
 import type { MovementResponse } from '../../entities/movement/types';
@@ -96,6 +97,7 @@ const IncomingManagementPage = () => {
   const [editMode, setEditMode] = useState(false);
   const [editValues, setEditValues] = useState<Record<string, Row>>({});
   const [newRowElement, setNewRowElement] = useState<HTMLTableRowElement | null>(null);
+  const [selectedDetailId, setSelectedDetailId] = useState<string | null>(null);
 
   const { data: movements = [] } = useGetMovements({
     type: 'INBOUND',
@@ -121,6 +123,14 @@ const IncomingManagementPage = () => {
     });
 
   const allSelected = filteredRows.length > 0 && selectedRows.size === filteredRows.length;
+  const selectedDetailRow = selectedDetailId
+    ? filteredRows.find((row) => row.id === selectedDetailId) ?? null
+    : null;
+
+  const openDetail = (id: string) => {
+    if (window.matchMedia('(max-width: 768px)').matches) return;
+    setSelectedDetailId(id);
+  };
 
   const toggleSelectAll = () => {
     if (allSelected) {
@@ -145,6 +155,7 @@ const IncomingManagementPage = () => {
       setNewRows([createEmptyRow()]);
       setDeleteMode(false);
       setEditMode(false);
+      setSelectedDetailId(null);
       setActionOpen(false);
       return;
     }
@@ -152,6 +163,7 @@ const IncomingManagementPage = () => {
     if (item === '입고 삭제') {
       setDeleteMode(true);
       setEditMode(false);
+      setSelectedDetailId(null);
       setActionOpen(false);
       return;
     }
@@ -164,6 +176,7 @@ const IncomingManagementPage = () => {
       setEditValues(nextValues);
       setEditMode(true);
       setDeleteMode(false);
+      setSelectedDetailId(null);
       setActionOpen(false);
       return;
     }
@@ -230,6 +243,46 @@ const IncomingManagementPage = () => {
       });
     } catch (error) {
       showApiErrorToast(error, '입고 수정에 실패했습니다.');
+    }
+  };
+
+  const saveDetailField = async (
+    row: Row,
+    field: 'site' | 'date' | 'qty' | 'note' | 'reference',
+    value: string,
+  ) => {
+    const nextRow = {
+      ...row,
+      [field]: field === 'qty' ? Number(value) : value,
+    };
+
+    try {
+      await updateMovementMutation.mutateAsync({
+        id: row.id,
+        body: {
+          site: nextRow.site,
+          movementDate: nextRow.date,
+          quantity: nextRow.qty,
+          note: nextRow.note,
+          reference: nextRow.reference,
+        },
+      });
+    } catch (error) {
+      showApiErrorToast(error, '입고 수정에 실패했습니다.');
+    }
+  };
+
+  const deleteDetailRow = async (id: string) => {
+    try {
+      await deleteMovementMutation.mutateAsync(id);
+      setSelectedDetailId(null);
+      setSelectedRows((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    } catch (error) {
+      showApiErrorToast(error, '입고 삭제에 실패했습니다.');
     }
   };
 
@@ -316,14 +369,14 @@ const IncomingManagementPage = () => {
     }
   };
 
-  const submitPendingNewRow = useCallback(() => {
+  const submitPendingNewRow = () => {
     const pendingRowId = newRows[0]?.id;
     if (!pendingRowId) {
       return;
     }
 
     void submitRow(pendingRowId);
-  }, [newRows]);
+  };
 
   useSubmitOnOutsideClick({
     container: newRowElement,
@@ -399,78 +452,110 @@ const IncomingManagementPage = () => {
         <TotalLabel>합계 ({filteredRows.reduce((sum, row) => sum + row.qty, 0).toLocaleString()})</TotalLabel>
 
         <TableWrap>
-          <Table>
-            <colgroup>
-              <col style={{ width: '48px' }} />
-              <col style={{ width: '120px' }} />
-              <col style={{ width: '120px' }} />
-              <col style={{ width: '180px' }} />
-              <col />
-              <col style={{ width: '80px' }} />
-              <col style={{ width: '130px' }} />
-              <col style={{ width: '100px' }} />
-              <col style={{ width: '100px' }} />
-            </colgroup>
-            <thead>
-              <HeaderRow>
-                <Th><Checkbox checked={allSelected} onChange={toggleSelectAll} /></Th>
-                <Th>사업장</Th>
-                <Th>입고 날짜</Th>
-                <Th>자재 코드</Th>
-                <Th>자재명</Th>
-                <Th>수량</Th>
-                <Th>자재 위치</Th>
-                <Th>비고</Th>
-                <Th>참고</Th>
-              </HeaderRow>
-            </thead>
-            <tbody>
-              {filteredRows.map((row) => (
-                editMode ? (
-                  <NewRow key={row.id}>
-                    <Td />
-                    <Td><NewRowInput type="text" value={editValues[row.id]?.site ?? row.site} onChange={(e) => updateEditValue(row.id, 'site', e.target.value)} onKeyDown={(e) => handleEditRowKeyDown(row.id, e)} /></Td>
-                    <Td><NewRowDateWrap><NewRowDateInput type="date" value={editValues[row.id]?.date ?? row.date} onChange={(e) => updateEditValue(row.id, 'date', e.target.value)} onKeyDown={(e) => handleEditRowKeyDown(row.id, e)} /></NewRowDateWrap></Td>
-                    <Td><NewRowInput type="text" value={row.code} disabled /></Td>
-                    <Td><NewRowInput type="text" value={row.name} disabled /></Td>
-                    <Td><NewRowInput type="number" value={editValues[row.id]?.qty ?? row.qty} onChange={(e) => updateEditValue(row.id, 'qty', e.target.value)} onKeyDown={(e) => handleEditRowKeyDown(row.id, e)} /></Td>
-                    <Td><NewRowInput type="text" value={row.location} disabled /></Td>
-                    <Td><NewRowInput type="text" value={editValues[row.id]?.note ?? row.note} onChange={(e) => updateEditValue(row.id, 'note', e.target.value)} onKeyDown={(e) => handleEditRowKeyDown(row.id, e)} /></Td>
-                    <Td><NewRowInput type="text" value={editValues[row.id]?.reference ?? row.reference} onChange={(e) => updateEditValue(row.id, 'reference', e.target.value)} onKeyDown={(e) => handleEditRowKeyDown(row.id, e)} /></Td>
-                  </NewRow>
-                ) : (
-                  <DataRow key={row.id}>
-                    <Td><Checkbox checked={selectedRows.has(row.id)} onChange={() => toggleRow(row.id)} /></Td>
-                    <Td>{row.site}</Td>
-                    <Td>{row.date}</Td>
-                    <Td>{row.code}</Td>
-                    <Td>{row.name}</Td>
-                    <Td>{row.qty}</Td>
-                    <Td>{row.location}</Td>
-                    <Td>{row.note || '-'}</Td>
-                    <Td>{row.reference || '-'}</Td>
-                  </DataRow>
-                )
-              ))}
-              {newRows.map((row) => (
-                <NewRow
-                  key={row.id}
-                  ref={row === newRows[0] ? setNewRowElement : undefined}
-                >
-                  <Td />
-                  <Td><NewRowInput type="text" value={row.site} onChange={(e) => updateNewRow(row.id, 'site', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></Td>
-                  <Td><NewRowDateWrap><NewRowDateInput type="date" value={row.date} onChange={(e) => updateNewRow(row.id, 'date', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></NewRowDateWrap></Td>
-                  <Td><NewRowInput type="text" value={row.code} onChange={(e) => updateNewRow(row.id, 'code', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></Td>
-                  <Td><NewRowInput type="text" value={row.name} onChange={(e) => updateNewRow(row.id, 'name', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></Td>
-                  <Td><NewRowInput type="number" value={row.qty} onChange={(e) => updateNewRow(row.id, 'qty', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></Td>
-                  <Td><NewRowInput type="text" value={row.location} onChange={(e) => updateNewRow(row.id, 'location', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></Td>
-                  <Td><NewRowInput type="text" value={row.note} onChange={(e) => updateNewRow(row.id, 'note', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></Td>
-                  <Td><NewRowInput type="text" value={row.reference} onChange={(e) => updateNewRow(row.id, 'reference', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></Td>
-                </NewRow>
-              ))}
-            </tbody>
-          </Table>
+              <Table>
+                <colgroup>
+                  <col style={{ width: '48px' }} />
+                  <col style={{ width: '120px' }} />
+                  <col style={{ width: '120px' }} />
+                  <col style={{ width: '180px' }} />
+                  <col />
+                  <col style={{ width: '80px' }} />
+                  <col style={{ width: '130px' }} />
+                  <col style={{ width: '100px' }} />
+                  <col style={{ width: '100px' }} />
+                </colgroup>
+                <thead>
+                  <HeaderRow>
+                    <Th onClick={(e) => e.stopPropagation()}><Checkbox checked={allSelected} onChange={toggleSelectAll} /></Th>
+                    <Th>사업장</Th>
+                    <Th>입고 날짜</Th>
+                    <Th>자재 코드</Th>
+                    <Th>자재명</Th>
+                    <Th>수량</Th>
+                    <Th>자재 위치</Th>
+                    <Th>비고</Th>
+                    <Th>참고</Th>
+                  </HeaderRow>
+                </thead>
+                <tbody>
+                  {filteredRows.map((row) => (
+                    editMode ? (
+                      <NewRow key={row.id}>
+                        <Td />
+                        <Td><NewRowInput type="text" value={editValues[row.id]?.site ?? row.site} onChange={(e) => updateEditValue(row.id, 'site', e.target.value)} onKeyDown={(e) => handleEditRowKeyDown(row.id, e)} /></Td>
+                        <Td><NewRowDateWrap><NewRowDateInput type="date" value={editValues[row.id]?.date ?? row.date} onChange={(e) => updateEditValue(row.id, 'date', e.target.value)} onKeyDown={(e) => handleEditRowKeyDown(row.id, e)} /></NewRowDateWrap></Td>
+                        <Td><NewRowInput type="text" value={row.code} disabled /></Td>
+                        <Td><NewRowInput type="text" value={row.name} disabled /></Td>
+                        <Td><NewRowInput type="number" value={editValues[row.id]?.qty ?? row.qty} onChange={(e) => updateEditValue(row.id, 'qty', e.target.value)} onKeyDown={(e) => handleEditRowKeyDown(row.id, e)} /></Td>
+                        <Td><NewRowInput type="text" value={row.location} disabled /></Td>
+                        <Td><NewRowInput type="text" value={editValues[row.id]?.note ?? row.note} onChange={(e) => updateEditValue(row.id, 'note', e.target.value)} onKeyDown={(e) => handleEditRowKeyDown(row.id, e)} /></Td>
+                        <Td><NewRowInput type="text" value={editValues[row.id]?.reference ?? row.reference} onChange={(e) => updateEditValue(row.id, 'reference', e.target.value)} onKeyDown={(e) => handleEditRowKeyDown(row.id, e)} /></Td>
+                      </NewRow>
+                    ) : (
+                      <DataRow
+                        key={row.id}
+                        active={selectedDetailId === row.id}
+                        onClick={() => openDetail(row.id)}
+                      >
+                        <Td onClick={(e) => e.stopPropagation()}><Checkbox checked={selectedRows.has(row.id)} onChange={() => toggleRow(row.id)} /></Td>
+                        <Td>{row.site}</Td>
+                        <Td>{row.date}</Td>
+                        <Td>{row.code}</Td>
+                        <Td>{row.name}</Td>
+                        <Td>{row.qty}</Td>
+                        <Td>{row.location}</Td>
+                        <Td>{row.note || '-'}</Td>
+                        <Td>{row.reference || '-'}</Td>
+                      </DataRow>
+                    )
+                  ))}
+                  {newRows.map((row) => (
+                    <NewRow
+                      key={row.id}
+                      ref={row === newRows[0] ? setNewRowElement : undefined}
+                    >
+                      <Td />
+                      <Td><NewRowInput type="text" value={row.site} onChange={(e) => updateNewRow(row.id, 'site', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></Td>
+                      <Td><NewRowDateWrap><NewRowDateInput type="date" value={row.date} onChange={(e) => updateNewRow(row.id, 'date', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></NewRowDateWrap></Td>
+                      <Td><NewRowInput type="text" value={row.code} onChange={(e) => updateNewRow(row.id, 'code', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></Td>
+                      <Td><NewRowInput type="text" value={row.name} onChange={(e) => updateNewRow(row.id, 'name', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></Td>
+                      <Td><NewRowInput type="number" value={row.qty} onChange={(e) => updateNewRow(row.id, 'qty', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></Td>
+                      <Td><NewRowInput type="text" value={row.location} onChange={(e) => updateNewRow(row.id, 'location', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></Td>
+                      <Td><NewRowInput type="text" value={row.note} onChange={(e) => updateNewRow(row.id, 'note', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></Td>
+                      <Td><NewRowInput type="text" value={row.reference} onChange={(e) => updateNewRow(row.id, 'reference', e.target.value)} onKeyDown={(e) => handleNewRowKeyDown(row.id, e)} /></Td>
+                    </NewRow>
+                  ))}
+                </tbody>
+              </Table>
         </TableWrap>
+
+          {selectedDetailRow && (
+            <RecordDetailPanel
+              title={selectedDetailRow.name}
+              subtitle={`${selectedDetailRow.code} · 입고 ${selectedDetailRow.qty.toLocaleString()}개`}
+              onClose={() => setSelectedDetailId(null)}
+              deleteLabel="입고 내역 삭제"
+              onDelete={() => deleteDetailRow(selectedDetailRow.id)}
+              sections={[
+                {
+                  title: '입고 정보',
+                  fields: [
+                    { label: '사업장', value: selectedDetailRow.site, editable: true, onSave: (value) => saveDetailField(selectedDetailRow, 'site', value) },
+                    { label: '입고 날짜', value: selectedDetailRow.date, editable: true, inputType: 'date', onSave: (value) => saveDetailField(selectedDetailRow, 'date', value) },
+                    { label: '수량', value: selectedDetailRow.qty, editable: true, inputType: 'number', onSave: (value) => saveDetailField(selectedDetailRow, 'qty', value) },
+                    { label: '자재 위치', value: selectedDetailRow.location },
+                  ],
+                },
+                {
+                  title: '메모',
+                  fields: [
+                    { label: '비고', value: selectedDetailRow.note || '', muted: !selectedDetailRow.note, editable: true, onSave: (value) => saveDetailField(selectedDetailRow, 'note', value) },
+                    { label: '참고', value: selectedDetailRow.reference || '', muted: !selectedDetailRow.reference, editable: true, onSave: (value) => saveDetailField(selectedDetailRow, 'reference', value) },
+                  ],
+                },
+              ]}
+            />
+          )}
       </PageInner>
     </Layout>
   );
