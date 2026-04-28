@@ -10,6 +10,7 @@ import OutgoingManagementPage from '../pages/OutgoingManagement';
 import ClosingManagementPage from '../pages/ClosingManagement';
 import InventoryManagementPage from '../pages/InventoryManagement';
 import EditHistoryManagementPage from '../pages/EditHistoryManagement';
+import LoginPage from '@/pages/Login';
 
 const ProtectedRoute = ({ children }: { children: ReactElement }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -71,7 +72,7 @@ const RouterContent = () => {
 
   return (
     <Routes>
-      <Route path="/login" element={<PublicRoute><EditHistoryManagementPage /></PublicRoute>} />
+      <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
       <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
       <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
       <Route path="/incoming" element={<ProtectedRoute><IncomingManagementPage /></ProtectedRoute>} />
