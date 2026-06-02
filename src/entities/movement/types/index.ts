@@ -11,14 +11,14 @@ export interface MovementResponse {
   itemId: string;
   itemCode: string;
   itemName: string;
-  location: string;
+  location?: string;
   site: string;
   type: MovementType;
   quantity: number;
   movementDate: string;
-  reference: string;
-  note: string;
-  userName: string;
+  reference?: string;
+  note?: string;
+  userName?: string;
   createdAt: string;
 }
 
@@ -63,8 +63,6 @@ export interface NewItemInboundResponse {
 
 export interface UpdateMovementRequest {
   site: string;
-  itemCode?: string;
-  location?: string;
   quantity: number;
   movementDate: string;
   reference?: string;
