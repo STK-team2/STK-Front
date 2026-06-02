@@ -3,9 +3,9 @@ import type { ApiResponse } from '../../../shared/types/api';
 import type { ItemResponse, RegisterItemRequest, UpdateItemRequest } from '../types';
 
 export const itemApi = {
-  search: (query = '') =>
+  search: (query = '', categoryId?: string) =>
     instance
-      .get<ApiResponse<ItemResponse[]>>('/items', { params: { query } })
+      .get<ApiResponse<ItemResponse[]>>('/items', { params: { query, categoryId } })
       .then((r) => r.data),
 
   register: (body: RegisterItemRequest) =>
