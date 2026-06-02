@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import * as s from './style';
 
@@ -40,6 +40,8 @@ export const RecordDetailPanel = ({
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState('');
   const [memoValue, setMemoValue] = useState(memo ?? '');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const cancelEditRef = useRef(false);
 
   useEffect(() => {
     setMemoValue(memo ?? '');
@@ -57,6 +59,10 @@ export const RecordDetailPanel = ({
   };
 
   const finishEditing = async (field: RecordDetailField) => {
+    if (cancelEditRef.current) {
+      cancelEditRef.current = false;
+      return;
+    }
     if (!field.onSave) {
       setEditingKey(null);
       return;
@@ -64,6 +70,16 @@ export const RecordDetailPanel = ({
 
     await field.onSave(editingValue);
     setEditingKey(null);
+  };
+
+  const handleDelete = async () => {
+    if (!onDelete || isDeleting) return;
+    setIsDeleting(true);
+    try {
+      await onDelete();
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -107,6 +123,7 @@ export const RecordDetailPanel = ({
                               void finishEditing(field);
                             }
                             if (e.key === 'Escape') {
+                              cancelEditRef.current = true;
                               setEditingKey(null);
                             }
                           }}
@@ -143,7 +160,7 @@ export const RecordDetailPanel = ({
 
         {onDelete ? (
           <s.Footer>
-            <s.DeleteButton type="button" onClick={() => void onDelete()}>
+            <s.DeleteButton type="button" onClick={() => void handleDelete()} disabled={isDeleting}>
               {deleteLabel}
             </s.DeleteButton>
           </s.Footer>
