@@ -13,3 +13,5 @@ export interface RegisterItemRequest {
   boxNumber?: string;
   location: string;
 }
+
+export type UpdateItemRequest = RegisterItemRequest;

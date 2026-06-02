@@ -4,14 +4,18 @@ import { FilterButton } from '../../shared/ui/FilterButton';
 import { SearchInput } from '../../shared/ui/SearchInput';
 import { ActionMenu } from '../../shared/ui/ActionMenu';
 import { Checkbox } from '../../shared/ui/Checkbox';
+import { RecordDetailPanel } from '../../shared/ui/RecordDetailPanel';
 import {
   useDownloadCurrentStock,
   useGetCurrentStock,
 } from '../../features/stock/api/queries';
+import { useDeleteItem, useUpdateItem } from '../../features/item/api/queries';
+import { showApiErrorToast } from '../../shared/lib/toast';
 import {
   Backdrop, PageInner, PageTitle, Toolbar, Filters, ToolbarRight,
   QtyLabel, QtyInputRow, QtyInput, QtySep, SortOptionList, SortOption,
   TableWrap, Table, HeaderRow, Th, DataRow, Td,
+  NewRow, NewRowInput, CancelBtn, SaveBtn,
 } from './style';
 
 type FilterType = 'qty' | 'status' | null;
@@ -26,7 +30,7 @@ interface Row {
   currentStock: number;
 }
 
-const INVENTORY_ACTIONS = ['재고 없는 품목', '다운로드'];
+const INVENTORY_ACTIONS = ['자재 수정', '재고 없는 품목', '다운로드'];
 
 const InventoryManagementPage = () => {
   const [openFilter, setOpenFilter] = useState<FilterType>(null);
@@ -36,9 +40,14 @@ const InventoryManagementPage = () => {
   const [qtyMax, setQtyMax] = useState('');
   const [stockStatus, setStockStatus] = useState<StockStatus>('all');
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  const [selectedDetailId, setSelectedDetailId] = useState<string | null>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [editValues, setEditValues] = useState<Record<string, Row>>({});
 
   const { data: currentStock = [] } = useGetCurrentStock();
   const downloadCurrentStockMutation = useDownloadCurrentStock();
+  const updateItemMutation = useUpdateItem();
+  const deleteItemMutation = useDeleteItem();
 
   const rows: Row[] = currentStock.map((item) => ({
     id: item.itemId,
@@ -69,6 +78,14 @@ const InventoryManagementPage = () => {
   });
 
   const allSelected = filteredRows.length > 0 && selectedRows.size === filteredRows.length;
+  const selectedDetailRow = selectedDetailId
+    ? filteredRows.find((row) => row.id === selectedDetailId) ?? null
+    : null;
+
+  const openDetail = (id: string) => {
+    if (window.matchMedia('(max-width: 768px)').matches) return;
+    setSelectedDetailId(id);
+  };
 
   const toggleSelectAll = () => {
     if (allSelected) {
@@ -93,7 +110,55 @@ const InventoryManagementPage = () => {
     setActionOpen(false);
   };
 
+  const cancelEditMode = () => {
+    setEditMode(false);
+    setEditValues({});
+  };
+
+  const updateEditValue = (id: string, field: keyof Omit<Row, 'id' | 'currentStock'>, value: string) => {
+    setEditValues((prev) => ({
+      ...prev,
+      [id]: { ...prev[id], [field]: value },
+    }));
+  };
+
+  const confirmAllEdits = async () => {
+    try {
+      await Promise.all(
+        filteredRows.map((row) => {
+          const edit = editValues[row.id];
+          if (!edit) return Promise.resolve();
+          return updateItemMutation.mutateAsync({
+            id: row.id,
+            body: {
+              itemCode: edit.code,
+              itemName: edit.name,
+              boxNumber: edit.boxNumber === '-' ? '' : edit.boxNumber,
+              location: edit.location,
+            },
+          });
+        }),
+      );
+      setEditMode(false);
+      setEditValues({});
+    } catch (error) {
+      showApiErrorToast(error, '자재 수정에 실패했습니다.');
+    }
+  };
+
   const handleActionItem = async (item: string) => {
+    if (item === '자재 수정') {
+      const nextValues: Record<string, Row> = {};
+      filteredRows.forEach((row) => {
+        nextValues[row.id] = { ...row };
+      });
+      setEditValues(nextValues);
+      setEditMode(true);
+      setSelectedDetailId(null);
+      setActionOpen(false);
+      return;
+    }
+
     if (item === '재고 없는 품목') {
       setStockStatus('empty');
       setActionOpen(false);
@@ -107,6 +172,42 @@ const InventoryManagementPage = () => {
         window.alert('다운로드에 실패했습니다.');
       }
       setActionOpen(false);
+    }
+  };
+
+  const saveDetailField = async (
+    row: Row,
+    field: 'boxNumber' | 'location' | 'code' | 'name',
+    value: string,
+  ) => {
+    const nextRow = { ...row, [field]: value };
+
+    try {
+      await updateItemMutation.mutateAsync({
+        id: row.id,
+        body: {
+          itemCode: nextRow.code,
+          itemName: nextRow.name,
+          boxNumber: nextRow.boxNumber === '-' ? '' : nextRow.boxNumber,
+          location: nextRow.location,
+        },
+      });
+    } catch (error) {
+      showApiErrorToast(error, '자재 수정에 실패했습니다.');
+    }
+  };
+
+  const deleteDetailRow = async (id: string) => {
+    try {
+      await deleteItemMutation.mutateAsync(id);
+      setSelectedDetailId(null);
+      setSelectedRows((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    } catch (error) {
+      showApiErrorToast(error, '자재 삭제에 실패했습니다.');
     }
   };
 
@@ -137,22 +238,29 @@ const InventoryManagementPage = () => {
               onToggle={() => setOpenFilter(openFilter === 'status' ? null : 'status')}
             >
               <SortOptionList>
-                <SortOption active={stockStatus === 'all'} type="button" onClick={() => setStockStatus('all')}>전체</SortOption>
-                <SortOption active={stockStatus === 'available'} type="button" onClick={() => setStockStatus('available')}>재고 있음</SortOption>
-                <SortOption active={stockStatus === 'empty'} type="button" onClick={() => setStockStatus('empty')}>재고 없음</SortOption>
+                <SortOption active={stockStatus === 'all'} type="button" onClick={() => { setStockStatus('all'); setOpenFilter(null); }}>전체</SortOption>
+                <SortOption active={stockStatus === 'available'} type="button" onClick={() => { setStockStatus('available'); setOpenFilter(null); }}>재고 있음</SortOption>
+                <SortOption active={stockStatus === 'empty'} type="button" onClick={() => { setStockStatus('empty'); setOpenFilter(null); }}>재고 없음</SortOption>
               </SortOptionList>
             </FilterButton>
           </Filters>
 
           <ToolbarRight>
             <SearchInput value={search} onChange={setSearch} />
-            <ActionMenu
-              label="재고 관리"
-              isOpen={actionOpen}
-              onToggle={() => setActionOpen((value) => !value)}
-              items={INVENTORY_ACTIONS}
-              onItemClick={(item) => void handleActionItem(item)}
-            />
+            {editMode ? (
+              <>
+                <CancelBtn type="button" onClick={cancelEditMode}>취소</CancelBtn>
+                <SaveBtn type="button" onClick={() => void confirmAllEdits()}>수정</SaveBtn>
+              </>
+            ) : (
+              <ActionMenu
+                label="재고 관리"
+                isOpen={actionOpen}
+                onToggle={() => setActionOpen((value) => !value)}
+                items={INVENTORY_ACTIONS}
+                onItemClick={(item) => void handleActionItem(item)}
+              />
+            )}
           </ToolbarRight>
         </Toolbar>
 
@@ -178,18 +286,55 @@ const InventoryManagementPage = () => {
             </thead>
             <tbody>
               {filteredRows.map((row) => (
-                <DataRow key={row.id}>
-                  <Td data-label="선택"><Checkbox checked={selectedRows.has(row.id)} onChange={() => toggleRow(row.id)} /></Td>
-                  <Td data-label="BOX 번호">{row.boxNumber}</Td>
-                  <Td data-label="자재 위치">{row.location}</Td>
-                  <Td data-label="자재코드">{row.code}</Td>
-                  <Td data-label="자재명">{row.name}</Td>
-                  <Td data-label="현재 재고">{row.currentStock}</Td>
-                </DataRow>
+                editMode ? (
+                  <NewRow key={row.id}>
+                    <Td data-label="선택" onClick={(e) => e.stopPropagation()}><Checkbox checked={selectedRows.has(row.id)} onChange={() => toggleRow(row.id)} /></Td>
+                    <Td data-label="BOX 번호"><NewRowInput type="text" value={editValues[row.id]?.boxNumber ?? (row.boxNumber === '-' ? '' : row.boxNumber)} onChange={(e) => updateEditValue(row.id, 'boxNumber', e.target.value)} /></Td>
+                    <Td data-label="자재 위치"><NewRowInput type="text" value={editValues[row.id]?.location ?? row.location} onChange={(e) => updateEditValue(row.id, 'location', e.target.value)} /></Td>
+                    <Td data-label="자재코드"><NewRowInput type="text" value={editValues[row.id]?.code ?? row.code} onChange={(e) => updateEditValue(row.id, 'code', e.target.value)} /></Td>
+                    <Td data-label="자재명"><NewRowInput type="text" value={editValues[row.id]?.name ?? row.name} onChange={(e) => updateEditValue(row.id, 'name', e.target.value)} /></Td>
+                    <Td data-label="현재 재고">{row.currentStock}</Td>
+                  </NewRow>
+                ) : (
+                  <DataRow
+                    key={row.id}
+                    active={selectedDetailId === row.id}
+                    onClick={() => openDetail(row.id)}
+                  >
+                    <Td data-label="선택" onClick={(e) => e.stopPropagation()}><Checkbox checked={selectedRows.has(row.id)} onChange={() => toggleRow(row.id)} /></Td>
+                    <Td data-label="BOX 번호">{row.boxNumber}</Td>
+                    <Td data-label="자재 위치">{row.location}</Td>
+                    <Td data-label="자재코드">{row.code}</Td>
+                    <Td data-label="자재명">{row.name}</Td>
+                    <Td data-label="현재 재고">{row.currentStock}</Td>
+                  </DataRow>
+                )
               ))}
             </tbody>
           </Table>
         </TableWrap>
+
+          {selectedDetailRow && (
+            <RecordDetailPanel
+              title={selectedDetailRow.name}
+              subtitle={`${selectedDetailRow.code} · 현재 재고 ${selectedDetailRow.currentStock.toLocaleString()}개`}
+              onClose={() => setSelectedDetailId(null)}
+              deleteLabel="자재 삭제"
+              onDelete={() => deleteDetailRow(selectedDetailRow.id)}
+              sections={[
+                {
+                  title: '재고 정보',
+                  fields: [
+                    { label: 'BOX 번호', value: selectedDetailRow.boxNumber === '-' ? '' : selectedDetailRow.boxNumber, editable: true, onSave: (value) => saveDetailField(selectedDetailRow, 'boxNumber', value) },
+                    { label: '자재 위치', value: selectedDetailRow.location, editable: true, onSave: (value) => saveDetailField(selectedDetailRow, 'location', value) },
+                    { label: '자재 코드', value: selectedDetailRow.code, editable: true, onSave: (value) => saveDetailField(selectedDetailRow, 'code', value) },
+                    { label: '자재명', value: selectedDetailRow.name, editable: true, onSave: (value) => saveDetailField(selectedDetailRow, 'name', value) },
+                    { label: '현재 재고', value: selectedDetailRow.currentStock.toLocaleString() },
+                  ],
+                },
+              ]}
+            />
+          )}
       </PageInner>
     </Layout>
   );

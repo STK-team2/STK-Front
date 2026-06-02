@@ -1,10 +1,11 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import Layout from '../../widgets/Layout';
 import { FilterButton } from '../../shared/ui/FilterButton';
 import { SearchInput } from '../../shared/ui/SearchInput';
 import { ActionMenu } from '../../shared/ui/ActionMenu';
 import { Checkbox } from '../../shared/ui/Checkbox';
+import { RecordDetailPanel } from '../../shared/ui/RecordDetailPanel';
 import { itemApi } from '../../entities/item/api/itemApi';
 import type { ItemResponse } from '../../entities/item/types';
 import type { MovementResponse } from '../../entities/movement/types';
@@ -24,7 +25,7 @@ import {
   DateFilterWrap, DateFilterLabel, DateRangeRow, DateRangeInput, DateRangeSep,
   TotalLabel, TableWrap, Table, HeaderRow, Th, DataRow, Td,
   NewRow, NewRowInput, NewRowDateWrap, NewRowDateInput,
-  CancelBtn, DeleteBtn,
+  CancelBtn, DeleteBtn, SaveBtn,
 } from './style';
 
 type FilterType = 'date' | 'qty' | 'sort' | null;
@@ -76,7 +77,7 @@ const mapMovementToRow = (movement: MovementResponse): Row => ({
   code: movement.itemCode,
   name: movement.itemName,
   qty: movement.quantity,
-  location: '-',
+  location: movement.location ?? '',
   note: movement.note ?? '',
   reference: movement.reference ?? '',
 });
@@ -99,6 +100,7 @@ const IncomingManagementPage = () => {
   const [editMode, setEditMode] = useState(false);
   const [editValues, setEditValues] = useState<Record<string, Row>>({});
   const [newRowElement, setNewRowElement] = useState<HTMLTableRowElement | null>(null);
+  const [selectedDetailId, setSelectedDetailId] = useState<string | null>(null);
 
   const { data: movements = [] } = useGetMovements({
     type: 'INBOUND',
@@ -127,6 +129,14 @@ const IncomingManagementPage = () => {
     });
 
   const allSelected = filteredRows.length > 0 && selectedRows.size === filteredRows.length;
+  const selectedDetailRow = selectedDetailId
+    ? filteredRows.find((row) => row.id === selectedDetailId) ?? null
+    : null;
+
+  const openDetail = (id: string) => {
+    if (window.matchMedia('(max-width: 768px)').matches) return;
+    setSelectedDetailId(id);
+  };
 
   const toggleSelectAll = () => {
     if (allSelected) {
@@ -151,6 +161,7 @@ const IncomingManagementPage = () => {
       setNewRows([createEmptyRow()]);
       setDeleteMode(false);
       setEditMode(false);
+      setSelectedDetailId(null);
       setActionOpen(false);
       return;
     }
@@ -158,6 +169,7 @@ const IncomingManagementPage = () => {
     if (item === '입고 삭제') {
       setDeleteMode(true);
       setEditMode(false);
+      setSelectedDetailId(null);
       setActionOpen(false);
       return;
     }
@@ -170,6 +182,7 @@ const IncomingManagementPage = () => {
       setEditValues(nextValues);
       setEditMode(true);
       setDeleteMode(false);
+      setSelectedDetailId(null);
       setActionOpen(false);
       return;
     }
@@ -212,6 +225,32 @@ const IncomingManagementPage = () => {
     setNewRows([]);
   };
 
+  const confirmAllEdits = async () => {
+    try {
+      await Promise.all(
+        Object.keys(editValues).map((id) => {
+          const row = editValues[id];
+          return updateMovementMutation.mutateAsync({
+            id,
+            body: {
+              site: row.site,
+              itemCode: row.code,
+              location: row.location || undefined,
+              movementDate: row.date,
+              quantity: row.qty,
+              note: row.note,
+              reference: row.reference,
+            },
+          });
+        }),
+      );
+      setEditMode(false);
+      setEditValues({});
+    } catch (error) {
+      showApiErrorToast(error, '입고 수정에 실패했습니다.');
+    }
+  };
+
   const updateEditValue = (id: string, field: keyof Omit<Row, 'id'>, value: string) => {
     setEditValues((prev) => ({
       ...prev,
@@ -219,19 +258,27 @@ const IncomingManagementPage = () => {
     }));
   };
 
-  const saveEditRow = async (id: string) => {
-    const row = editValues[id];
-    if (!row) return;
+  const saveDetailField = async (
+    row: Row,
+    field: 'site' | 'date' | 'qty' | 'location' | 'note' | 'reference',
+    value: string,
+  ) => {
+    const nextRow = {
+      ...row,
+      [field]: field === 'qty' ? Number(value) : value,
+    };
 
     try {
       await updateMovementMutation.mutateAsync({
-        id,
+        id: row.id,
         body: {
-          site: row.site,
-          movementDate: row.date,
-          quantity: row.qty,
-          note: row.note,
-          reference: row.reference,
+          site: nextRow.site,
+          itemCode: nextRow.code,
+          location: nextRow.location || undefined,
+          movementDate: nextRow.date,
+          quantity: nextRow.qty,
+          note: nextRow.note,
+          reference: nextRow.reference,
         },
       });
     } catch (error) {
@@ -239,11 +286,18 @@ const IncomingManagementPage = () => {
     }
   };
 
-  const revertEditRow = (id: string) => {
-    const original = filteredRows.find((row) => row.id === id);
-    if (!original) return;
-
-    setEditValues((prev) => ({ ...prev, [id]: { ...original } }));
+  const deleteDetailRow = async (id: string) => {
+    try {
+      await deleteMovementMutation.mutateAsync(id);
+      setSelectedDetailId(null);
+      setSelectedRows((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    } catch (error) {
+      showApiErrorToast(error, '입고 삭제에 실패했습니다.');
+    }
   };
 
   const updateNewRow = (id: string, field: keyof Omit<NewRowData, 'id'>, value: string) => {
@@ -273,6 +327,7 @@ const IncomingManagementPage = () => {
           movementDate: row.date,
           itemId: resolvedItem.id,
           quantity: Number(row.qty),
+          location: row.location || undefined,
           note: row.note,
           reference: row.reference,
         });
@@ -304,14 +359,14 @@ const IncomingManagementPage = () => {
     }
   };
 
-  const submitPendingNewRow = useCallback(() => {
+  const submitPendingNewRow = () => {
     const pendingRowId = newRows[0]?.id;
     if (!pendingRowId) {
       return;
     }
 
     void submitRow(pendingRowId);
-  }, [newRows]);
+  };
 
   useSubmitOnOutsideClick({
     container: newRowElement,
@@ -330,9 +385,9 @@ const IncomingManagementPage = () => {
     const itemData = isEditing ? editValues[row.id] : row;
     
     return (
-      <DataRow key={row.id} style={isChecked ? { background: '#f0f6ff' } : {}}>
-        <Td style={{ width: 48, textAlign: 'center' }} data-label="선택">
-          <Checkbox 
+      <DataRow key={row.id} active={selectedDetailId === row.id} onClick={() => !isEditing && openDetail(row.id)} style={isChecked ? { background: '#f0f6ff' } : {}}>
+        <Td style={{ width: 48, textAlign: 'center' }} data-label="선택" onClick={(e) => e.stopPropagation()}>
+          <Checkbox
             checked={isChecked}
             onChange={() => toggleRow(row.id)}
           />
@@ -431,19 +486,17 @@ const IncomingManagementPage = () => {
           </NewRowDateWrap>
         </Td>
         <Td data-label="자재 코드">
-          <NewRowInput 
-            placeholder="자재 코드 검색하여 입력" 
+          <NewRowInput
+            placeholder="자재 코드 검색하여 입력"
             value={row.code}
             onChange={(e) => updateNewRow(row.id, 'code', e.target.value)}
-            onBlur={() => handleNewRowBlur(row.id)}
           />
         </Td>
         <Td data-label="자재명">
-          <NewRowInput 
-            placeholder="자동 입력" 
+          <NewRowInput
+            placeholder="자동 입력"
             value={row.name}
             onChange={(e) => updateNewRow(row.id, 'name', e.target.value)}
-            onBlur={() => handleNewRowBlur(row.id)}
           />
         </Td>
         <Td data-label="입고 수량">
@@ -528,7 +581,10 @@ const IncomingManagementPage = () => {
                 <DeleteBtn type="button" onClick={() => void confirmDelete()}>삭제</DeleteBtn>
               </>
             ) : editMode ? (
-              <CancelBtn type="button" onClick={cancelEditMode}>취소</CancelBtn>
+              <>
+                <CancelBtn type="button" onClick={cancelEditMode}>취소</CancelBtn>
+                <SaveBtn type="button" onClick={() => void confirmAllEdits()}>수정</SaveBtn>
+              </>
             ) : (
               <ActionMenu
                 label="입고 관리"
@@ -575,6 +631,30 @@ const IncomingManagementPage = () => {
             </tbody>
           </Table>
         </TableWrap>
+
+          {selectedDetailRow && (
+            <RecordDetailPanel
+              title={selectedDetailRow.name}
+              subtitle={`${selectedDetailRow.code} · 입고 ${selectedDetailRow.qty.toLocaleString()}개`}
+              onClose={() => setSelectedDetailId(null)}
+              deleteLabel="입고 내역 삭제"
+              onDelete={() => deleteDetailRow(selectedDetailRow.id)}
+              sections={[
+                {
+                  title: '입고 정보',
+                  fields: [
+                    { label: '사업장', value: selectedDetailRow.site, editable: true, onSave: (value) => saveDetailField(selectedDetailRow, 'site', value) },
+                    { label: '입고 날짜', value: selectedDetailRow.date, editable: true, inputType: 'date', onSave: (value) => saveDetailField(selectedDetailRow, 'date', value) },
+                    { label: '수량', value: selectedDetailRow.qty, editable: true, inputType: 'number', onSave: (value) => saveDetailField(selectedDetailRow, 'qty', value) },
+                    { label: '자재 위치', value: selectedDetailRow.location, editable: true, onSave: (value) => saveDetailField(selectedDetailRow, 'location', value) },
+                    { label: '참고', value: selectedDetailRow.reference || '', muted: !selectedDetailRow.reference, editable: true, onSave: (value) => saveDetailField(selectedDetailRow, 'reference', value) },
+                  ],
+                },
+              ]}
+              memo={selectedDetailRow.note ?? ''}
+              onMemoSave={(value) => saveDetailField(selectedDetailRow, 'note', value)}
+            />
+          )}
       </PageInner>
     </Layout>
   );

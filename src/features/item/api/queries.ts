@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { itemApi } from '../../../entities/item/api/itemApi';
-import type { RegisterItemRequest } from '../../../entities/item/types';
+import type { RegisterItemRequest, UpdateItemRequest } from '../../../entities/item/types';
 
 export const itemKeys = {
   all: ['items'] as const,
@@ -30,6 +30,19 @@ export const useDeleteItem = () => {
     mutationFn: (id: string) => itemApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: itemKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['stock'] });
+    },
+  });
+};
+
+export const useUpdateItem = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, body }: { id: string; body: UpdateItemRequest }) =>
+      itemApi.update(id, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: itemKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['stock'] });
     },
   });
 };

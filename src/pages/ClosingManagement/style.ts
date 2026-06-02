@@ -62,6 +62,62 @@ export const filters = css`
   }
 `;
 
+export const toolbarRight = css`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+export const toolbarSaveBtn = css`
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 20px;
+  background: #0068e0;
+  border: none;
+  border-radius: 6px;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #ffffff;
+  cursor: pointer;
+  &:hover {
+    background: #0056b8;
+  }
+`;
+
+export const toolbarCancelBtn = css`
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 16px;
+  background: #ffffff;
+  border: 1px solid #bbbcc2;
+  border-radius: 6px;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #595b66;
+  cursor: pointer;
+  &:hover {
+    background: #f5f6f8;
+  }
+`;
+
+export const contentLayout = css`
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+
+  @media (max-width: 1280px) {
+    flex-direction: column;
+  }
+`;
+
+export const tableSection = css`
+  flex: 1;
+  min-width: 0;
+`;
 export const sortOptionList = css`
   display: flex;
   flex-direction: column;
@@ -203,6 +259,7 @@ export const th = css`
 
 export const dataRow = css`
   border-bottom: 1px solid #e5e6ea;
+  cursor: pointer;
   &:hover {
     background: #f8f9fa;
   }
@@ -223,6 +280,10 @@ export const dataRow = css`
       background: #ffffff;
     }
   }
+`;
+
+export const dataRowActive = css`
+  background: #eef5ff;
 `;
 
 export const td = css`
@@ -343,11 +404,21 @@ export const PageInner = styled.div`${pageInner}`;
 export const PageTitle = styled.h1`${pageTitle}`;
 export const Toolbar = styled.div`${toolbar}`;
 export const Filters = styled.div`${filters}`;
+export const ToolbarRight = styled.div`${toolbarRight}`;
+export const ToolbarCancelBtn = styled.button`${toolbarCancelBtn}`;
+export const ToolbarSaveBtn = styled.button`${toolbarSaveBtn}`;
+export const ContentLayout = styled.div`${contentLayout}`;
+export const TableSection = styled.div`${tableSection}`;
 export const TableWrap = styled.div`${tableWrap}`;
 export const Table = styled.table`${table}`;
 export const HeaderRow = styled.tr`${headerRow}`;
 export const Th = styled.th`${th}`;
-export const DataRow = styled.tr`${dataRow}`;
+export const DataRow = styled('tr', {
+  shouldForwardProp: (prop) => prop !== 'active',
+})<{ active?: boolean }>`
+  ${dataRow}
+  ${({ active }) => active && dataRowActive}
+`;
 export const Td = styled.td`${td}`;
 export const StatusText = styled('span', {
   shouldForwardProp: (prop) => prop !== 'closed',
