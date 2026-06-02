@@ -3,13 +3,14 @@ import type { ReactElement } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { authApi } from '../entities/auth/api/authApi';
 import { useAuthStore } from '../entities/auth/model/authStore';
-import LoginPage from '../pages/Login';
 import RegisterPage from '../pages/Register';
 import DashboardPage from '../pages/Dashboard';
 import IncomingManagementPage from '../pages/IncomingManagement';
 import OutgoingManagementPage from '../pages/OutgoingManagement';
 import ClosingManagementPage from '../pages/ClosingManagement';
 import InventoryManagementPage from '../pages/InventoryManagement';
+import EditHistoryManagementPage from '../pages/EditHistoryManagement';
+import LoginPage from '@/pages/Login';
 
 const ProtectedRoute = ({ children }: { children: ReactElement }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -78,6 +79,7 @@ const RouterContent = () => {
       <Route path="/outgoing" element={<ProtectedRoute><OutgoingManagementPage /></ProtectedRoute>} />
       <Route path="/closing" element={<ProtectedRoute><ClosingManagementPage /></ProtectedRoute>} />
       <Route path="/inventory" element={<ProtectedRoute><InventoryManagementPage /></ProtectedRoute>} />
+      <Route path="/history" element={<ProtectedRoute><EditHistoryManagementPage /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
