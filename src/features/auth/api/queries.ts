@@ -18,7 +18,7 @@ export const useSignIn = () => {
     onSuccess: (res) => {
       if (res.success) {
         setTokens(res.data.accessToken, res.data.refreshToken);
-        navigate('/incoming');
+        navigate('/dashboard');
       }
     },
   });
