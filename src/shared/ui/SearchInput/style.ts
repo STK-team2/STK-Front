@@ -30,12 +30,12 @@ export const searchInput = css`
     font-size: 15px;
   }
   @media (max-width: 768px) {
-    width: 160px;
-    height: 34px;
-    font-size: 13px;
+    width: 200px;
+    height: 38px;
+    font-size: 18px;
   }
   @media (max-width: 480px) {
-    width: 140px;
+    width: 180px;
   }
 `;
 

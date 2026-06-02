@@ -265,53 +265,53 @@ const InventoryManagementPage = () => {
         </Toolbar>
 
         <TableWrap>
-              <Table>
-                <colgroup>
-                  <col style={{ width: '48px' }} />
-                  <col style={{ width: '130px' }} />
-                  <col style={{ width: '140px' }} />
-                  <col style={{ width: '140px' }} />
-                  <col />
-                  <col style={{ width: '110px' }} />
-                </colgroup>
-                <thead>
-                  <HeaderRow>
-                    <Th onClick={(e) => e.stopPropagation()}><Checkbox checked={allSelected} onChange={toggleSelectAll} /></Th>
-                    <Th>BOX 번호</Th>
-                    <Th>자재 위치</Th>
-                    <Th>자재코드</Th>
-                    <Th>자재명</Th>
-                    <Th>현재 재고</Th>
-                  </HeaderRow>
-                </thead>
-                <tbody>
-                  {filteredRows.map((row) => (
-                    editMode ? (
-                      <NewRow key={row.id}>
-                        <Td onClick={(e) => e.stopPropagation()}><Checkbox checked={selectedRows.has(row.id)} onChange={() => toggleRow(row.id)} /></Td>
-                        <Td><NewRowInput type="text" value={editValues[row.id]?.boxNumber ?? (row.boxNumber === '-' ? '' : row.boxNumber)} onChange={(e) => updateEditValue(row.id, 'boxNumber', e.target.value)} /></Td>
-                        <Td><NewRowInput type="text" value={editValues[row.id]?.location ?? row.location} onChange={(e) => updateEditValue(row.id, 'location', e.target.value)} /></Td>
-                        <Td><NewRowInput type="text" value={editValues[row.id]?.code ?? row.code} onChange={(e) => updateEditValue(row.id, 'code', e.target.value)} /></Td>
-                        <Td><NewRowInput type="text" value={editValues[row.id]?.name ?? row.name} onChange={(e) => updateEditValue(row.id, 'name', e.target.value)} /></Td>
-                        <Td>{row.currentStock}</Td>
-                      </NewRow>
-                    ) : (
-                      <DataRow
-                        key={row.id}
-                        active={selectedDetailId === row.id}
-                        onClick={() => openDetail(row.id)}
-                      >
-                        <Td onClick={(e) => e.stopPropagation()}><Checkbox checked={selectedRows.has(row.id)} onChange={() => toggleRow(row.id)} /></Td>
-                        <Td>{row.boxNumber}</Td>
-                        <Td>{row.location}</Td>
-                        <Td>{row.code}</Td>
-                        <Td>{row.name}</Td>
-                        <Td>{row.currentStock}</Td>
-                      </DataRow>
-                    )
-                  ))}
-                </tbody>
-              </Table>
+          <Table>
+            <colgroup>
+              <col style={{ width: '48px' }} />
+              <col style={{ width: '130px' }} />
+              <col style={{ width: '140px' }} />
+              <col style={{ width: '140px' }} />
+              <col />
+              <col style={{ width: '110px' }} />
+            </colgroup>
+            <thead>
+              <HeaderRow>
+                <Th><Checkbox checked={allSelected} onChange={toggleSelectAll} /></Th>
+                <Th>BOX 번호</Th>
+                <Th>자재 위치</Th>
+                <Th>자재코드</Th>
+                <Th>자재명</Th>
+                <Th>현재 재고</Th>
+              </HeaderRow>
+            </thead>
+            <tbody>
+              {filteredRows.map((row) => (
+                editMode ? (
+                  <NewRow key={row.id}>
+                    <Td data-label="선택" onClick={(e) => e.stopPropagation()}><Checkbox checked={selectedRows.has(row.id)} onChange={() => toggleRow(row.id)} /></Td>
+                    <Td data-label="BOX 번호"><NewRowInput type="text" value={editValues[row.id]?.boxNumber ?? (row.boxNumber === '-' ? '' : row.boxNumber)} onChange={(e) => updateEditValue(row.id, 'boxNumber', e.target.value)} /></Td>
+                    <Td data-label="자재 위치"><NewRowInput type="text" value={editValues[row.id]?.location ?? row.location} onChange={(e) => updateEditValue(row.id, 'location', e.target.value)} /></Td>
+                    <Td data-label="자재코드"><NewRowInput type="text" value={editValues[row.id]?.code ?? row.code} onChange={(e) => updateEditValue(row.id, 'code', e.target.value)} /></Td>
+                    <Td data-label="자재명"><NewRowInput type="text" value={editValues[row.id]?.name ?? row.name} onChange={(e) => updateEditValue(row.id, 'name', e.target.value)} /></Td>
+                    <Td data-label="현재 재고">{row.currentStock}</Td>
+                  </NewRow>
+                ) : (
+                  <DataRow
+                    key={row.id}
+                    active={selectedDetailId === row.id}
+                    onClick={() => openDetail(row.id)}
+                  >
+                    <Td data-label="선택" onClick={(e) => e.stopPropagation()}><Checkbox checked={selectedRows.has(row.id)} onChange={() => toggleRow(row.id)} /></Td>
+                    <Td data-label="BOX 번호">{row.boxNumber}</Td>
+                    <Td data-label="자재 위치">{row.location}</Td>
+                    <Td data-label="자재코드">{row.code}</Td>
+                    <Td data-label="자재명">{row.name}</Td>
+                    <Td data-label="현재 재고">{row.currentStock}</Td>
+                  </DataRow>
+                )
+              ))}
+            </tbody>
+          </Table>
         </TableWrap>
 
           {selectedDetailRow && (

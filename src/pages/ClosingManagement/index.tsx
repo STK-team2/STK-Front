@@ -268,15 +268,15 @@ const ClosingManagementPage = () => {
                         active={selectedDetailId === row.closingId}
                         onClick={() => !editMode && openDetail(row.closingId)}
                       >
-                        <Td onClick={(e) => e.stopPropagation()}><Checkbox checked={selectedRows.has(row.closingId)} onChange={() => toggleRow(row.closingId)} /></Td>
-                        <Td>{row.itemCode}</Td>
-                        <Td>{row.itemName}</Td>
-                        <Td>{row.location}</Td>
-                        <Td>{row.closingYm}</Td>
-                        <Td>
+                        <Td data-label="선택" onClick={(e) => e.stopPropagation()}><Checkbox checked={selectedRows.has(row.closingId)} onChange={() => toggleRow(row.closingId)} /></Td>
+                        <Td data-label="자재코드">{row.itemCode}</Td>
+                        <Td data-label="자재명">{row.itemName}</Td>
+                        <Td data-label="자재 위치">{row.location}</Td>
+                        <Td data-label="기간">{row.closingYm}</Td>
+                        <Td data-label="상태">
                           <StatusText closed={isClosed}>{isClosed ? '마감' : '취소'}</StatusText>
                         </Td>
-                        <Td onClick={(e) => e.stopPropagation()}>
+                        <Td data-label="마감" onClick={(e) => e.stopPropagation()}>
                           {editMode ? (
                             isClosed ? (
                               <CancelBtn type="button" onClick={() => togglePendingStatus(row.closingId)}>취소</CancelBtn>
