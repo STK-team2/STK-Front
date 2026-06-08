@@ -2,6 +2,7 @@ export interface ChangeHistoryDto {
   id: string;
   userName: string;
   tableName: string;
+  screenName?: string;
   recordId: string;
   action: string;
   beforeValue: string;

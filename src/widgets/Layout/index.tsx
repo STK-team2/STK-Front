@@ -1,7 +1,17 @@
 /** @jsxImportSource @emotion/react */
+import { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Wrapper, Sidebar, LogoWrap, LogoClip, Logo, Nav, NavItem, LogoutBtn, Content, BottomNav, BottomNavItem } from './style';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../../entities/auth/model/authStore';
+import { useSignOut } from '../../features/auth/api/queries';
+import { useGetCurrentStock } from '../../features/stock/api/queries';
+import { useSearchItems } from '../../features/item/api/queries';
+import {
+  Wrapper, Sidebar, LogoWrap, LogoClip, Logo, Nav, NavItem, LogoutBtn, Content,
+  BottomNav, BottomNavItem, BellWrap, BellBtn, BellBadge, AlertDropdown,
+  AlertDropdownTitle, AlertList, AlertItem, AlertItemName, AlertItemStock,
+  NavSection, NavSectionLabel,
+} from './style';
 
 const navItems = [
   {
@@ -26,9 +36,46 @@ const navItems = [
   },
 ];
 
+const adminNavItems = [
+  {
+    label: '이력', path: '/history',
+    icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3h18v4H3z"/><path d="M3 10h18v4H3z"/><path d="M3 17h18v4H3z"/></svg>,
+  },
+  {
+    label: '사용자', path: '/users',
+    icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+  },
+];
+
+const BellIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+  </svg>
+);
+
 const Layout = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const role = useAuthStore((state) => state.role);
+  const signOutMutation = useSignOut();
+  const [bellOpen, setBellOpen] = useState(false);
+
+  const { data: stocks = [] } = useGetCurrentStock();
+  const { data: items = [] } = useSearchItems('');
+
+  const lowStockItems = useMemo(() => {
+    const stockMap = new Map(stocks.map((s) => [s.itemId, s.currentStock]));
+    return items.filter((item) => {
+      if (!item.lowStockThreshold) return false;
+      const current = stockMap.get(item.id) ?? 0;
+      return current <= item.lowStockThreshold;
+    });
+  }, [stocks, items]);
+
+  const handleLogout = () => {
+    void signOutMutation.mutate();
+  };
 
   return (
     <Wrapper>
@@ -39,7 +86,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
           </LogoClip>
         </LogoWrap>
         <Nav>
-          {navItems.map(item => (
+          {navItems.map((item) => (
             <NavItem
               key={item.path}
               active={location.pathname === item.path}
@@ -49,14 +96,66 @@ const Layout = ({ children }: { children: ReactNode }) => {
               {item.label}
             </NavItem>
           ))}
+          {role === 'ADMIN' && (
+            <>
+              <NavSection>
+                <NavSectionLabel>관리자</NavSectionLabel>
+              </NavSection>
+              {adminNavItems.map((item) => (
+                <NavItem
+                  key={item.path}
+                  active={location.pathname === item.path}
+                  onClick={() => navigate(item.path)}
+                  type="button"
+                >
+                  {item.label}
+                </NavItem>
+              ))}
+            </>
+          )}
         </Nav>
-        <LogoutBtn type="button">로그아웃</LogoutBtn>
+
+        <BellWrap>
+          <BellBtn type="button" onClick={() => setBellOpen((v) => !v)}>
+            <BellIcon />
+            {lowStockItems.length > 0 && (
+              <BellBadge>{lowStockItems.length > 99 ? '99+' : lowStockItems.length}</BellBadge>
+            )}
+            저재고 알림
+          </BellBtn>
+          {bellOpen && (
+            <AlertDropdown>
+              <AlertDropdownTitle>
+                저재고 품목 {lowStockItems.length}건
+              </AlertDropdownTitle>
+              <AlertList>
+                {lowStockItems.length === 0 ? (
+                  <AlertItem>저재고 품목이 없습니다.</AlertItem>
+                ) : (
+                  lowStockItems.map((item) => {
+                    const current = stocks.find((s) => s.itemId === item.id)?.currentStock ?? 0;
+                    return (
+                      <AlertItem key={item.id}>
+                        <AlertItemName>{item.itemName}</AlertItemName>
+                        <AlertItemStock>
+                          {current} / {item.lowStockThreshold}
+                        </AlertItemStock>
+                      </AlertItem>
+                    );
+                  })
+                )}
+              </AlertList>
+            </AlertDropdown>
+          )}
+        </BellWrap>
+
+        <LogoutBtn type="button" onClick={handleLogout} disabled={signOutMutation.isPending}>로그아웃</LogoutBtn>
       </Sidebar>
-      <Content>
+      <Content onClick={() => setBellOpen(false)}>
         {children}
       </Content>
       <BottomNav>
-        {navItems.map(item => (
+        {navItems.map((item) => (
           <BottomNavItem
             key={item.path}
             active={location.pathname === item.path}

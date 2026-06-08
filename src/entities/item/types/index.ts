@@ -4,6 +4,9 @@ export interface ItemResponse {
   itemName: string;
   boxNumber: string;
   location: string;
+  categoryName?: string;
+  imageUrl?: string;
+  lowStockThreshold?: number;
   createdAt: string;
 }
 
@@ -12,6 +15,8 @@ export interface RegisterItemRequest {
   itemName: string;
   boxNumber?: string;
   location: string;
+  categoryId?: string;
+  lowStockThreshold?: number;
 }
 
 export type UpdateItemRequest = RegisterItemRequest;

@@ -4,14 +4,14 @@ import type { RegisterItemRequest, UpdateItemRequest } from '../../../entities/i
 
 export const itemKeys = {
   all: ['items'] as const,
-  search: (query: string) => ['items', 'search', query] as const,
+  search: (query: string, categoryId?: string) => ['items', 'search', query, categoryId] as const,
 };
 
-export const useSearchItems = (query = '') =>
+export const useSearchItems = (query = '', categoryId?: string) =>
   useQuery({
-    queryKey: itemKeys.search(query),
-    queryFn: () => itemApi.search(query),
-    select: (res) => res.data,
+    queryKey: itemKeys.search(query, categoryId),
+    queryFn: () => itemApi.search(query, categoryId),
+    select: (res) => res.data ?? [],
   });
 
 export const useRegisterItem = () => {

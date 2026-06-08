@@ -226,8 +226,6 @@ const OutgoingManagementPage = () => {
             id,
             body: {
               site: row.site,
-              itemCode: row.code,
-              location: row.location || undefined,
               movementDate: row.date,
               quantity: row.qty,
               note: row.note,
@@ -259,7 +257,6 @@ const OutgoingManagementPage = () => {
         id,
         body: {
           site: row.site,
-          itemCode: row.code,
           movementDate: row.date,
           quantity: row.qty,
           note: row.note,
@@ -286,8 +283,6 @@ const OutgoingManagementPage = () => {
         id: row.id,
         body: {
           site: nextRow.site,
-          itemCode: nextRow.code,
-          location: nextRow.location || undefined,
           movementDate: nextRow.date,
           quantity: nextRow.qty,
           note: nextRow.note,
@@ -341,6 +336,7 @@ const OutgoingManagementPage = () => {
   const submitRow = async (id: string) => {
     const row = newRows.find((value) => value.id === id);
     if (!row) return;
+    if (registerOutboundMutation.isPending) return;
 
     if (!row.site || !row.date || !row.code || !row.name || !row.qty) {
       showErrorToast('사업장, 날짜, 자재 코드, 자재명, 수량은 필수입니다.');
@@ -439,13 +435,13 @@ const OutgoingManagementPage = () => {
             <SearchInput value={search} onChange={setSearch} />
             {deleteMode ? (
               <>
-                <CancelBtn type="button" onClick={cancelDeleteMode}>취소</CancelBtn>
-                <DeleteBtn type="button" onClick={() => void confirmDelete()}>삭제</DeleteBtn>
+                <CancelBtn type="button" onClick={cancelDeleteMode} disabled={deleteMovementMutation.isPending}>취소</CancelBtn>
+                <DeleteBtn type="button" onClick={() => void confirmDelete()} disabled={deleteMovementMutation.isPending}>삭제</DeleteBtn>
               </>
             ) : editMode ? (
               <>
-                <CancelBtn type="button" onClick={cancelEditMode}>취소</CancelBtn>
-                <SaveBtn type="button" onClick={() => void confirmAllEdits()}>수정</SaveBtn>
+                <CancelBtn type="button" onClick={cancelEditMode} disabled={updateMovementMutation.isPending}>취소</CancelBtn>
+                <SaveBtn type="button" onClick={() => void confirmAllEdits()} disabled={updateMovementMutation.isPending}>수정</SaveBtn>
               </>
             ) : (
               <ActionMenu
