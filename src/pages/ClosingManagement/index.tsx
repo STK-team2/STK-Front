@@ -18,12 +18,16 @@ import {
   TableWrap, Table, HeaderRow, Th, DataRow, Td,
   StatusText, CloseBtn, CancelBtn,
   ToolbarRight, ToolbarCancelBtn, ToolbarSaveBtn,
+  ModalOverlay, ModalCard, ModalTitle, ModalFieldLabel, ModalMonthInput,
+  ModalActions, ModalCancelBtn, ModalConfirmBtn,
+  ModalSearchInput, ModalItemList, ModalItemRow, ModalItemCode, ModalItemName, ModalEmptyText,
 } from './style';
+import { useSearchItems } from '../../features/item/api/queries';
 
 type FilterType = 'date' | 'status' | null;
 type ClosingFilterStatus = 'ALL' | 'CLOSED' | 'CANCELLED';
 
-const CLOSING_ACTIONS = ['마감 수정'];
+const CLOSING_ACTIONS = ['마감 추가', '마감 수정'];
 
 const ClosingManagementPage = () => {
   const [openFilter, setOpenFilter] = useState<FilterType>(null);
@@ -36,6 +40,12 @@ const ClosingManagementPage = () => {
   const [selectedDetailId, setSelectedDetailId] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<Record<string, 'CLOSED' | 'CANCELLED'>>({});
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [addMonth, setAddMonth] = useState('');
+  const [addSearch, setAddSearch] = useState('');
+  const [addSelectedItems, setAddSelectedItems] = useState<Set<string>>(new Set());
+
+  const { data: allItems = [] } = useSearchItems(addSearch);
 
   const { data: closingRows = [] } = useGetClosingStock({
     status: statusFilter === 'ALL' ? undefined : statusFilter,
@@ -91,12 +101,12 @@ const ClosingManagementPage = () => {
     });
   };
 
-  const toggleStatus = async (id: string, closingYmValue: string, isClosed: boolean) => {
+  const toggleStatus = async (id: string, closingYmValue: string, itemId: string, isClosed: boolean) => {
     try {
       if (isClosed) {
         await cancelClosingMutation.mutateAsync(id);
       } else {
-        await closeMonthMutation.mutateAsync({ closingYm: closingYmValue });
+        await closeMonthMutation.mutateAsync({ closingYm: closingYmValue, itemId });
       }
     } catch (error) {
       showApiErrorToast(error, isClosed ? '마감 취소에 실패했습니다.' : '마감 처리에 실패했습니다.');
@@ -136,19 +146,19 @@ const ClosingManagementPage = () => {
     }
 
     try {
-      const monthsToClose = new Set<string>();
+      const itemsToClose: { closingYm: string; itemId: string }[] = [];
       const itemsToCancel: string[] = [];
 
       for (const row of changes) {
         if (pendingStatus[row.closingId] === 'CLOSED') {
-          monthsToClose.add(row.closingYm);
+          itemsToClose.push({ closingYm: row.closingYm, itemId: row.itemId });
         } else {
           itemsToCancel.push(row.closingId);
         }
       }
 
       await Promise.all([
-        ...Array.from(monthsToClose).map((ym) => closeMonthMutation.mutateAsync({ closingYm: ym })),
+        ...itemsToClose.map(({ closingYm, itemId }) => closeMonthMutation.mutateAsync({ closingYm, itemId })),
         ...itemsToCancel.map((id) => cancelClosingMutation.mutateAsync(id)),
       ]);
 
@@ -159,8 +169,41 @@ const ClosingManagementPage = () => {
     }
   };
 
+  const closeAddModal = () => {
+    setAddModalOpen(false);
+    setAddMonth('');
+    setAddSearch('');
+    setAddSelectedItems(new Set());
+  };
+
+  const toggleAddItem = (itemId: string) => {
+    setAddSelectedItems((prev) => {
+      const next = new Set(prev);
+      if (next.has(itemId)) next.delete(itemId);
+      else next.add(itemId);
+      return next;
+    });
+  };
+
+  const handleAddClosing = async () => {
+    if (!addMonth || addSelectedItems.size === 0) return;
+    try {
+      await Promise.all(
+        Array.from(addSelectedItems).map((itemId) =>
+          closeMonthMutation.mutateAsync({ closingYm: addMonth, itemId }),
+        ),
+      );
+      closeAddModal();
+    } catch (error) {
+      showApiErrorToast(error, '마감 추가에 실패했습니다.');
+    }
+  };
+
   const handleActionItem = (item: string) => {
-    if (item === '마감 수정') {
+    if (item === '마감 추가') {
+      setAddModalOpen(true);
+      setActionOpen(false);
+    } else if (item === '마감 수정') {
       enterEditMode();
     }
   };
@@ -181,6 +224,52 @@ const ClosingManagementPage = () => {
 
   return (
     <Layout>
+      {addModalOpen && (
+        <ModalOverlay onClick={closeAddModal}>
+          <ModalCard onClick={(e) => e.stopPropagation()}>
+            <ModalTitle>마감 추가</ModalTitle>
+            <div>
+              <ModalFieldLabel>마감 연월</ModalFieldLabel>
+              <ModalMonthInput
+                type="month"
+                value={addMonth}
+                onChange={(e) => setAddMonth(e.target.value)}
+              />
+            </div>
+            <div>
+              <ModalFieldLabel>자재 선택</ModalFieldLabel>
+              <ModalSearchInput
+                placeholder="자재코드·자재명 검색"
+                value={addSearch}
+                onChange={(e) => setAddSearch(e.target.value)}
+              />
+              <ModalItemList>
+                {allItems.length === 0 ? (
+                  <ModalEmptyText>자재가 없습니다.</ModalEmptyText>
+                ) : (
+                  allItems.map((item) => (
+                    <ModalItemRow key={item.itemId} onClick={() => toggleAddItem(item.itemId)}>
+                      <Checkbox checked={addSelectedItems.has(item.itemId)} onChange={() => toggleAddItem(item.itemId)} />
+                      <ModalItemCode>{item.itemCode}</ModalItemCode>
+                      <ModalItemName>{item.itemName}</ModalItemName>
+                    </ModalItemRow>
+                  ))
+                )}
+              </ModalItemList>
+            </div>
+            <ModalActions>
+              <ModalCancelBtn type="button" onClick={closeAddModal}>취소</ModalCancelBtn>
+              <ModalConfirmBtn
+                type="button"
+                disabled={!addMonth || addSelectedItems.size === 0}
+                onClick={() => void handleAddClosing()}
+              >
+                추가{addSelectedItems.size > 0 ? ` (${addSelectedItems.size})` : ''}
+              </ModalConfirmBtn>
+            </ModalActions>
+          </ModalCard>
+        </ModalOverlay>
+      )}
       {(openFilter || actionOpen) && <Backdrop onClick={closeAll} />}
 
       <PageInner>
@@ -285,9 +374,9 @@ const ClosingManagementPage = () => {
                             )
                           ) : (
                             isClosed ? (
-                              <CancelBtn type="button" onClick={() => void toggleStatus(row.closingId, row.closingYm, true)}>취소</CancelBtn>
+                              <CancelBtn type="button" onClick={() => void toggleStatus(row.closingId, row.closingYm, row.itemId, true)}>취소</CancelBtn>
                             ) : (
-                              <CloseBtn type="button" onClick={() => void toggleStatus(row.closingId, row.closingYm, false)}>마감</CloseBtn>
+                              <CloseBtn type="button" onClick={() => void toggleStatus(row.closingId, row.closingYm, row.itemId, false)}>마감</CloseBtn>
                             )
                           )}
                         </Td>

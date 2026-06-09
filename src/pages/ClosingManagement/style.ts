@@ -439,3 +439,194 @@ export const DateRangeInput = styled.input`${dateRangeInput}`;
 export const DateRangeSep = styled.span`${dateRangeSep}`;
 export const CloseBtn = styled.button`${closeBtn}`;
 export const CancelBtn = styled.button`${cancelBtn}`;
+
+export const modalOverlay = css`
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const modalCard = css`
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 28px 32px;
+  width: 540px;
+  max-width: calc(100vw - 32px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+export const modalTitle = css`
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1b1e;
+  margin: 0;
+  font-feature-settings: 'ss05' 1;
+`;
+
+export const modalFieldLabel = css`
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 14px;
+  color: #595b66;
+  margin: 0 0 6px 0;
+  font-feature-settings: 'ss05' 1;
+`;
+
+export const modalMonthInput = css`
+  width: 100%;
+  height: 40px;
+  border: 1.5px solid #d1d3db;
+  border-radius: 8px;
+  padding: 0 12px;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 15px;
+  color: #1a1b1e;
+  outline: none;
+  box-sizing: border-box;
+  background: transparent;
+  cursor: pointer;
+  &:focus {
+    border-color: #0068e0;
+  }
+  &::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+  }
+`;
+
+export const modalActions = css`
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+`;
+
+export const modalCancelBtn = css`
+  height: 38px;
+  padding: 0 18px;
+  background: #ffffff;
+  border: 1px solid #bbbcc2;
+  border-radius: 8px;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #595b66;
+  cursor: pointer;
+  &:hover {
+    background: #f5f6f8;
+  }
+`;
+
+export const modalConfirmBtn = css`
+  height: 38px;
+  padding: 0 20px;
+  background: #0068e0;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #ffffff;
+  cursor: pointer;
+  &:hover {
+    background: #0056b8;
+  }
+  &:disabled {
+    background: #bbbcc2;
+    cursor: not-allowed;
+  }
+`;
+
+export const modalSearchInput = css`
+  width: 100%;
+  height: 36px;
+  border: 1.5px solid #d1d3db;
+  border-radius: 8px;
+  padding: 0 12px;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 14px;
+  color: #1a1b1e;
+  outline: none;
+  box-sizing: border-box;
+  background: transparent;
+  margin-bottom: 8px;
+  &:focus {
+    border-color: #0068e0;
+  }
+  &::placeholder {
+    color: #9497a0;
+  }
+`;
+
+export const modalItemList = css`
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1px solid #e5e6ea;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+`;
+
+export const modalItemRow = css`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f1f4;
+  &:last-child {
+    border-bottom: none;
+  }
+  &:hover {
+    background: #f5f6f8;
+  }
+`;
+
+export const modalItemCode = css`
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 13px;
+  color: #595b66;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-feature-settings: 'ss05' 1;
+`;
+
+export const modalItemName = css`
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 14px;
+  color: #1a1b1e;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-feature-settings: 'ss05' 1;
+`;
+
+export const modalEmptyText = css`
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 14px;
+  color: #9497a0;
+  text-align: center;
+  padding: 24px 0;
+  font-feature-settings: 'ss05' 1;
+`;
+
+export const ModalOverlay = styled.div`${modalOverlay}`;
+export const ModalCard = styled.div`${modalCard}`;
+export const ModalTitle = styled.h2`${modalTitle}`;
+export const ModalFieldLabel = styled.p`${modalFieldLabel}`;
+export const ModalMonthInput = styled.input`${modalMonthInput}`;
+export const ModalActions = styled.div`${modalActions}`;
+export const ModalCancelBtn = styled.button`${modalCancelBtn}`;
+export const ModalConfirmBtn = styled.button`${modalConfirmBtn}`;
+export const ModalSearchInput = styled.input`${modalSearchInput}`;
+export const ModalItemList = styled.div`${modalItemList}`;
+export const ModalItemRow = styled.div`${modalItemRow}`;
+export const ModalItemCode = styled.span`${modalItemCode}`;
+export const ModalItemName = styled.span`${modalItemName}`;
+export const ModalEmptyText = styled.p`${modalEmptyText}`;

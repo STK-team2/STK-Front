@@ -19,6 +19,7 @@ export interface ClosingStockResponse {
 
 export interface CloseMonthRequest {
   closingYm: string;
+  itemId: string;
 }
 
 export interface CloseMonthResponse {
